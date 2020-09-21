@@ -1,0 +1,169 @@
+plate,IFA_Neospora,diagnosis_neo,neo_status,toxo_status,spratio,diagnosis_toxo,hum.pop.den,sample,kay.code,hy.id,dart.date,sample.origin,notes.appearance,dart.year,dob.date,dob.event.data,disappeared.date,disappeared.event.status,disappeared.event.data,sex,status,mom,dad,number.littermates,litrank,toxo.status,age.mon.dart,dob.yr,age.cat.dart,hum.dist.dob,rank.dart,stan.rank.dart
+plate4,400,low,negative,positive,0.81,positive,low,4369,9,hol,10/25/92,blood,NA,1992,NA,talek,3/30/93,dead,lions,m,i,NA,NA,NA,NA,1,NA,NA,adult,NA,NA,NA
+plate3,800,high,positive,positive,0.8,positive,low,7508,10,bb,12/8/93,blood,NA,1993,7/13/89,talek,12/29/98,dead,humans (spear),f,r,bsh,NA,1,1,1,52.9,1989,adult,low,2,0.9
+plate3,200,low,negative,positive,0.65,positive,low,4378,11,dave,8/3/90,blood,NA,1990,9/15/86,talek,11/12/90,dls,dispersed,m,r,27,NA,1,NA,1,46.6,1986,adult,low,NA,NA
+plate3,800,high,positive,positive,0.68,positive,low,4308,12,sher,8/7/90,blood,pink,1990,8/1/87,talek,6/27/01,dls,fate unknown,m,r,kb,65,0,1,1,36.2,1987,adult,low,NA,NA
+plate5,400,low,negative,positive,0.97,positive,low,7534,18,bud,12/1/90,blood,color red,1990,7/13/89,talek,5/16/93,dls,dispersed,m,r,bsh,NA,1,2,1,16.6,1989,subadult,low,NA,NA
+plate3,400,low,negative,positive,0.86,positive,low,7511,19,q,12/5/90,blood,color pink,1990,10/29/88,talek,3/6/93,dls,dispersed,m,r,bsh,NA,0,1,1,25.2,1988,adult,low,NA,NA
+plate4,100,low,negative,negative,0.44,doubtful,low,7338,20,rv,12/7/90,blood,edta,1990,5/15/90,talek,4/27/97,dls,fate unknown,f,r,gw,1019,1,1,0,6.8,1990,cub,low,11,0
+plate3,1600,high,positive,negative,0.47,doubtful,low,4989,21,sy,12/19/90,blood,frozen on side,1990,NA,talek,2/12/97,dls,fate unknown,m,i,NA,NA,NA,NA,0,NA,NA,adult,NA,NA,NA
+plate3,800,high,positive,positive,0.82,positive,low,3872,23,gw,12/22/90,blood,NA,1990,1/1/78,talek,12/12/95,dls,inferred dead,f,r,NA,NA,NA,NA,1,155.7,1978,adult,low,11,0
+plate3,1600,high,positive,positive,1.09,positive,low,5003,24,mrb,12/22/90,blood,NA,1990,NA,talek,6/1/92,dead,hyenas,m,i,NA,NA,NA,NA,1,NA,NA,adult,NA,NA,NA
+plate3,800,high,positive,positive,1.08,positive,low,5009,25,coch,12/15/93,blood,NA,1993,2/1/85,talek,9/2/95,dead,lions,f,r,NA,NA,NA,NA,1,106.4,1985,adult,low,5,0.6
+plate3,800,high,positive,negative,0.39,negative,low,3873,26,chy,11/29/91,blood,NA,1991,10/14/89,talek,3/5/97,dls,,m,r,coch,NA,1,2,0,25.5,1989,adult,low,NA,NA
+plate3,800,high,positive,positive,1.05,positive,low,6879,27,bsh,5/2/94,blood,NA,1994,1/1/83,talek,5/29/99,dead,kidney failure,f,r,kb,NA,NA,NA,1,136,1983,adult,low,1,1
+plate3,1600,high,positive,positive,0.54,positive,low,3836,28,quai,12/28/90,blood,NA,1990,NA,talek,6/21/93,dls,fate unknown,m,i,NA,NA,NA,NA,1,NA,NA,adult,NA,NA,NA
+plate5,200,low,negative,positive,0.76,positive,low,3977,29,sx,12/28/90,blood,p frozen on side of tube,1990,10/14/89,talek,7/7/00,dls,inferred dead,f,r,coch,NA,1,1,1,14.5,1989,subadult,low,NA,NA
+plate3,400,low,negative,positive,0.59,positive,low,5745,30,dj,1/19/91,blood,pink,1991,11/15/85,talek,10/27/96,dls,lions,f,r,n2,NA,NA,NA,1,62.1,1985,adult,low,3,0.8
+plate3,400,low,negative,positive,0.7,positive,low,4557,33,ap,1/21/91,blood,NA,1991,6/15/88,talek,5/26/95,,,m,r,coch,NA,0,1,1,31.2,1988,adult,low,NA,NA
+plate3,1600,high,positive,positive,0.71,positive,low,3770,36,ua,6/26/94,blood,"says ""junk p"" on tube",1994,3/1/87,talek,5/5/01,dls,lions,f,r,79,NA,0,1,1,87.8,1987,adult,low,11,0.130434783
+plate3,800,high,positive,positive,0.82,positive,low,5762,38,23s,2/25/91,blood,pink,1991,6/1/83,talek,3/25/95,dls,lions,f,r,27,NA,NA,NA,1,92.8,1983,adult,low,15,-0.4
+plate3,1600,high,positive,positive,0.59,positive,low,4368,39,kb,2/28/91,blood,pink,1991,1/1/78,talek,6/23/95,dls,inferred dead,f,r,NA,NA,NA,NA,1,157.9,1978,adult,low,2,0.9
+plate3,800,high,positive,positive,0.88,positive,low,3795,40,mw,3/4/91,blood,NA,1991,5/1/87,talek,11/15/91,dead,unknown,f,r,3,NA,0,1,1,46.1,1987,adult,low,4,0.7
+plate3,400,low,negative,positive,0.72,positive,low,5236,47,en,7/6/91,blood,tube says 7/7/91,1991,NA,talek,8/25/94,dls,dispersed,m,i,NA,NA,NA,NA,1,NA,NA,adult,NA,NA,NA
+plate5,200,low,negative,negative,0.45,doubtful,low,4375,51,pp,7/11/91,blood,NA,1991,6/3/90,talek,10/12/93,dls,dispersed,m,r,dps,NA,0,1,0,13.2,1990,subadult,low,NA,NA
+plate4,400,low,negative,positive,0.59,positive,low,7322,52,fn,7/11/91,blood,NA,1991,NA,talek,6/24/99,dls,fate unknown,m,i,NA,NA,NA,NA,1,NA,NA,adult,NA,NA,NA
+plate4,400,low,negative,positive,0.85,positive,low,7299,55,lg,6/28/94,blood,color red,1994,6/1/82,talek,4/16/99,dls,inferred dead,f,r,11,NA,NA,NA,1,144.9,1982,adult,low,23,-0.913043478
+plate4,400,low,negative,positive,0.55,positive,low,4335,61,es,8/22/91,blood,NA,1991,6/1/84,talek,5/7/96,dls,inferred dead,f,r,11,NA,NA,NA,1,86.7,1984,adult,low,17,-0.6
+plate4,400,low,negative,positive,0.64,positive,low,7475,66,pb,9/16/91,blood,NA,1991,11/1/87,talek,11/5/95,dls,unknown,m,r,bsh,46,0,1,1,46.5,1987,adult,low,NA,NA
+plate5,400,low,negative,negative,0.09,negative,low,5765,71,pt,11/13/91,blood,NA,1991,4/1/91,talek,6/11/96,dls,inferred dead,f,r,coch,1019,1,NA,0,7.4,1991,cub,low,5,0.6
+plate5,400,low,negative,negative,0.01,negative,low,5808,74,who,11/27/91,blood,NA,1991,7/7/91,talek,12/21/06,,,f,r,bsh,zip,0,1,0,4.7,1991,cub,low,1,1
+plate5,NA,,,negative,0.05,negative,low,5799,76,hob,6/14/92,blood,NA,1992,7/20/91,talek,5/6/99,dls,inferred dead,f,r,es,int,1,2,0,10.8,1991,cub,low,16,-0.666666667
+plate4,800,high,positive,negative,0.45,doubtful,low,4116,79,zip,4/11/92,blood,"sample reads ""5/11/92"" but excel has ""4/11/92"" as the date",1992,NA,talek,4/21/94,dls,fate unknown,m,i,NA,NA,NA,NA,0,NA,NA,adult,NA,NA,NA
+plate5,100,low,negative,negative,0.16,negative,low,6136,82,ger,7/12/93,blood,frozen on side,1993,11/7/92,talek,6/2/05,dead,humans,f,r,coch,en,1,1,0,8.1,1992,cub,low,5,0.6
+plate5,100,low,negative,positive,0.7,positive,low,6141,83,bern,7/19/93,blood,NA,1993,10/1/92,talek,9/4/00,dls,lions,f,r,lg,hol,0,1,1,9.6,1992,cub,low,20,-0.9
+NA,100,low,negative,positive,NA,NA,low,NA,84,baj,7/14/93,blood,,1993,1/1/93,talek,,,,m,r,bb,fn,1,2,,6.37,1993,cub,low,NA,NA
+NA,800,high,positive,positive,NA,NA,low,NA,87,gil,7/18/93,blood,,1993,8/1/92,talek,,,,f,r,bsh,NA,0,1,,11.5,1992,cub,low,NA,NA
+plate5,400,low,negative,negative,0.13,negative,low,4712,89,gol,5/26/92,blood,no hyena id on vial,1992,7/20/91,talek,3/14/01,dead,humans (speared),f,r,es,fn,1,1,0,10.2,1991,cub,low,16,-0.666666667
+plate4,400,low,negative,negative,0.47,doubtful,low,4860,90,gan,6/7/92,blood,NA,1992,10/30/88,talek,8/2/94,dls,inferred dead,f,r,es,NA,1,2,0,43.2,1988,adult,low,18,-0.888888889
+plate5,400,low,negative,positive,0.82,positive,low,12138,96,jab,12/8/92,blood,cream; normal,1992,2/2/92,talek,4/26/98,dls,inferred dead,f,r,bb,NA,1,NA,1,10.2,1992,cub,low,2,0.888888889
+plate5,400,low,negative,positive,0.62,positive,low,4883,98,krk,12/9/92,blood,NA,1992,1/10/92,talek,2/6/94,dls,dispersed,m,r,kb,mrb,1,1,1,11,1992,cub,low,3,0.777777778
+plate4,50,low,negative,negative,0.12,negative,low,7392,100,nav,7/21/93,blood,NA,1993,11/7/92,talek,7/20/16,dls,inferred dead,f,r,coch,en,1,2,0,8.4,1992,cub,low,5,0.6
+plate3,200,low,negative,positive,0.78,positive,low,4054,105,tz,8/11/93,blood,p frozen at top,1993,NA,talek,2/18/00,dls,dispersed,m,i,NA,NA,NA,NA,1,NA,NA,adult,NA,NA,NA
+plate4,400,low,negative,positive,0.52,positive,low,5604,106,jj,8/12/93,blood,no id on sample,1993,9/15/92,talek,1/29/03,dead,,f,r,dj,zip,1,2,1,10.9,1992,cub,low,4,0.7
+plate3,400,low,negative,negative,0.48,doubtful,low,4109,107,will,4/26/94,blood,frozen on side,1994,NA,talek,12/23/96,dls,dispersed,m,i,NA,NA,NA,NA,0,NA,NA,adult,NA,NA,NA
+plate4,400,low,negative,positive,0.83,positive,low,13587,108,cr,5/24/94,blood,cream; normal,1994,8/15/93,talek,3/3/02,dls,inferred dead,f,r,ot,NA,1,1,1,9.3,1993,cub,low,10,0.217391304
+plate4,400,low,negative,negative,0.46,doubtful,low,7142,110,ud,5/25/94,blood,"min1 vial says ""9/29/99""",1994,10/4/93,talek,1/7/98,dls,,m,r,23s,NA,0,NA,0,7.7,1993,cub,low,17,-0.391304348
+plate3,400,low,negative,negative,0.49,doubtful,low,7074,112,mike,6/10/94,blood,red; tube incorrectly says '628' and '10/5/11',1994,NA,talek,11/19/97,dead,lions,m,i,NA,NA,NA,NA,0,NA,NA,adult,NA,NA,NA
+plate4,50,low,negative,positive,0.72,positive,low,4888,119,par,6/23/94,blood,edta,1994,7/15/93,talek,2/10/04,dls,inferred dead,f,r,gw,rcn,0,NA,1,11.3,1993,cub,low,13,-0.043478261
+NA,800,high,positive,positive,0.73,positive,low,4377,121,jb,7/4/94,blood,,1994,6/26/93,talek,12/3/97,dls,inferred dead,f,r,bsh,fn,1,1,1,12.3,1993,subadult,low,NA,NA
+plate5,800,high,positive,positive,0.76,positive,low,4314,124,rm,8/27/94,blood,"frozen on side, says rum on tube",1994,7/7/93,talek,9/12/96,dls,inferred dead,f,r,ua,NA,1,1,1,13.7,1993,subadult,low,NA,NA
+plate3,1600,high,positive,positive,0.81,positive,low,13591,126,mig,9/20/94,blood,clear; appears empty,1994,NA,talek,2/2/10,dls,fate unknown,m,i,NA,NA,NA,NA,1,NA,NA,adult,NA,NA,NA
+plate4,400,low,negative,negative,0.06,negative,low,5426,127,scby,9/23/94,blood,NA,1994,1/27/94,talek,11/5/94,dead,unknown,f,r,sd,rcn,0,NA,0,7.9,1994,cub,low,14,-0.130434783
+plate4,400,low,negative,negative,0.1,negative,low,4373,128,irq,9/25/94,blood,edta,1994,1/10/94,talek,10/13/96,dls,dispersed,m,r,coch,NA,1,NA,0,8.5,1994,cub,low,7,0.47826087
+plate5,800,high,positive,positive,0.87,positive,low,4111,130,kl,12/17/94,blood,frozen on side,1994,7/7/93,talek,12/30/94,dls,inferred dead,f,r,ua,sy,1,2,1,17.3,1993,subadult,low,NA,NA
+plate4,NA,,,positive,0.89,positive,low,12165,131,kip,12/18/94,blood,cream; normal,1994,12/10/93,talek,9/26/00,dls,inferred dead,f,r,who,fn,1,1,1,12.3,1993,subadult,low,NA,NA
+plate4,0,low,negative,negative,0.12,negative,low,13399,137,wm,2/9/95,blood,cream; normal,1995,7/7/94,talek,3/13/95,dead,disease,f,r,jab,NA,1,1,0,7.1,1994,cub,low,5,0.724137931
+plate4,100,low,negative,positive,0.81,positive,low,12163,138,zulu,2/10/95,blood,cream; normal,1995,5/1/94,talek,8/31/97,dead,lions,m,r,pt,NA,1,2,1,9.4,1994,cub,low,14,0.103448276
+plate4,0,low,negative,negative,0.1,negative,low,3982,139,wr,2/12/95,blood,p frozen at top but not much,1995,6/22/94,talek,2/25/07,dls,inferred dead,f,r,bb,rcn,1,2,0,7.7,1994,cub,low,6,0.655172414
+plate4,100,low,negative,positive,0.62,positive,low,7778,140,mh,3/6/95,blood,NA,1995,6/22/94,talek,3/12/96,,,f,r,bb,NA,1,1,1,8.4,1994,cub,low,6,0.655172414
+plate4,200,low,negative,negative,0.27,negative,low,12144,145,mp,4/10/95,blood,slightly pink,1995,7/23/94,talek,7/13/13,dls,inferred dead,f,r,dj,bag,1,1,0,8.6,1994,cub,low,8,0.517241379
+plate4,400,low,negative,negative,0.1,negative,low,3755,146,dd,4/13/95,blood,NA,1995,7/23/94,talek,10/17/00,dls,dispersed,m,r,dj,bag,1,2,0,8.7,1994,cub,low,8,0.517241379
+plate4,400,low,negative,positive,0.6,positive,low,5525,160,amar,10/25/95,blood,NA,1995,1/25/95,talek,6/13/03,dls,inferred dead,f,r,ua,fn,1,1,1,9,1995,cub,low,17,-0.103448276
+plate4,200,low,negative,negative,0.14,negative,low,5535,161,kon,11/2/95,blood,NA,1995,1/25/95,talek,6/16/00,dls,dispersed,m,r,ua,NA,1,2,0,9.2,1995,cub,low,17,-0.103448276
+NA,800,high,positive,negative,0.43,doubtful,low,5532,162,lop,2/26/96,blood,NA,1996,2/15/95,talek,3/1/97,dead,,f,r,who,NA,0,NA,0,12.4,1995,subadult,low,NA,NA
+plate3,800,high,positive,positive,0.56,positive,low,5551,164,stg,7/2/97,blood,NA,1997,NA,talek,9/20/99,dls,dispersed,m,i,NA,NA,NA,NA,1,NA,NA,adult,NA,NA,NA
+plate3,800,high,positive,positive,0.61,positive,low,3869,167,gob,7/17/97,blood,"no datre on tube, looked at tbldarting",1997,NA,talek,6/9/02,dls,dispersed,m,i,NA,NA,NA,NA,1,NA,NA,adult,NA,NA,NA
+plate4,1600,high,positive,positive,0.54,positive,low,5541,169,jone,6/8/96,blood,NA,1996,8/1/95,talek,5/25/97,dls,inferred dead,f,r,jab,fn,1,1,1,10.2,1995,cub,low,6,0.655172414
+plate4,400,low,negative,negative,0.03,negative,low,5662,170,rinc,6/8/96,blood,frozen on side,1996,8/1/95,talek,5/9/97,dls,inferred dead,m,r,jab,fn,1,2,0,10.2,1995,cub,low,6,0.655172414
+plate3,800,high,positive,negative,0.48,doubtful,low,4059,172,pos,7/8/96,blood,p frozen on side; min1,1996,NA,talek,3/25/99,dls,fate unknown,m,i,NA,NA,NA,NA,0,NA,NA,adult,NA,NA,NA
+plate5,200,low,negative,negative,0.08,negative,low,5658,173,pf,6/21/96,blood,NA,1996,5/20/95,talek,7/28/96,dead,humans,m,r,bail,NA,0,NA,0,13.1,1995,subadult,low,NA,NA
+plate5,NA,,,positive,0.94,positive,low,5671,174,arse,8/9/96,blood,NA,1996,3/22/95,talek,8/9/96,dead,humans (us),f,r,bsh,rcn,1,1,1,16.6,1995,subadult,low,NA,NA
+plate3,800,high,positive,negative,0.38,negative,low,5677,175,rs,6/4/97,blood,edta. frozen in cap,1997,NA,talek,12/15/99,dead,,m,i,NA,NA,NA,NA,0,NA,NA,adult,NA,NA,NA
+plate3,800,high,positive,positive,0.65,positive,low,5682,178,bp,7/15/97,blood,edta; pink; frozen on side,1997,NA,talek,4/15/02,dls,dispersed,m,i,NA,NA,NA,NA,1,NA,NA,adult,NA,NA,NA
+plate3,400,low,negative,positive,0.6,positive,low,4118,179,sim,7/28/96,blood,tube incorrectly says 7/29 but it's actually 7/28; min1,1996,NA,talek,3/17/00,dls,humans (us),m,i,NA,NA,NA,NA,1,NA,NA,adult,NA,NA,NA
+plate3,800,high,positive,positive,0.86,positive,low,7452,181,sein,7/16/97,blood,edta,1997,3/22/95,talek,3/9/02,dead,humans (masai?),f,r,bsh,rcn,1,2,1,27.8,1995,adult,low,2,0.928571429
+plate3,800,high,positive,positive,0.64,positive,low,7446,183,bos,1/22/97,blood,"""min0""",1997,NA,talek,6/28/02,dls,fate unknown,m,i,NA,NA,NA,NA,1,NA,NA,adult,NA,NA,NA
+plate3,800,high,positive,positive,0.95,positive,low,7451,189,chic,11/6/97,blood,"""min1""",1997,NA,talek,4/9/98,dls,dispersed,m,i,NA,NA,NA,NA,1,NA,NA,adult,NA,NA,NA
+plate4,800,high,positive,positive,0.57,positive,low,6592,197,mrph,6/7/97,blood,NA,1997,6/25/96,talek,4/10/11,dead,lions,f,r,bsh,NA,1,1,1,11.4,1996,cub,low,1,1
+plate5,800,high,positive,positive,0.77,positive,low,5020,202,oly,6/12/97,blood,NA,1997,11/7/95,talek,6/20/99,dls,dispersed,m,r,gil,fn,1,1,1,19.2,1995,subadult,low,NA,NA
+plate4,400,low,negative,negative,0.15,negative,low,5038,205,kang,6/9/97,blood,NA,1997,10/7/96,talek,2/15/98,dls,inferred dead,m,r,lg,NA,1,1,0,8,1996,cub,low,26,-0.785714286
+plate4,400,low,negative,positive,0.6,positive,low,5035,206,gonz,6/9/97,blood,NA,1997,9/6/96,talek,3/20/99,dls,dispersed,m,r,hob,tz,0,NA,1,9.1,1996,cub,low,24,-0.642857143
+plate4,100,low,negative,negative,0.05,negative,low,5019,207,nod,6/11/97,blood,NA,1997,10/13/96,talek,2/15/01,dls,dispersed,m,r,ua,mike,1,2,0,7.9,1996,cub,low,19,-0.285714286
+plate4,800,high,positive,positive,0.51,positive,low,5043,208,darw,6/11/97,blood,NA,1997,7/1/96,talek,7/5/02,dls,,m,r,jb,fa,0,NA,1,11.3,1996,cub,low,3,0.857142857
+plate4,800,high,positive,negative,0.09,negative,low,7584,211,linc,6/30/97,blood,NA,1997,10/23/96,talek,1/5/01,dls,dispersed,m,r,nav,mike,1,1,0,8.2,1996,cub,low,15,0
+plate4,400,low,negative,negative,0.4,negative,low,7608,212,wash,6/30/97,blood,NA,1997,10/23/96,talek,8/27/97,dead,humans,m,r,nav,mike,1,2,0,8.2,1996,cub,low,15,0
+plate4,800,high,positive,negative,0.17,negative,low,5470,213,mali,7/4/97,blood,NA,1997,10/13/96,talek,1/13/06,dls,inferred dead,f,r,jab,NA,1,2,0,8.7,1996,cub,low,8,0.5
+plate4,800,high,positive,negative,0.38,negative,low,4358,216,dna,11/7/97,blood,NA,1997,12/23/96,talek,12/9/99,dls,dispersed,m,r,gil,NA,1,1,0,10.5,1996,cub,low,4,0.785714286
+plate3,400,low,negative,positive,0.71,positive,low,4361,221,bm,7/27/97,blood,frozen on side; min1,1997,7/17/89,talek,8/18/99,dls,fate unknown,f,r,23s,NA,1,2,1,96.3,1989,adult,low,27,-0.857142857
+plate5,200,low,negative,positive,0.65,positive,low,6016,223,sks,7/31/97,blood,NA,1997,10/16/95,talek,4/21/98,dls,dispersed,m,r,ot,rcn,1,2,1,21.5,1995,subadult,low,NA,NA
+plate3,800,high,positive,positive,0.58,positive,low,5996,225,vgs,3/5/99,blood,edta;min1,1999,NA,talek,1/25/06,dead,snakebite?,m,i,NA,NA,NA,NA,1,NA,NA,adult,NA,NA,NA
+plate3,400,low,negative,positive,0.77,positive,low,6023,227,exc,2/3/99,blood,edta,1999,NA,,9/29/00,dead,unknown,m,i,NA,NA,NA,NA,1,NA,NA,adult,NA,NA,NA
+plate4,400,low,negative,negative,0.34,negative,low,3811,231,puc,3/14/98,blood,NA,1998,6/1/97,talek,12/23/06,dls,inferred dead,f,r,ger,fn,1,1,0,9.4,1997,cub,low,15,0
+plate5,400,low,negative,positive,0.9,positive,low,4115,237,ldv,3/7/99,blood,NA,1999,11/24/97,talek,4/23/07,dead,lions,m,r,hg,mer,1,2,1,15.4,1997,subadult,low,NA,NA
+plate3,400,low,negative,positive,0.66,positive,low,5395,240,mer,8/1/99,blood,frozen on side,1999,NA,,9/21/04,dls,fate unknown,m,i,NA,NA,NA,NA,1,NA,NA,adult,NA,NA,NA
+plate5,200,low,negative,positive,0.62,positive,low,4094,243,yet,10/20/98,blood,NA,1998,7/9/97,talek,3/13/01,dls,dispersed,m,r,kip,mike,1,1,1,15.4,1997,subadult,low,NA,NA
+plate5,800,high,positive,negative,0.36,negative,low,5392,248,whh,2/22/99,blood,edta,1999,2/28/98,talek,10/22/04,dead,,f,r,nav,zig,0,NA,0,11.8,1998,cub,low,17,-0.066666667
+plate4,800,high,positive,positive,1.04,positive,low,5401,249,csn,1/29/99,blood,frozen on side,1999,2/15/98,talek,5/3/05,dead,lions,f,r,bsh,fn,0,NA,1,11.4,1998,cub,low,1,1
+plate5,200,low,negative,negative,0.44,doubtful,low,4328,251,cuj,5/11/99,blood,frozen on side,1999,7/9/97,talek,6/3/01,dls,dispersed,m,r,kip,NA,1,2,0,22,1997,subadult,low,NA,NA
+plate5,400,low,negative,negative,0.41,doubtful,low,5317,253,ali,4/26/99,blood,NA,1999,8/4/97,talek,2/6/18,dls,double check: alive but with disappeared date,f,r,bb,mike,1,1,0,20.7,1997,subadult,low,NA,NA
+plate4,50,low,negative,negative,0.1,negative,low,5344,258,her,8/11/99,blood,NA,1999,11/20/98,talek,1/10/03,dls,,m,r,mrph,NA,1,2,0,8.7,1998,cub,low,2,0.933333333
+plate4,200,low,negative,negative,0.08,negative,low,5330,259,sch,6/24/99,blood,NA,1999,11/20/98,talek,4/4/00,dead,lions,m,r,ua,mig,1,2,0,7.1,1998,cub,low,20,-0.266666667
+plate4,200,low,negative,positive,0.64,positive,low,4616,262,cpa,7/4/99,blood,NA,1999,11/18/98,talek,2/9/02,dls,dispersed,m,r,sx,gob,0,NA,1,7.5,1998,cub,low,18,-0.133333333
+plate5,100,low,negative,negative,0.02,negative,low,4303,263,tsa,7/4/99,blood,NA,1999,12/10/98,talek,8/2/01,dls,inferred dead,m,r,par,NA,0,NA,0,6.8,1998,cub,low,26,-0.666666667
+plate5,100,low,negative,positive,0.66,positive,low,4588,265,foz,8/19/99,blood,NA,1999,12/15/97,talek,3/28/11,dead,lions,m,r,hob,mike,1,NA,1,20.1,1997,subadult,low,NA,NA
+plate5,800,high,positive,negative,0.16,negative,low,4581,267,jut,7/11/99,blood,frozen on side,1999,11/30/98,talek,11/24/03,dls,inferred dead,f,r,ger,pos,1,1,0,7.3,1998,cub,low,14,0.133333333
+plate5,400,low,negative,negative,0.16,negative,low,4607,268,gdz,7/21/99,blood,edta,1999,12/3/98,talek,9/29/00,dls,inferred dead,m,r,kip,tz,1,2,0,7.6,1998,cub,low,7,0.6
+plate5,800,high,positive,negative,0.07,negative,low,4671,271,ind,10/4/99,blood,edta,1999,12/2/98,talek,8/18/02,dls,dispersed,m,r,bail,chas,1,1,0,10.1,1998,cub,low,22,-0.4
+plate5,400,low,negative,negative,0.1,negative,low,4660,272,coo,9/12/99,blood,NA,1999,12/3/98,talek,12/7/05,dead,croc?,f,r,kip,tz,1,1,0,9.3,1998,cub,low,7,0.6
+plate5,100,low,negative,negative,0.07,negative,low,4652,275,cam,9/21/99,blood,NA,1999,11/21/98,talek,10/23/06,dls,inferred dead,f,r,jj,zig,1,1,0,10,1998,cub,low,12,0.266666667
+plate5,200,low,negative,negative,0.45,doubtful,low,4682,278,sco,10/25/99,blood,edta,1999,12/15/97,talek,7/24/02,dls,dispersed,m,r,hob,mike,1,NA,0,22.3,1997,subadult,low,NA,NA
+plate5,200,low,negative,positive,0.51,positive,low,4046,283,zim,11/7/99,blood,NA,1999,11/29/98,talek,12/12/02,dls,inferred dead,f,r,cr,zig,1,1,1,11.3,1998,cub,low,19,-0.2
+plate5,400,low,negative,positive,0.58,positive,low,5313,286,ath,11/26/99,blood,NA,1999,11/20/98,talek,3/31/04,dead,snake bite,f,r,mrph,NA,1,1,1,12.2,1998,subadult,low,NA,NA
+plate5,200,low,negative,positive,0.71,positive,low,4077,290,cyp,12/18/99,blood,collected from dead hyena,1999,5/13/99,talek,12/18/99,dead,lions,m,r,bern,NA,1,1,1,7.2,1999,cub,low,31,-1
+plate1,800,high,positive,positive,0.74,positive,hi,3816,363,roos,6/7/13,blood,NA,2013,3/2/07,talek,NA,dls,double check: alive but with disappeared date,f,r,nav,NA,NA,NA,1,75.2,2007,adult,NA,44,-0.829787234
+plate2,200,low,negative,negative,0.48,doubtful,hi,7886,555,tnks,8/8/14,blood,NA,2014,3/15/13,talek,NA,dls,double check: alive but with disappeared date,f,r,alfe,NA,0,NA,0,16.8,2013,subadult,hi,NA,NA
+plate1,800,high,positive,positive,0.7,positive,hi,4280,604,hel,5/6/12,blood,NA,2012,2/1/06,talek,NA,dls,double check: alive but with disappeared date,f,r,mrph,NA,NA,NA,1,75.1,2006,adult,NA,2,0.96
+plate2,400,low,negative,negative,0.22,negative,hi,4786,627,twst,5/7/12,blood,NA,2012,3/3/11,talek,3/30/18,dls,double check: alive but with disappeared date,f,r,adon,NA,0,NA,0,14.2,2011,subadult,NA,NA,NA
+plate2,800,high,positive,positive,0.8,positive,hi,3993,630,alde,4/30/12,blood,NA,2012,11/1/10,talek,3/21/13,dls,dispersed,m,r,loki,NA,1,1,1,17.9,2010,subadult,NA,NA,NA
+plate1,200,low,negative,positive,0.69,positive,hi,3748,632,atac,6/13/12,blood,NA,2012,2/15/09,talek,NA,dls,double check: alive but with disappeared date,f,r,hel,NA,1,2,1,39.9,2009,adult,NA,7,0.76
+plate2,800,high,positive,positive,0.51,positive,hi,4791,636,bora,6/1/12,blood,NA,2012,12/23/10,talek,6/19/18,dls,,f,r,art,NA,0,NA,1,17.3,2010,subadult,NA,NA,NA
+plate2,200,low,negative,positive,0.89,positive,hi,4783,647,ted,5/24/12,blood,NA,2012,10/30/10,talek,3/25/18,dls,double check: alive but with disappeared date,f,r,aqua,NA,1,2,1,18.8,2010,subadult,NA,NA,NA
+plate2,200,low,negative,positive,0.7,positive,hi,4795,648,endr,5/25/12,blood,NA,2012,11/1/10,talek,4/3/14,dead,poison (april 2014 incident),m,r,loki,NA,1,2,1,18.8,2010,subadult,NA,NA,NA
+plate2,800,high,positive,negative,0.49,doubtful,hi,4812,652,neon,6/15/12,blood,NA,2012,12/26/10,talek,NA,dls,double check: alive but with disappeared date,f,r,yog,NA,0,NA,1,17.6,2010,subadult,NA,NA,NA
+plate1,800,low,positive,positive,0.84,positive,hi,4148,653,pant,5/23/13,blood,NA,2013,12/21/10,talek,2/1/15,dls,dispersed,m,r,hel,NA,1,2,1,29,2010,adult,NA,NA,NA
+plate2,800,high,positive,positive,0.7,positive,hi,3695,658,gala,9/4/13,blood,white,2013,1/6/12,talek,4/12/14,dead,humans (poison - april 2014),f,r,hel,NA,0,NA,1,19.9,2012,subadult,hi,NA,NA
+plate2,800,high,positive,positive,0.68,positive,hi,10098,659,brgr,5/28/13,blood,"cream; normal, challenge darting - 14 min, date on vial says 6/3/15",2013,10/30/11,talek,NA,dls,double check: alive but with disappeared date,f,r,cen,NA,1,1,1,18.9,2011,subadult,NA,NA,NA
+plate2,800,high,positive,positive,0.65,positive,hi,6944,660,gsmk,5/24/13,blood,pink,2013,12/2/11,talek,8/17/13,dls,inferred dead,f,r,sbl,NA,1,2,1,17.7,2011,subadult,NA,NA,NA
+plate2,800,high,positive,positive,0.88,positive,hi,6918,664,fxtr,5/8/13,blood,NA,2013,10/16/11,talek,5/9/16,dls,inferred dead,f,r,dra,NA,1,1,1,18.7,2011,subadult,NA,NA,NA
+plate2,100,low,negative,positive,0.67,positive,hi,3773,665,bata,6/2/13,blood,NA,2013,11/16/11,talek,12/20/13,dls,dispersed,m,r,hex,NA,1,2,1,18.5,2011,subadult,NA,NA,NA
+plate2,1600,high,positive,positive,0.72,positive,hi,6899,676,lust,3/14/13,blood,NA,2013,9/6/11,talek,NA,dls,double check: alive but with disappeared date,f,r,arg,NA,1,2,1,18.2,2011,subadult,NA,NA,NA
+plate2,100,low,negative,positive,0.55,positive,hi,6965,688,xena,5/5/13,blood,NA,2013,11/25/11,talek,11/12/14,dls,,m,r,loki,NA,0,NA,1,17.3,2011,subadult,NA,NA,NA
+plate2,800,high,positive,negative,0.39,negative,hi,3779,690,bnt,5/7/13,blood,NA,2013,9/25/11,talek,NA,dls,double check: alive but with disappeared date,f,r,mono,NA,0,NA,0,19.4,2011,subadult,NA,NA,NA
+plate1,800,high,positive,positive,0.62,positive,hi,3663,698,odd,6/25/13,blood,white,2013,1/3/12,talek,NA,dls,double check: alive but with disappeared date,f,r,mgta,NA,1,1,1,17.7,2012,subadult,hi,NA,NA
+plate2,200,low,negative,positive,0.55,positive,hi,7235,707,tilt,5/22/12,blood,NA,2012,7/20/08,talek,NA,dls,double check: alive but with disappeared date,f,r,ffl,NA,1,1,1,46.1,2008,adult,NA,35,-0.36
+plate2,100,low,negative,negative,0.43,doubtful,hi,7232,727,hex,6/9/12,blood,NA,2012,3/4/03,talek,4/13/16,dls,inferred dead,f,r,bail,NA,NA,NA,0,111.2,2003,adult,NA,45,-0.76
+plate2,800,high,positive,positive,0.62,positive,hi,7563,755,pan,5/8/12,blood,NA,2012,5/20/04,talek,3/21/13,dead,,f,r,mrph,NA,1,1,1,95.6,2004,adult,NA,8,0.72
+plate2,800,high,positive,positive,0.71,positive,hi,7588,763,baez,5/19/12,blood,NA,2012,10/16/04,talek,NA,,,f,r,bail,NA,1,1,1,91.1,2004,adult,NA,48,-0.88
+plate2,NA,,,positive,0.71,positive,hi,4249,774,dra,6/10/12,blood,NA,2012,11/15/07,talek,6/12/12,dead,car,f,r,ali,NA,1,1,1,54.8,2007,adult,NA,31,-0.2
+plate2,400,low,negative,negative,0.47,doubtful,hi,5571,781,juno,5/28/12,blood,NA,2012,4/20/08,talek,NA,dls,double check: alive but with disappeared date,f,r,mrph,NA,1,1,0,49.2,2008,adult,NA,5,0.84
+plate2,800,high,positive,negative,0.43,doubtful,hi,3752,807,mgta,4/11/12,blood,NA,2012,1/10/09,talek,5/30/19,dls,,f,r,mos,NA,1,1,0,39,2009,adult,NA,13,0.52
+plate2,1600,high,positive,positive,0.87,positive,hi,7277,808,obam,6/7/12,blood,NA,2012,11/13/08,talek,4/12/14,dead,poison (april 2014 incident),f,r,nav,NA,1,2,1,42.8,2008,adult,NA,44,-0.72
+plate2,800,high,positive,positive,0.71,positive,hi,12108,813,amaz,6/16/12,blood,cream; normal,2012,2/15/09,talek,NA,dls,double check: alive but with disappeared date,f,r,hel,NA,1,1,1,40,2009,adult,NA,4,0.88
+plate2,1600,high,positive,positive,0.5,positive,hi,3765,837,zion,6/18/12,blood,NA,2012,2/19/10,talek,5/6/13,dls,inferred dead,f,r,sbl,NA,1,2,1,27.9,2010,adult,NA,23,0.12
+plate2,200,low,negative,negative,0.32,negative,hi,5179,842,hrpy,5/24/12,blood,NA,2012,10/29/09,talek,2/27/18,dls,,f,r,pan,NA,NA,NA,0,30.8,2009,adult,NA,9,0.68
+plate2,NA,,,positive,0.58,positive,hi,4171,845,buar,5/26/12,blood,NA,2012,12/18/09,talek,NA,dls,double check: alive but with disappeared date,f,r,hel,NA,1,2,1,29.2,2009,adult,NA,3,0.92
+plate2,1600,high,positive,positive,0.52,positive,hi,4154,848,ziti,6/5/13,blood,NA,2013,4/3/10,talek,NA,dls,double check: alive but with disappeared date,m,r,guci,NA,1,2,1,38.1,2010,adult,NA,NA,NA
+plate4,50,low,negative,positive,0.56,positive,low,5695,991,hg,8/17/99,blood,edta,1999,9/15/92,talek,1/22/03,dls,inferred dead,f,r,dj,zip,1,1,1,83,1992,adult,low,11,0.333333333
+plate2,200,low,negative,negative,0.46,doubtful,low,4039,1005,zoey,6/22/12,blood,p frozen on side,2012,NA,serena.n,3/26/13,dls,,f,r,digs,NA,1,NA,0,NA,NA,adult,low,5,0.6
+plate2,200,low,negative,positive,0.71,positive,low,7845,1008,pike,5/17/15,blood,NA,2015,10/30/07,happy.zebra,NA,dls,fate unknown,f,r,koi,NA,NA,NA,1,90.5,2007,adult,low,1,1
+plate2,1600,high,positive,positive,0.71,positive,low,12109,1009,slin,7/22/12,blood,cream; normal,2012,NA,serena.s,8/14/18,dls,,f,r,NA,NA,NA,NA,1,NA,NA,adult,low,3,0.75
+plate3,800,high,positive,positive,0.8,positive,low,6917,1013,bart,8/8/12,blood,NA,2012,NA,serena.s,9/14/14,dls,fate unknown,f,r,NA,NA,NA,NA,1,NA,NA,adult,low,4,0.625
+plate2,100,low,negative,positive,0.68,positive,low,4035,1015,peep,6/30/12,blood,NA,2012,NA,serena.n,1/24/13,dls,,f,r,NA,NA,NA,NA,1,NA,NA,adult,low,3,0.8
+plate2,1600,high,positive,positive,0.52,positive,low,4042,1020,tnsl,6/19/12,blood,p frozen on side,2012,NA,serena.n,6/12/14,dls,fate unknown,f,r,elf?,NA,NA,NA,1,NA,NA,adult,low,16,-0.5
+plate3,1600,high,positive,positive,0.76,positive,low,3777,1021,mtn,7/21/12,blood,NA,2012,NA,serena.s,12/22/16,dls,,f,r,NA,NA,NA,NA,1,NA,NA,adult,low,15,-0.75
+plate2,800,high,positive,negative,0.39,doubtful,low,12107,1022,wafl,7/2/12,blood,"cream; normal, tube says ""hep. plasma 1 ml""",2012,8/1/07,serena.n,NA,,,f,r,NA,NA,NA,NA,0,59,2007,adult,low,1,1
+plate2,400,low,negative,positive,0.58,positive,low,12112,1036,ema,7/7/12,blood,cream; normal,2012,NA,serena.n,3/13/16,dls,fate unknown,f,r,NA,NA,NA,NA,1,NA,NA,adult,low,17,-0.6
+plate2,800,high,positive,positive,0.51,positive,low,3667,1048,digs,6/21/13,blood,white,2013,NA,serena.n,3/31/15,dead,,f,r,NA,NA,NA,NA,1,NA,NA,adult,low,4,0.7
+plate3,1600,high,positive,negative,0.46,doubtful,low,6933,1071,taj,9/6/12,blood,NA,2012,NA,serena.s,1/8/18,dls,fate unknown,f,r,NA,NA,NA,NA,0,NA,NA,adult,low,8,0.125
+plate3,200,low,negative,positive,0.78,positive,low,4036,1074,java,1/10/13,blood,pink,2013,NA,serena.s,11/26/17,dls,,f,r,NA,NA,NA,NA,1,NA,NA,adult,low,1,1
+plate2,1600,high,positive,positive,0.53,positive,low,6950,1088,shrm,2/8/13,blood,NA,2013,NA,serena.n,10/16/16,dead,unknown,f,r,NA,NA,NA,NA,1,NA,NA,adult,low,6,0.5
+plate3,800,high,positive,positive,0.68,positive,low,3780,1092,clov,6/24/12,blood,NA,2012,NA,serena.s,8/24/16,dls,fate unknown,f,r,NA,NA,NA,NA,1,NA,NA,adult,low,2,0.875
+plate2,800,high,positive,positive,0.63,positive,low,6999,1095,hndy,6/29/12,blood,NA,2012,1/1/08,serena.n,3/27/14,dls,,f,r,shrm,NA,NA,NA,1,53.9,2008,adult,low,13,-0.2
+plate2,200,low,negative,negative,0.45,doubtful,low,3613,1096,hucn,7/2/14,blood,white,2014,9/12/11,serena.n,9/24/14,dls,double check: alive but with disappeared date,m,r,rbc,NA,1,1,0,33.6,2011,adult,low,NA,NA
+plate2,1600,high,positive,positive,0.67,positive,low,7789,1137,uzi,3/19/15,blood,NA,2015,8/21/12,serena.n,3/11/16,dls,double check: alive but with disappeared date,m,r,angi,NA,0,NA,1,30.9,2012,adult,low,NA,NA
+plate2,200,low,negative,positive,0.64,positive,low,7799,1156,ring,1/29/15,blood,NA,2015,11/30/09,happy.zebra,NA,,,f,r,ao,NA,1,1,1,62,2009,adult,low,18,-0.888888889
+plate3,200,low,negative,positive,0.84,positive,low,7947,1162,trni,3/4/15,blood,pink,2015,7/4/12,serena.n,NA,dls,,m,r,wafl,NA,0,NA,1,32,2012,adult,low,NA,NA
+plate2,100,low,negative,positive,0.9,positive,low,7814,1166,csby,3/10/15,blood,NA,2015,12/30/07,happy.zebra,NA,dls,fate unknown,f,r,spb,NA,NA,NA,1,86.3,2007,adult,low,15,-0.555555556
+plate2,1600,high,positive,positive,0.62,positive,low,13634,1190,mchl,7/16/15,blood,"cream; normal; says ""junk plasma 4""",2015,11/17/12,serena.n,8/31/16,dls,,m,r,ele,NA,1,1,1,31.9,2012,adult,low,NA,NA
+plate3,400,low,negative,positive,0.73,positive,low,4598,269a,dub,10/19/99,blood,edta,1999,NA,,6/4/16,dead,lions,m,i,NA,NA,NA,NA,1,NA,NA,adult,NA,NA,NA
