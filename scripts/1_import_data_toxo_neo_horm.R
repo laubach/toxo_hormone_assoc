@@ -92,7 +92,7 @@
 ###############################################################################    
       
   ### 2.1 Import sample data files
-    ## a) Import Aripo normalized RNA expression data saved as csv
+    ## a) Import nesop_toxo_data.
       neosp_toxo_data <- read_csv(paste0(project_data_path,
                                   'neosp_toxo_data.csv'))
       
@@ -100,12 +100,11 @@
     ## a) Import Access data backend from Mara Hyena Project data package
       # Use hyenadata package 'load_all_tables' function to load all tables
       hyenadata::load_all_tables() 
-    
-    ## b) Remove extra everything from global environment, (dataframes,
-      # functions, etc.) except those listed
-      rm(list = ls()[!ls() %in% c('neosp_toxo_data', 'tblFecalHormones', 
-                                  'tblFecalRepository', 'project_data_path')])
       
+    ## b) Rename data tables
+      fecal_horm <- tblFecalHormones
+      fecal_repos <- tblFecalRepository
+      repro_state <- tblReproStates
  
       
 
@@ -119,6 +118,6 @@
       # RData file.
       save(file = paste0(project_data_path, 
                          'raw_data_neosp_toxo_hormone.RData'), 
-           list = c('neosp_toxo_data', 'tblFecalHormones', 
-                    'tblFecalRepository'))
+           list = c('neosp_toxo_data', 'fecal_horm', 
+                    'fecal_repos', 'repro_state'))
     

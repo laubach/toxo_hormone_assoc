@@ -4,7 +4,7 @@
 ##############              2. Tidy and Join Data                ##############
 ##############                 By: Zach Laubach                  ##############
 ##############               created: 19 Sept 2020               ##############
-##############             last updated: 19 Sept 2020            ##############
+##############             last updated: 21 Sept 2020            ##############
 ###############################################################################
 
 
@@ -81,6 +81,17 @@
     
     ## c) Source scripts path
       source_path <- paste("~/Git/source_code/")
+      
+      
+  ### 1.6 Source functions
+    ## a) all_char_to_lower function
+      source(file = paste0(source_path, "all_char_to_lower.R"))
+      
+    ## b) format_var_names function
+      source(file = paste0(source_path, "format_var_names.R"))
+      
+    ## c) format_var_names_dash function
+      source(file = paste0(source_path, "format_var_names_dash.R"))  
 
 
       
@@ -89,43 +100,171 @@
 ###############################################################################  
   
   ### 2.1 Load RData
-    ## a) Load RData (tables on guppy samples, RNA expression, and beahvior)
-      load(paste0(project_data_path,'raw_data_pred_rna_behav.RData'))
+    ## a) Load RData (diognotistic, hyena lion interactions, 
+      # and hyena data base)
+      load(paste0(project_data_path,'raw_data_neosp_toxo_hormone.RData'))
      
       
       
 ###############################################################################
 ##############              3. Tidy individual tables            ##############
 ###############################################################################
+  
+  ### 3.1 Tidy tblFecalHormones
+    ## a) Convert all text to lower case
+      fecal_horm <- AllCharactersToLower(fecal_horm)
+      
+    ## b) Format variable names (lowercase and separated by '.')
+      fecal_horm <- FormatVarNames(fecal_horm)
+      
+    ## c) Convert hormone concentrations to numeric
+      # make list of variable namges that contain 'ng.g'
+      horm_columns <- fecal_horm %>%
+        select(contains('ng.g')) %>%
+        colnames()
+      # convert variables (from horm_columns list) to character first 
+      fecal_horm <- fecal_horm %>%
+        mutate_at(horm_columns, list(as.character)) 
+      
+    ## d) Check
+      class(fecal_horm$androgens.ng.g)
+      
+    ## e) Convert variables (from horm_columns list) to numeric 
+      fecal_horm <- fecal_horm %>%
+        mutate_at(horm_columns, list(as.numeric))
+    
+    ## f) Check again
+      class(fecal_horm$androgens.ng.g)
+      
+      
+  ### 3.2 Tidy fecal_repos
+    ## a) Convert all text to lower case
+      fecal_repos <- AllCharactersToLower(fecal_repos)
+      
+    ## b) Format variable names (lowercase and separated by '.')
+      fecal_repos <- FormatVarNames(fecal_repos)
+      
+    ## c) Rename hyena.id as hy.id
+      fecal_repos <- fecal_repos %>%
+        rename('hy.id' = 'hyena.id')
+      
+      
+  ### 3.3 Tidy tblReproStates
+    ## a) Convert all text to lower case
+      repro_state <- AllCharactersToLower(repro_state)
+      
+    ## b) Format variable names (lowercase and separated by '.')
+      repro_state <- FormatVarNames(repro_state)
+      
+    ## c) Rename mom as hy.id 
+      repro_state <- repro_state %>%
+        rename('hy.id' = 'mom')
+      
+    
+  ### 3.4 Tidy neosp_toxo_data
+    ## a) Convert all text to lower case
+      neosp_toxo_data <- AllCharactersToLower(neosp_toxo_data)
+      
+    ## b) Update 'toxo_status'
+      neosp_toxo_data <- neosp_toxo_data  %>%
+        transform(toxo_status = case_when(!is.na(neosp_toxo_data$toxo_status) & 
+                                            toxo_status == 'positive'
+                                         ~ 1,
+                                         !is.na(neosp_toxo_data$toxo_status) & 
+                                           toxo_status == 'negative'
+                                         ~ 0))
+     
+    ## c) Drop redundant variable, 'toxo.status'   
+      neosp_toxo_data <- neosp_toxo_data  %>%
+        select(-c(toxo.status))
+      
+    ## d) Update 'neo_status'
+      neosp_toxo_data <- neosp_toxo_data  %>%
+        transform(neo_status = case_when(!is.na(neosp_toxo_data$neo_status) & 
+                                           neo_status == 'positive'
+                                          ~ 1,
+                                          !is.na(neosp_toxo_data$neo_status) & 
+                                           neo_status == 'negative'
+                                          ~ 0))
+      
+    ## e) Format variable names (lowercase and separated by '.')
+      neosp_toxo_data <- FormatVarNames(neosp_toxo_data)  
+      
 
       
+###############################################################################
+##############     4. Join tables and re-tidy fecal luma data    ##############
+###############################################################################         
       
-      setwd("~/Desktop/NEOSPORA_ANALYSIS/Neospora_Analyses")
-      coccid_data <- read.csv("neospora_and_toxo_diagnostics.csv")
-      rbind(coccid_data[coccid_data$diagnosis_neo=="high",],coccid_data[coccid_data$diagnosis_neo=="low",])->coccid_data
-      as.factor(coccid_data$diagnosis_neo)->coccid_data$diagnosis_neo
-      #coccid_data$diagnosis_toxo[coccid_data$diagnosis_toxo=="doubtful",]<-"negative"
-      as.factor(coccid_data$diagnosis_toxo)->coccid_data$diagnosis_toxo
-      as.factor(coccid_data$sex)->coccid_data$diagnosis_sex
-      as.factor(coccid_data$age.cat.dart)->coccid_data$age
-      coccid_data$age<-factor(coccid_data$age, levels=c("cub","subadult","adult"))
-      coccid_data$neo_status<-factor(coccid_data$neo_status, levels=c("negative","positive"))
-      coccid_data$toxo_status<-factor(coccid_data$toxo_status, levels=c("negative","positive"))
-      
-      as.numeric(coccid_data$age.mon.dart)->coccid_data$agem
-      rename(coccid_data, clan = dob.event.data)->coccid_data
-      #NOTE: this is clan of birth; some males may have dispersed?
+  ### 4.1 Make the fecal_luma_data (fecal cort as outcome) dataframe
+    ## a) Left join fecal_repos to fecal_horm, retains all columns from both
+      fecal_data <- fecal_horm %>%
+        left_join(select(fecal_repos, c(fecal.sample.id, hy.id, kaycode,
+                                        poop.date, poop.time)),
+                  by = "fecal.sample.id")
       
       
+  ### 4.2 Combine repro_state w fecal_data
+    ## a) Make an empty data frame
+      # This is an empty data frame that can store the overlaping 
+      # fecal_data and repro_states data
+      fecal_repro_data  <- c()   
       
-      ##add columns for neospora diagnosis at two cutoffs
-      cutofflow<-rep(NA,nrow(coccid_data))
-      cutoffhigh<-rep(NA,nrow(coccid_data))
-      cbind(coccid_data,cutoffhigh,cutofflow)
-      coccid_data$cutofflow <- ifelse(coccid_data$IFA_Neospora<=160, 0, NA)
-      coccid_data$cutofflow <- ifelse(coccid_data$IFA_Neospora>160, 1,coccid_data$cutofflow)
-      coccid_data$cutoffhigh <- ifelse(coccid_data$IFA_Neospora<=640, 0, NA)
-      coccid_data$cutoffhigh <- ifelse(coccid_data$IFA_Neospora>640, 1,coccid_data$cutoffhigh)
+    ## b) For loop to find overlap
+      # Iterate over fecal data (hy.id and poop.date), to find interseciton
+      # with repro_state data
+      for (i in 1:nrow(fecal_data)) { 
+        
+        # loop through 1:n IDs in fecal_data
+        id = paste (fecal_data$hy.id[i])  
+        
+        # loop through 1:n dates in fecal_data
+        poop.date <-(fecal_data$poop.date[i])
+        
+        # loop through 1:n poop.time in fecal_data
+        poop.time <-(fecal_data$poop.time[i])
+        
+        # create a dataframe to store the rows from repro_states where the
+        # id matches hy.id, and poop.date is in between cycle start and stop 
+        overlap_poop_repro <- filter(repro_state, id == hy.id & 
+                                       poop.date >= cycle.start & 
+                                       poop.date <= cycle.stop)
+        
+        # Control flow
+        # if there is no id match and date overlap, 
+        # then go to next loop iteration in fecal_data
+        if (nrow(overlap_poop_repro) < 1) {
+          next
+        }
+        
+        # add the poop.date onto the overlap_poop_repro data
+        overlap_poop_repro <- cbind(overlap_poop_repro, poop.date, poop.time)
+        
+        # add the filtered overlap_poop_repro data to a new dataframe
+        # over each iteration of the loop
+        fecal_repro_data <- rbind(fecal_repro_data, 
+                                  overlap_poop_repro)
+      }
+      
+    ## c) Join repro state data to fecal data 
+      fecal_data <- fecal_data %>%
+        left_join(select(fecal_repro_data, c(hy.id, poop.date, poop.time,  
+                                             state, cycle.start, cycle.stop, 
+                                             trimester, parity)),
+                  by = c('hy.id' = 'hy.id',
+                         'poop.date' = 'poop.date',
+                         'poop.time' = 'poop.time')) 
+      
+    # ## d) Tidy fecal_data after join to repro states
+    #   # NOTE: Boom fec samp 5208 ; lyle fec samp id 3617 both
+    #   # have overlapping duplicate parities in the same year.
+    #   # HACK: Keep the first entry and drop the second
+    #   fecal_data <- fecal_data %>%
+    #     distinct(fecal.sample.id, .keep_all = T)
+      
+      
+      
+    ### 4.3 STOPPED 4.4 Tidy Fecal Data of 3_hy_luma_stress.R...need to go through 4.6
       
       
       
@@ -134,36 +273,17 @@
       
       
       
+      ## a) Left join life_hist to fecal_data,
+      fecal_data <- fecal_data %>% 
+        left_join(life_hist, by = c('hy.id' = 'hy.id'))     
       
       
       
       
-  ### 3.1 Tidy _samp_data
-    ## a) Add Aripo basin identifer variable to aripo_samp_data
-      aripo_samp_data$basin <- paste('aripo')
       
-    ## b) Add Quare basin identifer variable to quare_samp_data
-      quare_samp_data$basin <- paste('quare') 
       
-    ## c) Make a variable group by collapsing 'pop' and 'rear in order to
-      # create a 4-level ordinal factor for Aripo data
-      aripo_samp_data <- aripo_samp_data  %>%
-        mutate(group = case_when(aripo_samp_data$pop %in% c('LP') & 
-                                   aripo_samp_data$rear %in% c ('NP')
-                                    ~ c('LP_NP'),
-                                 aripo_samp_data$pop %in% c('LP') & 
-                                   aripo_samp_data$rear %in% c ('P')
-                                 ~ c('LP_P'),
-                                 aripo_samp_data$pop %in% c('HP') & 
-                                   aripo_samp_data$rear %in% c ('NP')
-                                 ~ c('HP_NP'),
-                                 aripo_samp_data$pop %in% c('HP') & 
-                                   aripo_samp_data$rear %in% c ('P')
-                                 ~ c('HP_P'))) %>%
-        transform(group = factor(group,
-                                 levels = c('LP_NP', 'LP_P', 'HP_NP',
-                                                     'HP_P')))
-
+      
+      
     ## d) Make a variable group by collapsing 'pop' and 'rear in order to
       # create a 4-level ordinal factor for Quare data 
       quare_samp_data <- quare_samp_data  %>%
