@@ -1,10 +1,12 @@
 ###############################################################################
-##############       Associations of Toxoplasma gondii and       ##############
-##############       Neospora caninum with hormone levels        ##############
-##############                  1. Data Import                   ##############
-##############                 By: Zach Laubach                  ##############
-##############               created: 19 Sept 2020               ##############
-##############             last updated: 21 Sept 2020            ##############
+#############        Associations of Toxoplasma gondii and        #############
+#############        Neospora caninum with hormone levels         #############
+#############                                                     #############
+#############                   1. Data Import                    #############
+#############                                                     #############
+#############                  By: Zach Laubach                   #############
+#############                created: 19 Sept 2020                #############
+#############              last updated: 5 Oct 2020               #############
 ###############################################################################
 
 
@@ -85,7 +87,6 @@
       project_data_path <- paste0(here('data/'))
      
   
-  
       
 ###############################################################################
 ##############                  2. Import data                   ##############
@@ -105,7 +106,7 @@
       fecal_horm <- tblFecalHormones
       fecal_repos <- tblFecalRepository
       repro_state <- tblReproStates
- 
+  
       
 
 ###############################################################################
@@ -117,7 +118,7 @@
       # Files are saved in the 'data' folder in the working directory as an
       # RData file.
       save(file = paste0(project_data_path, 
-                         'raw_data_neosp_toxo_hormone.RData'), 
+                         '1_raw_data_neo_toxo_fec_horm.RData'), 
            list = c('neosp_toxo_data', 'fecal_horm', 
                     'fecal_repos', 'repro_state'))
     
