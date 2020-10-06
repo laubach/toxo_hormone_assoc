@@ -1,18 +1,17 @@
 ###############################################################################
-#############            Spotted Hyena Neospora caninum:          #############
-############# Determinants and behavior and fitness consequences  #############
+#############        Associations of Toxoplasma gondii and        #############
+#############        Neospora caninum with hormone levels         #############
 #############                                                     #############
-#############      3. Descriptive stats: Determinants Neosp.      #############
+#############             3. Descriptive statsistics              #############
 #############                                                     #############
 #############                  By: Zach Laubach                   #############
 #############                 created: 5 Oct 2020                 #############
-#############               last updated: 5 Oct 2020              #############
+#############               last updated: 6 Oct 2020              #############
 ###############################################################################
 
-#**************************  Determinants of Neosp  **************************** 
 
-  ### PURPOSE: Do univariate and bivariate associations for determinants of 
-             # of Neospora caninum in spotted hyenas
+  ### PURPOSE: Do univariate and bivariate associations for associations 
+             # of toxo. and neosp. with fecal horomones in spotted hyenas
   
   
   # Code Blocks
@@ -117,7 +116,8 @@
 ###############################################################################  
   
   ### 2.1 Load RData
-    ## a) load RData: updated neosp_data joined to hyena data tables
+    ## a) load RData: updated fec_horm_neosp_toxo_data joined to hyena 
+      # data tables
       load(paste0(project_data_path, '2_tidy_data_neo_toxo_fec_horm.RData'))
      
       
@@ -126,272 +126,541 @@
 ##############               3. Univariate analysis              ##############
 ###############################################################################
     
-  ### 3.1 Univariate stats neosp 
-    ## a) Descriptive stats neosp status
-      univar_neosp_stat <- neosp_data %>%
-        group_by(neo.status) %>%
-        summarise(n.status = sum(!is.na(neo.status))) %>%
-        mutate(freq = n.status / sum(n.status, na.rm = T))
+  ### 3.1 Univariate stats fecal testosterone (T)
+    ## a) Descriptive stats fecal testosterone (T) data
+      univar_T_stat <- fec_horm_neosp_toxo_data_12 %>%
+        summarise (n.T = sum(!is.na(testosterone.ng.g)),
+                   avg.T = round (mean(testosterone.ng.g, 
+                                              na.rm = T),2),
+                   stdev.T = round (sd(testosterone.ng.g, 
+                                              na.rm = T), 2)) 
       
     ## b) save the data frame of summary stats out as a pdf into output file
-      pdf(here('output/univar_neosp_status.pdf'), height = 4, width = 8)
-      grid.table(univar_neosp_stat)
+      pdf(here('output/univar_T_stat.pdf'), height = 4, width = 8)
+      grid.table(univar_T_stat)
       dev.off()
       
-    ## c) Histogram Neospora IFA
-      hist_plot_neosp <- ggplot(data=neosp_data, aes(x=ifa.neospora)) + 
+    ## c) Descriptive stats fecal testosterone (T) data grouped by ID
+      univar_T_id_stat <- fec_horm_neosp_toxo_data_12 %>%
+        group_by(hy.id) %>%
+        summarise (n.T = sum(!is.na(testosterone.ng.g)),
+                   avg.T = round (mean(testosterone.ng.g, 
+                                       na.rm = T),2),
+                   stdev.T = round (sd(testosterone.ng.g, 
+                                       na.rm = T), 2)) 
+      
+    ## d) Histogram fecal testosterone
+      hist_plot_T <- ggplot(data=fec_horm_neosp_toxo_data_12, 
+                                aes(x=testosterone.ng.g)) + 
         geom_histogram(aes(y = ..count..),
-                       breaks=seq(0, 1700, by = 100), 
+                       breaks=seq(0, 600, by = 5), 
                        col='black',
                        fill = 'dark grey') +
-        xlim(c(0,1700)) +
-        labs(title = 'Histogram of Neospora caninum IFA') +
+        xlim(c(0,600)) +
+        labs(title = 'Histogram of Fecal Testosterone 
+(repeated measures)') +
         theme(plot.title = element_text(hjust = 0.5)) + # center title
-        labs(x='N. caninum IFA', y='Frequency') 
+        labs(x='Fec. Testosterone (ng/g)', y='Frequency') 
       
-      print(hist_plot_neosp)
+      print(hist_plot_T)
       
-    ## d) Save histogram plot
+    ## e) Natural log transformation of T data 
+      fec_horm_neosp_toxo_data_12$testosterone.ng.g.ln <- 
+        log(fec_horm_neosp_toxo_data_12$testosterone.ng.g)
+      
+    ## f) Histogram of Nat. Log. of fecal testosterone
+      hist_plot_ln_T <- ggplot(data=fec_horm_neosp_toxo_data_12, 
+                            aes(x=testosterone.ng.g.ln)) + 
+        geom_histogram(aes(y = ..count..),
+                       breaks=seq(0, 7.5, by = 0.5), 
+                       col='black',
+                       fill = 'dark grey') +
+        xlim(c(0,7.5)) +
+        labs(title = 'Histogram of Nat. Log. Fecal Testosterone 
+(repeated measures)') +
+        theme(plot.title = element_text(hjust = 0.5)) + # center title
+        labs(x='Nat. Log. Fec. Testosterone (ng/g)', y='Frequency') 
+      
+      print(hist_plot_ln_T)
+
+    ## g) Save histogram plot
       # use ggsave to save the plot
-      ggsave('histogram_neosp.pdf', plot = hist_plot_neosp, 
+      ggsave('histogram_ln_T.pdf', plot = hist_plot_ln_T, 
              device = NULL, 
              path = here('output/'), scale = 1, width = 5, 
              height = 3, 
              units = c('in'), dpi = 300, limitsize = TRUE)  
       
-    ## e) Density plot Neospora IFA  
-      density_plot_neosp <- ggplot(data=neosp_data, aes(x=ifa.neospora)) + 
-        geom_density() +
-        xlim(c(0,1700)) +
-        labs(title = 'Density plot of Neospora caninum IFA') +
-        theme(plot.title = element_text(hjust = 0.5)) + # center title
-        labs(x='N. caninum IFA', y='Frequency') 
+    
+  ### 3.2 Univariate stats fecal corticosterone (cort)
+    ## a) Descriptive stats fecal corticosterone (cort) data
+      univar_cort_stat <- fec_horm_neosp_toxo_data_12 %>%
+        summarise (n.cort = sum(!is.na(corticosterone.ng.g)),
+                   avg.cort = round (mean(corticosterone.ng.g, 
+                                       na.rm = T),2),
+                   stdev.cort = round (sd(corticosterone.ng.g, 
+                                       na.rm = T), 2)) 
       
-      print(density_plot_neosp)
+    ## b) save the data frame of summary stats out as a pdf into output file
+      pdf(here('output/univar_cort_stat.pdf'), height = 4, width = 8)
+      grid.table(univar_cort_stat)
+      dev.off()
       
-    ## f) Save density plot
-      # use ggsave to save the plot
-      ggsave('density_plot_neosp.pdf', plot = density_plot_neosp, 
-             device = NULL, 
-             path = here('output/'), scale = 1, width = 5, 
-             height = 3, 
-             units = c('in'), dpi = 300, limitsize = TRUE) 
-
-    ## g) Histogram Neospora IFA by infection status
-      hist_plot_neosp_by_status <- 
-        ggplot(data=neosp_data, aes(x=ifa.neospora, 
-                                          fill = neo.status)) + 
+    ## c) Descriptive stats fecal corticosterone (cort) data grouped by ID
+      univar_cort_id_stat <- fec_horm_neosp_toxo_data_12 %>%
+        group_by(hy.id) %>%
+        summarise (n.cort = sum(!is.na(corticosterone.ng.g)),
+                   avg.cort = round (mean(corticosterone.ng.g, 
+                                       na.rm = T),2),
+                   stdev.cort = round (sd(corticosterone.ng.g, 
+                                       na.rm = T), 2)) 
+      
+    ## d) Histogram fecal corticosterone
+      hist_plot_T <- ggplot(data=fec_horm_neosp_toxo_data_12, 
+                            aes(x=corticosterone.ng.g)) + 
         geom_histogram(aes(y = ..count..),
-                       breaks=seq(0, 1700, by = 100), 
-                       # col='black',
-                       # fill = 'dark grey',
-                       position='dodge') +
-        xlim(c(0,1700)) +
-        labs(title = 'Histogram of Neospora caninum IFA by infection status') +
+                       breaks=seq(0, 1000, by = 5), 
+                       col='black',
+                       fill = 'dark grey') +
+        xlim(c(0, 1000)) +
+        labs(title = 'Histogram of Fecal Corticosterone 
+(repeated measures)') +
         theme(plot.title = element_text(hjust = 0.5)) + # center title
-        labs(x='N. caninum IFA', y='Frequency') 
+        labs(x='Fec. Corticosterone (ng/g)', y='Frequency') 
       
-      print(hist_plot_neosp_by_status)
+      print(hist_plot_T)
       
-    ## h) Save histogram plot
+    ## e) Natural log transformation of T data 
+      fec_horm_neosp_toxo_data_12$corticosterone.ng.g.ln <- 
+        log(fec_horm_neosp_toxo_data_12$corticosterone.ng.g)
+      
+    ## f) Histogram of Nat. Log. of fecal corticosterone
+      hist_plot_ln_T <- ggplot(data=fec_horm_neosp_toxo_data_12, 
+                               aes(x=corticosterone.ng.g.ln)) + 
+        geom_histogram(aes(y = ..count..),
+                       breaks=seq(0, 7.5, by = 0.5), 
+                       col='black',
+                       fill = 'dark grey') +
+        xlim(c(0,7.5)) +
+        labs(title = 'Histogram of Nat. Log. Fecal Corticosterone 
+(repeated measures)') +
+        theme(plot.title = element_text(hjust = 0.5)) + # center title
+        labs(x='Nat. Log. Fec. Corticosterone (ng/g)', y='Frequency') 
+      
+      print(hist_plot_ln_T)
+      
+    ## g) Save histogram plot
       # use ggsave to save the plot
-      ggsave('hist_plot_neosp_by_status.pdf', plot = hist_plot_neosp_by_status, 
+      ggsave('histogram_ln_cort.pdf', plot = hist_plot_ln_T, 
              device = NULL, 
              path = here('output/'), scale = 1, width = 5, 
              height = 3, 
              units = c('in'), dpi = 300, limitsize = TRUE) 
       
+  
 
 ###############################################################################
 ##############               4. Bivariate analysis               ##############
 ############################################################################### 
       
-  ### 4.1 Descriptive bivariate stats neosp status by sex
+  ### 4.1 Descriptive bivariate stats testosterone status by sex
     ## a) Sex ratio summary 
-      neosp_sex_ratio_sum <- neosp_data %>%
-        #group_by (id) %>%
-        group_by (sex, neo.status) %>%
-        summarise(n=n_distinct(hy.id)) %>%
-        mutate(freq = n / sum(n))
+      T_sex_ratio_sum <- fec_horm_neosp_toxo_data_12 %>%
+        filter(!is.na(testosterone.ng.g)) %>%
+        group_by (hy.id, sex) %>%
+        summarise (n.Test = sum(!is.na(testosterone.ng.g)),
+                   avg.Test = round (mean(testosterone.ng.g, 
+                                       na.rm = T),2),
+                   stdev.Test = round (sd(testosterone.ng.g, 
+                                       na.rm = T), 2)) 
+      
+      # summarize T averaged over individuals
+      T_sex_ratio_sum <- T_sex_ratio_sum %>%
+        group_by (sex) %>%
+        summarise (n.T = sum(!is.na(avg.Test)),
+                   avg.T = round (mean(avg.Test, 
+                                       na.rm = T),2),
+                   stdev.T = round (sd(avg.Test, 
+                                       na.rm = T), 2))%>%
+        mutate(freq = n.T / sum(n.T))
       
     ## b) save the data frame of summary stats out as a pdf into output file
-      pdf(here('output/neosp_sex_ratio_sum.pdf'), 
-          height = 3, width = 5)
-      grid.table(neosp_sex_ratio_sum)
+      pdf(here('output/T_sex_ratio_sum.pdf'), 
+          height = 4, width = 5)
+      grid.table(T_sex_ratio_sum)
       dev.off() 
       
       
-  ### 4.2 Descriptive bivariate stats neosp by age.mon.dart    
-    ## a) Age summary  
-      neosp_age_var_sum <- neosp_data %>%
-        group_by (age.cat.dart) %>%
-        summarise (n.age.dart = sum(!is.na(age.mon.dart)),
-                   avg.age.dart = round (mean(age.mon.dart, na.rm = T),2),
-                   stdev.age.dart = round (sd(age.mon.dart, na.rm = T), 2)) %>%
-        mutate (freq_age =  (n.age.dart / sum(n.age.dart)))
+  ### 4.2 Descriptive bivariate stats testosterone status by categorical age
+      # when fecal sample was collected
+    ## a) Age summary 
+      T_age_sum <- fec_horm_neosp_toxo_data_12 %>%
+        filter(!is.na(testosterone.ng.g)) %>%
+        group_by (hy.id, fecal.age.cat) %>%
+        summarise (n.Test = sum(!is.na(testosterone.ng.g)),
+                   avg.Test = round (mean(testosterone.ng.g, 
+                                          na.rm = T),2),
+                   stdev.Test = round (sd(testosterone.ng.g, 
+                                          na.rm = T), 2)) 
+      
+      # summarize T averaged over individuals
+      T_age_sum <- T_age_sum %>%
+        group_by (fecal.age.cat) %>%
+        summarise (n.T = sum(!is.na(avg.Test)),
+                   avg.T = round (mean(avg.Test, 
+                                       na.rm = T),2),
+                   stdev.T = round (sd(avg.Test, 
+                                       na.rm = T), 2))%>%
+        mutate(freq = n.T / sum(n.T))
       
     ## b) save the data frame of summary stats out as a pdf into output file
-      pdf(here('output/neosp_age_var_sum.pdf'), 
-          height = 4, width = 8)
-      grid.table(neosp_age_var_sum)
+      pdf(here('output/T_age_sum.pdf'), 
+          height = 4, width = 5)
+      grid.table(T_age_sum)
       dev.off() 
       
-    ## c) Age categories summary 
-      neosp_age_cat_sum <- neosp_data %>%
-        #group_by (id) %>%
-        group_by (age.cat.dart, neo.status) %>%
-        summarise(n=n_distinct(hy.id)) %>%
-        mutate(freq = n / sum(n))
+    ## c) Sex by Age summary 
+      T_sex_age_sum <- fec_horm_neosp_toxo_data_12 %>%
+        filter(!is.na(testosterone.ng.g)) %>%
+        group_by (hy.id, sex, fecal.age.cat) %>%
+        summarise (n.Test = sum(!is.na(testosterone.ng.g)),
+                   avg.Test = round (mean(testosterone.ng.g, 
+                                          na.rm = T),2),
+                   stdev.Test = round (sd(testosterone.ng.g, 
+                                          na.rm = T), 2)) 
       
+      # summarize T averaged over individuals
+      T_sex_age_sum <- T_sex_age_sum %>%
+        group_by (sex, fecal.age.cat) %>%
+        summarise (n.T = sum(!is.na(avg.Test)),
+                   avg.T = round (mean(avg.Test, 
+                                       na.rm = T),2),
+                   stdev.T = round (sd(avg.Test, 
+                                       na.rm = T), 2))%>%
+        mutate(freq = n.T / sum(n.T))
+  
     ## d) save the data frame of summary stats out as a pdf into output file
-      pdf(here('output/neosp_age_cat_sum.pdf'), 
-          height = 3, width = 5)
-      grid.table(neosp_age_cat_sum)
+      pdf(here('output/T_sex_age_sum.pdf'), 
+          height = 5, width = 5)
+      grid.table(T_sex_age_sum)
       dev.off() 
       
-    ## e) Plot age at darting by neosp status
-      age_dart_by_neosp_plot <- ggplot(data = neosp_data,
-             aes (x = neo.status, y = age.mon.dart,
-                  color = neo.status)) +
-        geom_boxplot() +
-        theme(text = element_text(size=20))+
-        scale_colour_hue(l = 50) + # Use a slightly darker palette than normal
-        labs (title = 'Age at diagnosis by Neosp. 
-infection status') +
-        ylab ('Age at diagnosis (mon)') +
-        xlab ('Neosp status (0 = uninfected)')
       
-      print(age_dart_by_neosp_plot)
+  ### 4.3 Descriptive bivariate stats testosterone status by reproductive state
+      # when fecal sample was collected
+    ## a) Reproductive state (for females) or males 
+      T_repro_sum <- fec_horm_neosp_toxo_data_12 %>%
+        filter(!is.na(testosterone.ng.g)) %>%
+        group_by (hy.id, state) %>%
+        summarise (n.Test = sum(!is.na(testosterone.ng.g)),
+                   avg.Test = round (mean(testosterone.ng.g, 
+                                          na.rm = T),2),
+                   stdev.Test = round (sd(testosterone.ng.g, 
+                                          na.rm = T), 2)) 
       
-    ## f) Save Plot
-      # use ggsave to save the boxplot
-      ggsave('age_dart_by_neosp_plot.pdf', plot = age_dart_by_neosp_plot, 
-             device = NULL, 
-             path = here('output/'), scale = 1, width = 7, 
-             height = 5, 
-             units = c('in'), dpi = 300, limitsize = TRUE)  
+      # summarize T averaged over individuals
+      T_repro_sum <- T_repro_sum %>%
+        group_by (state) %>%
+        summarise (n.T = sum(!is.na(avg.Test)),
+                   avg.T = round (mean(avg.Test, 
+                                       na.rm = T),2),
+                   stdev.T = round (sd(avg.Test, 
+                                       na.rm = T), 2))%>%
+        mutate(freq = n.T / sum(n.T))
       
+      ## b) save the data frame of summary stats out as a pdf into output file
+      pdf(here('output/T_repro_sum.pdf'), 
+          height = 4, width = 5)
+      grid.table(T_repro_sum)
+      dev.off()     
+
       
-  ### 4.3 Descriptive bivariate stats neosp by rank
-    ## a) Neosp. by rank summary, among females and males separately
-      # separate sexes because rank calculate separately
-      neosp_rank_sex_sum <- neosp_data %>%
-        group_by  (sex, neo.status) %>%
-        summarise (n.rank =  sum(!is.na(stan.rank.dart)),
-                   #n_rank = n(), # n including na
-                   avg.rank = round (mean(stan.rank.dart, na.rm = T),2),
-                   stdev.rank = round (sd(stan.rank.dart, na.rm = T), 2))
+  ### 4.4 Descriptive bivariate stats testosterone status by time of day
+      # when fecal sample was collected
+    ## a) AM vs PM summary 
+      T_time_sum <- fec_horm_neosp_toxo_data_12 %>%
+        filter(!is.na(testosterone.ng.g)) %>%
+        group_by (hy.id, poop.am.pm) %>%
+        summarise (n.Test = sum(!is.na(testosterone.ng.g)),
+                   avg.Test = round (mean(testosterone.ng.g, 
+                                          na.rm = T),2),
+                   stdev.Test = round (sd(testosterone.ng.g, 
+                                          na.rm = T), 2)) 
       
-    ## b) save the data frame of summary stats out as a pdf into output file
-      pdf(here('output/neosp_rank_sex_sum.pdf'),
-          height = 4, width = 8)
-      grid.table(neosp_rank_sex_sum)
-      dev.off()
-      
-    ## c) Neosp. by rank summary, among females and males separately by age
-      neosp_rank_sex_age_sum <- neosp_data %>%
-        group_by  (sex, age.cat.dart, neo.status) %>%
-        summarise (n.rank =  sum(!is.na(stan.rank.dart)),
-                   #n_rank = n(), # n including na
-                   avg.rank = round (mean(stan.rank.dart, na.rm = T),2),
-                   stdev.rank = round (sd(stan.rank.dart, na.rm = T), 2))
-      
-    ## d) save the data frame of summary stats out as a pdf into output file
-      pdf(here('output/neosp_rank_sex_age_sum.pdf'),
-          height = 4, width = 8)
-      grid.table(neosp_rank_sex_age_sum)
-      dev.off()
-      
-    ## e) Plot standardize rank by neosp. by sex 
-      neosp_rank_sex_plot <- ggplot(data = neosp_data,
-                                        aes (x = sex, y = stan.rank.dart,
-                                             color = neo.status)) +
-        geom_boxplot() +
-        theme(text = element_text(size=20))+
-        scale_colour_hue(l = 50) + # Use a slightly darker palette than normal
-        labs (title = 'Rank by neosp. infection status by sex') +
-        ylab ('Standardized rank') +
-        xlab ('Neosp status (0 = uninfected)')
-      
-      print(neosp_rank_sex_plot)
-      
-    ## f) Save Plot
-      # use ggsave to save the boxplot
-      ggsave('neosp_rank_sex_plot.pdf', plot = neosp_rank_sex_plot, 
-             device = NULL, 
-             path = here('output/'), scale = 1, width = 7, 
-             height = 5, 
-             units = c('in'), dpi = 300, limitsize = TRUE)
-      
-    ## g) Plot standardize rank by neosp. by sex and by age
-      neosp_rank_sex_age_plot <- ggplot(data = neosp_data,
-                                       aes (x = sex, y = stan.rank.dart,
-                                            color = neo.status)) +
-        geom_boxplot() +
-        facet_wrap(~age.cat.dart) +
-        theme(text = element_text(size=20))+
-        scale_colour_hue(l = 50) + # Use a slightly darker palette than normal
-        labs (title = 'Rank by neosp. infection status
-by sex by age') +
-        ylab ('Standardized rank') +
-        xlab ('Neosp status (0 = uninfected)')
-      
-      print(neosp_rank_sex_age_plot)
-      
-    ## h) Save Plot
-      # use ggsave to save the boxplot
-      ggsave('neosp_rank_sex_age_plot.pdf', plot = neosp_rank_sex_age_plot, 
-             device = NULL, 
-             path = here('output/'), scale = 1, width = 7, 
-             height = 5, 
-             units = c('in'), dpi = 300, limitsize = TRUE)  
-      
-      
-  ### 4.4 Descriptive bivariate stats Neosp by human pop size
-    ## a) Neosp. by human pop size (proxy) summary 
-      neosp_hum_pop_sum <- neosp_data %>%
-        #group_by (id) %>%
-        group_by (hum.pop.den, neo.status) %>%
-        summarise(n=n_distinct(hy.id)) %>%
-        mutate(freq = n / sum(n))
+      # summarize T averaged over individuals
+      T_time_sum <- T_time_sum %>%
+        group_by (poop.am.pm) %>%
+        summarise (n.T = sum(!is.na(avg.Test)),
+                   avg.T = round (mean(avg.Test, 
+                                       na.rm = T),2),
+                   stdev.T = round (sd(avg.Test, 
+                                       na.rm = T), 2))%>%
+        mutate(freq = n.T / sum(n.T))
       
     ## b) save the data frame of summary stats out as a pdf into output file
-      pdf(here('output/neosp_hum_pop_sum.pdf'), 
-          height = 3, width = 5)
-      grid.table(neosp_hum_pop_sum)
-      dev.off() 
-      
-    ## c) Neosp. by human pop size (proxy) summary, among females and males 
-      # separately by age
-      neosp_hum_pop_sex_age_sum <- neosp_data %>%
-        group_by  (sex, age.cat.dart, hum.pop.den, neo.status) %>%
-        summarise(n=n_distinct(hy.id)) %>%
-        mutate(freq = n / sum(n))
-      
-    ## d) save the data frame of summary stats out as a pdf into output file
-      pdf(here('output/neosp_hum_pop_sex_age_sum.pdf'),
-          height = 8, width = 8)
-      grid.table(neosp_hum_pop_sex_age_sum)
-      dev.off()
-      
-    ## e) Neosp. by human pop size (proxy) summary, by sex in subadults 
-        # and adult hyeans
-      neosp_hum_pop_sex_subs_adlt_sum <- neosp_data %>%
-        filter(age.cat.dart == 'subadult' | age.cat.dart == 'adult') %>%
-        group_by (sex, hum.pop.den, neo.status) %>%
-        summarise(n=n_distinct(hy.id)) %>%
-        mutate(freq = n / sum(n))
-      
-    ## f) save the data frame of summary stats out as a pdf into output file
-      pdf(here('output/neosp_hum_pop_sex_subs_adlt_sum.pdf'),
-          height = 7, width = 8)
-      grid.table(neosp_hum_pop_sex_subs_adlt_sum)
-      dev.off()
+      pdf(here('output/T_time_sum.pdf'), 
+          height = 4, width = 5)
+      grid.table(T_time_sum)
+      dev.off()     
       
     
-            
+  ### 4.5 Descriptive bivariate stats testosterone status by the season
+      # when fecal sample was collected
+    ## a) Migration present vs absent summary 
+      T_migrtn_seas_sum <- fec_horm_neosp_toxo_data_12 %>%
+        filter(!is.na(testosterone.ng.g)) %>%
+        group_by (hy.id, migratn.seas.fec) %>%
+        summarise (n.Test = sum(!is.na(testosterone.ng.g)),
+                   avg.Test = round (mean(testosterone.ng.g, 
+                                          na.rm = T),2),
+                   stdev.Test = round (sd(testosterone.ng.g, 
+                                          na.rm = T), 2)) 
       
+      # summarize T averaged over individuals
+      T_migrtn_seas_sum <- T_migrtn_seas_sum %>%
+        group_by (migratn.seas.fec) %>%
+        summarise (n.T = sum(!is.na(avg.Test)),
+                   avg.T = round (mean(avg.Test, 
+                                       na.rm = T),2),
+                   stdev.T = round (sd(avg.Test, 
+                                       na.rm = T), 2))%>%
+        mutate(freq = n.T / sum(n.T))
+      
+      ## b) save the data frame of summary stats out as a pdf into output file
+      pdf(here('output/T_migrtn_seas_sum.pdf'), 
+          height = 4, width = 5)
+      grid.table(T_migrtn_seas_sum)
+      dev.off()   
       
 
+  ### 4.6 Descriptive bivariate stats testosterone status by human disturbance
+      # when fecal sample was collected
+    ## a) Human disturbance summary 
+      T_hum_disturb_sum <- fec_horm_neosp_toxo_data_12 %>%
+        filter(!is.na(testosterone.ng.g)) %>%
+        group_by (hy.id, hum.pop.den) %>%
+        summarise (n.Test = sum(!is.na(testosterone.ng.g)),
+                   avg.Test = round (mean(testosterone.ng.g, 
+                                          na.rm = T),2),
+                   stdev.Test = round (sd(testosterone.ng.g, 
+                                          na.rm = T), 2)) 
+      
+      # summarize T averaged over individuals
+      T_hum_disturb_sum <- T_hum_disturb_sum %>%
+        group_by (hum.pop.den) %>%
+        summarise (n.T = sum(!is.na(avg.Test)),
+                   avg.T = round (mean(avg.Test, 
+                                       na.rm = T),2),
+                   stdev.T = round (sd(avg.Test, 
+                                       na.rm = T), 2))%>%
+        mutate(freq = n.T / sum(n.T))
+      
+    ## b) save the data frame of summary stats out as a pdf into output file
+      pdf(here('output/T_hum_disturb_sum.pdf'), 
+          height = 4, width = 5)
+      grid.table(T_hum_disturb_sum)
+      dev.off()
+      
+      
+  ### 4.7 Descriptive bivariate stats corticosterone status by sex
+    ## a) Sex ratio summary 
+      cort_sex_ratio_sum <- fec_horm_neosp_toxo_data_12 %>%
+        filter(!is.na(corticosterone.ng.g)) %>%
+        group_by (hy.id, sex) %>%
+        summarise (n.Cort = sum(!is.na(corticosterone.ng.g)),
+                   avg.Cort = round (mean(corticosterone.ng.g, 
+                                          na.rm = T),2),
+                   stdev.Cort = round (sd(corticosterone.ng.g, 
+                                          na.rm = T), 2)) 
+      
+      # summarize T averaged over individuals
+      cort_sex_ratio_sum <- cort_sex_ratio_sum %>%
+        group_by (sex) %>%
+        summarise (n.cort = sum(!is.na(avg.Cort)),
+                   avg.cort = round (mean(avg.Cort, 
+                                       na.rm = T),2),
+                   stdev.cort = round (sd(avg.Cort, 
+                                       na.rm = T), 2))%>%
+        mutate(freq = n.cort / sum(n.cort))
+      
+    ## b) save the data frame of summary stats out as a pdf into output file
+      pdf(here('output/cort_sex_ratio_sum.pdf'), 
+          height = 4, width = 5)
+      grid.table(cort_sex_ratio_sum)
+      dev.off() 
+      
+      
+  ### 4.8 Descriptive bivariate stats corticosterone status by categorical age
+      # when fecal sample was collected
+    ## a) Age summary 
+      cort_age_sum <- fec_horm_neosp_toxo_data_12 %>%
+        filter(!is.na(corticosterone.ng.g)) %>%
+        group_by (hy.id, fecal.age.cat) %>%
+        summarise (n.Cort = sum(!is.na(corticosterone.ng.g)),
+                   avg.Cort = round (mean(corticosterone.ng.g, 
+                                          na.rm = T),2),
+                   stdev.Cort = round (sd(corticosterone.ng.g, 
+                                          na.rm = T), 2)) 
+      
+      # summarize T averaged over individuals
+      cort_age_sum <- cort_age_sum %>%
+        group_by (fecal.age.cat) %>%
+        summarise (n.cort = sum(!is.na(avg.Cort)),
+                   avg.cort = round (mean(avg.Cort, 
+                                       na.rm = T),2),
+                   stdev.cort = round (sd(avg.Cort, 
+                                       na.rm = T), 2))%>%
+        mutate(freq = n.cort / sum(n.cort))
+      
+    ## b) save the data frame of summary stats out as a pdf into output file
+      pdf(here('output/cort_age_sum.pdf'), 
+          height = 4, width = 5)
+      grid.table(cort_age_sum)
+      dev.off() 
+      
+    ## c) Sex by Age summary 
+      cort_sex_age_sum <- fec_horm_neosp_toxo_data_12 %>%
+        filter(!is.na(corticosterone.ng.g)) %>%
+        group_by (hy.id, sex, fecal.age.cat) %>%
+        summarise (n.Cort = sum(!is.na(corticosterone.ng.g)),
+                   avg.Cort = round (mean(corticosterone.ng.g, 
+                                          na.rm = T),2),
+                   stdev.Cort = round (sd(corticosterone.ng.g, 
+                                          na.rm = T), 2)) 
+      
+      # summarize T averaged over individuals
+      cort_sex_age_sum <- cort_sex_age_sum %>%
+        group_by (sex, fecal.age.cat) %>%
+        summarise (n.cort = sum(!is.na(avg.Cort)),
+                   avg.cort = round (mean(avg.Cort, 
+                                       na.rm = T),2),
+                   stdev.cort = round (sd(avg.Cort, 
+                                       na.rm = T), 2))%>%
+        mutate(freq = n.cort / sum(n.cort))
+      
+    ## d) save the data frame of summary stats out as a pdf into output file
+      pdf(here('output/cort_sex_age_sum.pdf'), 
+          height = 5, width = 5)
+      grid.table(cort_sex_age_sum)
+      dev.off() 
+      
+      
+  ### 4.9 Descriptive bivariate stats corticosterone status by reproductive state
+      # when fecal sample was collected
+    ## a) Reproductive state (for females) or males 
+      cort_repro_sum <- fec_horm_neosp_toxo_data_12 %>%
+        filter(!is.na(corticosterone.ng.g)) %>%
+        group_by (hy.id, state) %>%
+        summarise (n.Cort = sum(!is.na(corticosterone.ng.g)),
+                   avg.Cort = round (mean(corticosterone.ng.g, 
+                                          na.rm = T),2),
+                   stdev.Cort = round (sd(corticosterone.ng.g, 
+                                          na.rm = T), 2)) 
+      
+      # summarize T averaged over individuals
+      cort_repro_sum <- cort_repro_sum %>%
+        group_by (state) %>%
+        summarise (n.cort = sum(!is.na(avg.Cort)),
+                   avg.cort = round (mean(avg.Cort, 
+                                       na.rm = T),2),
+                   stdev.cort = round (sd(avg.Cort, 
+                                       na.rm = T), 2))%>%
+        mutate(freq = n.cort / sum(n.cort))
+      
+    ## b) save the data frame of summary stats out as a pdf into output file
+      pdf(here('output/cort_repro_sum.pdf'), 
+          height = 4, width = 5)
+      grid.table(cort_repro_sum)
+      dev.off()     
+      
+      
+  ### 4.10 Descriptive bivariate stats corticosterone status by time of day
+      # when fecal sample was collected
+    ## a) AM vs PM summary 
+      cort_time_sum <- fec_horm_neosp_toxo_data_12 %>%
+        filter(!is.na(corticosterone.ng.g)) %>%
+        group_by (hy.id, poop.am.pm) %>%
+        summarise (n.Cort = sum(!is.na(corticosterone.ng.g)),
+                   avg.Cort = round (mean(corticosterone.ng.g, 
+                                          na.rm = T),2),
+                   stdev.Cort = round (sd(corticosterone.ng.g, 
+                                          na.rm = T), 2)) 
+      
+      # summarize T averaged over individuals
+      cort_time_sum <- cort_time_sum %>%
+        group_by (poop.am.pm) %>%
+        summarise (n.cort = sum(!is.na(avg.Cort)),
+                   avg.cort = round (mean(avg.Cort, 
+                                       na.rm = T),2),
+                   stdev.cort = round (sd(avg.Cort, 
+                                       na.rm = T), 2))%>%
+        mutate(freq = n.cort / sum(n.cort))
+      
+    ## b) save the data frame of summary stats out as a pdf into output file
+      pdf(here('output/cort_time_sum.pdf'), 
+          height = 4, width = 5)
+      grid.table(cort_time_sum)
+      dev.off()     
+      
+      
+  ### 4.11 Descriptive bivariate stats corticosterone status by the season
+      # when fecal sample was collected
+    ## a) Migration present vs absent summary 
+      cort_migrtn_seas_sum <- fec_horm_neosp_toxo_data_12 %>%
+        filter(!is.na(corticosterone.ng.g)) %>%
+        group_by (hy.id, migratn.seas.fec) %>%
+        summarise (n.Cort = sum(!is.na(corticosterone.ng.g)),
+                   avg.Cort = round (mean(corticosterone.ng.g, 
+                                          na.rm = T),2),
+                   stdev.Cort = round (sd(corticosterone.ng.g, 
+                                          na.rm = T), 2)) 
+      
+      # summarize T averaged over individuals
+      cort_migrtn_seas_sum <- cort_migrtn_seas_sum %>%
+        group_by (migratn.seas.fec) %>%
+        summarise (n.cort = sum(!is.na(avg.Cort)),
+                   avg.cort = round (mean(avg.Cort, 
+                                       na.rm = T),2),
+                   stdev.cort = round (sd(avg.Cort, 
+                                       na.rm = T), 2))%>%
+        mutate(freq = n.cort / sum(n.cort))
+      
+    ## b) save the data frame of summary stats out as a pdf into output file
+      pdf(here('output/cort_migrtn_seas_sum.pdf'), 
+          height = 4, width = 5)
+      grid.table(cort_migrtn_seas_sum)
+      dev.off()   
+      
+      
+  ### 4.12 Descriptive bivariate stats corticosterone status by human disturbance
+      # when fecal sample was collected
+    ## a) Human disturbance summary 
+      cort_hum_disturb_sum <- fec_horm_neosp_toxo_data_12 %>%
+        filter(!is.na(corticosterone.ng.g)) %>%
+        group_by (hy.id, hum.pop.den) %>%
+        summarise (n.Cort = sum(!is.na(corticosterone.ng.g)),
+                   avg.Cort = round (mean(corticosterone.ng.g, 
+                                          na.rm = T),2),
+                   stdev.Cort = round (sd(corticosterone.ng.g, 
+                                          na.rm = T), 2)) 
+      
+      # summarize T averaged over individuals
+      cort_hum_disturb_sum <- cort_hum_disturb_sum %>%
+        group_by (hum.pop.den) %>%
+        summarise (n.cort = sum(!is.na(avg.Cort)),
+                   avg.cort = round (mean(avg.Cort, 
+                                       na.rm = T),2),
+                   stdev.cort = round (sd(avg.Cort, 
+                                       na.rm = T), 2))%>%
+        mutate(freq = n.cort / sum(n.cort))
+      
+    ## b) save the data frame of summary stats out as a pdf into output file
+      pdf(here('output/cort_hum_disturb_sum.pdf'), 
+          height = 4, width = 5)
+      grid.table(cort_hum_disturb_sum)
+      dev.off()
+      
+
+     
       
       

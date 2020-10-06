@@ -396,7 +396,50 @@
                                state = factor(state,
                                               levels = c("n", "p", 
                                                          "l", "o", "m")))
-     
+    
+        
+  ### 4.5 Consider data inclusion cut-offs for fec_horm_neosp_toxo_data
+    ## a) Calcuate time between diagnosis and fecal samlple colleciton
+      fec_horm_neosp_toxo_data <- fec_horm_neosp_toxo_data  %>%
+        mutate(mon.btwn.diag.fec = round((interval(dart.date,
+                                                   poop.date) %/% days(1) 
+                                      / 30.44), 1))
+      
+      
+    ## b) Generate a flag to indicate if the fecal sample collection comes 
+      # before or after diagnosis (darting date)
+      fec_horm_neosp_toxo_data$poop.before.after <- 
+        ifelse((fec_horm_neosp_toxo_data$poop.date >=
+                  fec_horm_neosp_toxo_data$dart.date), 'after',
+               (ifelse(is.na(fec_horm_neosp_toxo_data$poop.date),
+                       NA, 'before')))  
+      
+      
+#********************** Data Inclusion/Exclusion Criteria **********************
+      
+    ## c) Subset the data to include only samples collected within 12 months 
+      # of the diagnosis
+      fec_horm_neosp_toxo_data_12 <- fec_horm_neosp_toxo_data  %>%
+        filter(abs(mon.btwn.diag.fec) <= 12)
+      
+    ## d) Fecal hormone measues based on toxo diagnosis
+      # Subset data to include only fecal hormone data before negative 
+      # infection and after postive infection
+      fec_horm_toxo_data_restrict <- fec_horm_neosp_toxo_data_12 %>%
+        filter ((grepl('1', toxo.status) &
+                   grepl('after', poop.before.after)) | 
+                  (grepl('0', toxo.status) & 
+                     grepl('before', poop.before.after)))
+      
+    ## e) Fecal hormone measues based on neosp diagnosis
+      fec_horm_neosp_data_restrict <- fec_horm_neosp_toxo_data_12 %>%
+        filter ((grepl('1', neo.status) &
+                   grepl('after', poop.before.after)) | 
+                  (grepl('0', neo.status) & 
+                     grepl('before', poop.before.after)))
+      
+#********************** Data Inclusion/Exclusion Criteria **********************  
+      
       
 
 ###############################################################################
@@ -409,7 +452,9 @@
       # RData file.
       save(file = paste0(project_data_path, 
                          '2_tidy_data_neo_toxo_fec_horm.RData'), 
-           list = c('fec_horm_neosp_toxo_data'))
+           list = c('fec_horm_neosp_toxo_data', 'fec_horm_neosp_toxo_data_12',
+                    'fec_horm_toxo_data_restrict', 
+                    'fec_horm_neosp_data_restrict'))
       
       
 
