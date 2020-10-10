@@ -6,7 +6,7 @@
 #############                                                     #############
 #############                  By: Zach Laubach                   #############
 #############                created: 19 Sept 2020                #############
-#############              last updated: 5 Oct 2020               #############
+#############              last updated: 9 Oct 2020               #############
 ###############################################################################
 
 
@@ -63,9 +63,9 @@
     sessionInfo()
     
     # Developed in:   
-    # R version 4.0.0 (2020-04-24)
+    # R version 4.0.2 (2020-06-22)
     # Platform: x86_64-apple-darwin17.0 (64-bit)
-    # Running under: macOS Mojave 10.14.6
+    # Running under: macOS Catalina 10.15.7
     
   
   ### 1.4 Set working directory 
@@ -165,27 +165,23 @@
     ## a) Convert all text to lower case
       neosp_toxo_data <- AllCharactersToLower(neosp_toxo_data)
       
-    ## b) Update 'toxo_status'
-      neosp_toxo_data <- neosp_toxo_data  %>%
-        transform(toxo_status = case_when(!is.na(neosp_toxo_data$toxo_status) & 
-                                            toxo_status == 'positive'
-                                         ~ 1,
-                                         !is.na(neosp_toxo_data$toxo_status) & 
-                                           toxo_status == 'negative'
-                                         ~ 0))
+    ## b) Format as toxo_status as a factor
+      neosp_toxo_data <- transform(neosp_toxo_data,
+                                   toxo_status = 
+                                     factor(toxo_status,
+                                            levels = c("negative", 
+                                                       "positive")))
      
     ## c) Drop redundant variable, 'toxo.status'   
       neosp_toxo_data <- neosp_toxo_data  %>%
         select(-c(toxo.status))
       
-    ## d) Update 'neo_status'
-      neosp_toxo_data <- neosp_toxo_data  %>%
-        transform(neo_status = case_when(!is.na(neosp_toxo_data$neo_status) & 
-                                           neo_status == 'positive'
-                                          ~ 1,
-                                          !is.na(neosp_toxo_data$neo_status) & 
-                                           neo_status == 'negative'
-                                          ~ 0))
+    ## d) Format as neo_status as a factor
+      neosp_toxo_data <- transform(neosp_toxo_data,
+                                   neo_status = 
+                                     factor(neo_status,
+                                            levels = c("negative", 
+                                                       "positive")))
       
     ## e) Format variable names (lowercase and separated by '.')
       neosp_toxo_data <- FormatVarNames(neosp_toxo_data) 
@@ -204,6 +200,14 @@
       neosp_toxo_data <- neosp_toxo_data %>%
         mutate(disappeared.date = as.Date(neosp_toxo_data$disappeared.date,
                                    format = '%m/%d/%y'))
+      
+    ## i) Format sex as a factor
+      neosp_toxo_data <- transform(neosp_toxo_data,
+                                   sex = 
+                                     factor(sex,
+                                            levels = c("f", 
+                                                       "m")))
+    
       
 
       
@@ -281,6 +285,20 @@
       fec_horm_neosp_toxo_data <- fec_horm_neosp_toxo_data %>%
         filter(!is.na(toxo.status) | !is.na(neo.status))
       
+    ## c) Get the clan status for each hyena on their poop date
+      clan_status <- hyenadata::get_clan_status(fec_horm_neosp_toxo_data$hy.id,
+                                      fec_horm_neosp_toxo_data$poop.date)
+    
+    ## d) Rename clan as poop.clan
+      clan_status <- clan_status %>%
+        rename('poop.clan' = 'clan')
+      
+    ## e) Left join clan_status to fec_horm_neosp_toxo_data
+      fec_horm_neosp_toxo_data <- fec_horm_neosp_toxo_data %>%
+        left_join(select(clan_status, c(ids, dates, poop.clan)),
+                  by = c('hy.id' = 'ids',
+                         'poop.date' = 'dates'))
+      
       
   ### 4.4 Tidy fec_horm_neosp_toxo_data including preciion covariates 
     ## a) Create a varialbes, 'fecal.age.days', and 'fecal.age.mon,' 
@@ -310,7 +328,22 @@
                                          sex == "f" & fecal.age.mon > 24 
                                          ~ c("adult")))
       
-    ## c) Re-code *nominal* factor (with ordered levels)  
+    ## c) Fill in missing ages for (Serena animals and immigrant males, 
+      # whose dob is unknown)
+      fec_horm_neosp_toxo_data <- fec_horm_neosp_toxo_data  %>%
+        mutate(fecal.age.cat = case_when
+                 (!is.na(fec_horm_neosp_toxo_data$fecal.age.cat)
+                   ~ fecal.age.cat,
+                   is.na(fec_horm_neosp_toxo_data$fecal.age.cat) 
+                  & sex == "m" & status == 'i'
+                  ~ c("adult"),
+                 is.na(fec_horm_neosp_toxo_data$fecal.age.cat) 
+                  & sex == "f" & (grepl('serena', dob.event.data) |
+                                    grepl('happy', dob.event.data))
+                  ~ c("adult")))  
+      
+      
+    ## d) Re-code *nominal* factor (with ordered levels)  
       # Set levels (odering) fecal.age.cat variable and sets the 
       # reference level to cub 
       # NOTE: model output is difference in means btwn reference and each 
@@ -322,7 +355,7 @@
                                                                 "subadult", 
                                                                 "adult")))
       
-    ## d)  Extract month and year from poop.date
+    ## e)  Extract month and year from poop.date
       # Use lubridate to extract the month/yr during which a poop sample was 
       # collected and make a new variable  
       fec_horm_neosp_toxo_data$poop.mon <- 
@@ -330,13 +363,13 @@
       fec_horm_neosp_toxo_data$poop.yr <- 
         year(fec_horm_neosp_toxo_data$poop.date)
       
-    ## e) Create a varialbe, 'migratn.seas.fec,' which indicates if a poop 
+    ## f) Create a varialbe, 'migratn.seas.fec,' which indicates if a poop 
       # sample was collected in migration (June 1 - Oct 31)
       fec_horm_neosp_toxo_data <- fec_horm_neosp_toxo_data  %>%
         mutate(migratn.seas.fec = ifelse(poop.mon >= 6 & poop.mon<= 10, 
                                          'migration', 'none'))
       
-    ## f) Re-code *nominal* factor (with ordered levels)  
+    ## g) Re-code *nominal* factor (with ordered levels)  
       # Set levels (odering) of migratn.seas.fec variable and sets the reference  
       # level to 'none'
       fec_horm_neosp_toxo_data <- transform(fec_horm_neosp_toxo_data, 
@@ -344,20 +377,20 @@
                                 factor(migratn.seas.fec,
                                        levels = c("none", "migration")))  
       
-    ## g) Convert poop.time to a datetime class
+    ## h) Convert poop.time to a datetime class
       fec_horm_neosp_toxo_data$poop.time <- 
         as.POSIXct(paste(fec_horm_neosp_toxo_data$poop.date,
                          fec_horm_neosp_toxo_data$poop.time), 
                    format = '%Y-%m-%d %H:%M:%S')
       
-    ## h) Extract am vs. pm from poop.time
+    ## i) Extract am vs. pm from poop.time
       # Use lubridate to extract the month during which a poop sample was 
       # collected and make a new variable
       fec_horm_neosp_toxo_data <- fec_horm_neosp_toxo_data  %>%
         mutate(poop.am.pm = ifelse(lubridate::am(poop.time), 'am', 
                                    'pm'))
       
-    ## i) Re-code *nominal* factor (with ordered levels)  
+    ## j) Re-code *nominal* factor (with ordered levels)  
       # Set levels (odering) of poop.am.pm variable and sets the reference  
       # level to 'am' 
       fec_horm_neosp_toxo_data <- transform(fec_horm_neosp_toxo_data, 
@@ -365,11 +398,11 @@
                                                   levels = c("am", 
                                                              "pm"))) 
       
-    ## j) Change state to character
+    ## k) Change state to character
       fec_horm_neosp_toxo_data$state <- 
         as.character(fec_horm_neosp_toxo_data$state)
       
-    ## k) Replaces NA with repro state
+    ## l) Replaces NA with repro state
       # *** NOTE *** Hyena's less than ~750 days old are not in tblReprostates,  
       # but are by default n = nulliparous. Animals older than ~750 days
       # sometimes have missing data on repro state, possibly because
@@ -389,14 +422,42 @@
                                  sex == 'm'
                                  ~ c('m')))
       
-    ## l) Re-code *nominal* factor (with ordered levels)  
+    ## m) Re-code *nominal* factor (with ordered levels)  
       # Set levels (odering) of state variable and sets the reference level 
       # to 'n' makes this
       fec_horm_neosp_toxo_data <- transform( fec_horm_neosp_toxo_data, 
                                state = factor(state,
                                               levels = c("n", "p", 
                                                          "l", "o", "m")))
-    
+      
+    ## n) Rename existing human disturbance variable (which is based on dob)
+      fec_horm_neosp_toxo_data <- fec_horm_neosp_toxo_data %>%
+        rename('hum.pop.dob' = 'hum.pop.den')
+      
+    ## o) Create a 2-level ordinal factor indicating human pastoralist presence
+      # /disturbance based Green et. al 2018 when fecal sample was collected
+      # 
+      fec_horm_neosp_toxo_data <- fec_horm_neosp_toxo_data %>%
+        mutate(hum.pop.poop = case_when(fec_horm_neosp_toxo_data$poop.clan
+                                        %in% c('talek', 'talek.e', 'kcm', 
+                                               'fig tree') &
+                                          fec_horm_neosp_toxo_data$poop.yr >= 2000
+                                        ~ c('hi'),
+                                        fec_horm_neosp_toxo_data$poop.clan
+                                        %in% c('talek', 'talek.e', 'kcm',
+                                               'fig tree') &
+                                        fec_horm_neosp_toxo_data$poop.yr < 2000 
+                                        ~ c('low'),
+                                        fec_horm_neosp_toxo_data$poop.clan 
+                                        %in% c('serena.n', 'serena.s',
+                                               'happy.zebra')
+                                        ~ c('low')))
+      
+    ## p) Re-code hum.dist as nominal factor and set level (order)
+      fec_horm_neosp_toxo_data <- transform(fec_horm_neosp_toxo_data,
+                                   hum.pop.poop = factor(hum.pop.poop,
+                                                   levels = c('hi','low')))
+
         
   ### 4.5 Consider data inclusion cut-offs for fec_horm_neosp_toxo_data
     ## a) Calcuate time between diagnosis and fecal samlple colleciton
@@ -426,20 +487,21 @@
       # Subset data to include only fecal hormone data before negative 
       # infection and after postive infection
       fec_horm_toxo_data_restrict <- fec_horm_neosp_toxo_data_12 %>%
-        filter ((grepl('1', toxo.status) &
+        filter ((grepl('positive', toxo.status) &
                    grepl('after', poop.before.after)) | 
-                  (grepl('0', toxo.status) & 
+                  (grepl('negative', toxo.status) & 
                      grepl('before', poop.before.after)))
       
     ## e) Fecal hormone measues based on neosp diagnosis
       fec_horm_neosp_data_restrict <- fec_horm_neosp_toxo_data_12 %>%
-        filter ((grepl('1', neo.status) &
+        filter ((grepl('positive', neo.status) &
                    grepl('after', poop.before.after)) | 
-                  (grepl('0', neo.status) & 
+                  (grepl('negative', neo.status) & 
                      grepl('before', poop.before.after)))
       
 #********************** Data Inclusion/Exclusion Criteria **********************  
       
+ 
       
 
 ###############################################################################

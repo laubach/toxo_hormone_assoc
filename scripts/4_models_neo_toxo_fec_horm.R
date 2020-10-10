@@ -2,23 +2,26 @@
 #############            Spotted Hyena Neospora caninum:          #############
 ############# Determinants and behavior and fitness consequences  #############
 #############                                                     #############
-#############           5_1 Models: Determinants Neosp.           #############
+############# 4 Models: Toxo. and Neosp. associations w/ hormones #############
 #############                                                     #############
 #############                  By: Zach Laubach                   #############
-#############                created: 24 Sept 2020                #############
-#############              last updated: 24 Sept 2020             #############
+#############                created: 6 Oct 2020                #############
+#############              last updated: 9 Oct 2020             #############
 ###############################################################################
 
-#**************************  Determinants of Neosp. **************************** 
 
-  ### PURPOSE: Model associations of determinants of Neospora caninum 
+
+  ### PURPOSE: Model associations between T. gondii and Neospora caninum 
+             # infection with fecal testosterone and corticosterone levels 
              # in spotted hyenas
   
   
   # Code Blocks
     # 1: Configure workspace
     # 2: Load RData
-    # 3: Determinants of N. caninum infection models
+    # 3: Model precision covariates
+    # 4: Infection associations with testosterone
+    # 5: Infection associations with corticosterone
 
 
 
@@ -86,6 +89,64 @@
       # load car packages (used for type II and type III SS test)
       library ('car')
       #options(contrasts = c('contr.sum', 'contr.poly'))
+      
+      # Check for dotwhisker and install if not already installed
+      # used with broom to graph beta estimates
+      if (!'dotwhisker' %in% installed.packages()[,1]){
+        install.packages ('dotwhisker')
+      }
+      # load dotwhisker packages
+      library ('dotwhisker')
+      
+    ## c) Modeling Packages
+      # Check for broom and install if not already installed
+      if (!'broom' %in% installed.packages()[,1]){
+        install.packages ('broom')
+      }
+      # load broom packages
+      library ('broom')
+      
+      # install broom.mixed, a package under development by Ben Bolker
+      # similar to broom but extends bey lm and glm
+      install.packages("remotes")
+      remotes::install_github("bbolker/broom.mixed")
+      
+      # Check for nlme and install if not already installed
+      if (!'nlme' %in% installed.packages()[,1]){
+        install.packages ('nlme')
+      }
+      # load nlme packages
+      library ('nlme')
+      
+      # Check for lme4 and install if not already installed
+      if (!'lme4' %in% installed.packages()[,1]){
+        install.packages ('lme4')
+      }
+      # load lme4 packages
+      library ('lme4')
+      
+      # Check for boot and install if not already installed
+      # used to generate boot strap CI from LME4
+      if (!'boot' %in% installed.packages()[,1]){
+        install.packages ('boot')
+      }
+      # load boot packages
+      library ('boot')
+      
+      # Check for car and install if not already installed
+      # includes vif function
+      if (!'car' %in% installed.packages()[,1]){
+        install.packages ('car')
+      }
+      # load car packages
+      library ('car')
+      
+      # Check for merTools and install if not already installed
+      if (!'merTools' %in% installed.packages()[,1]){
+        install.packages ('merTools')
+      }
+      # load merTools packages
+      library ('merTools')
 
         
   ### 1.3 Get Version and Session Info
@@ -93,9 +154,9 @@
     sessionInfo()
     
     # Developed in:   
-    # R version 4.0.0 (2020-04-24)
+    # R version 4.0.2 (2020-06-22)
     # Platform: x86_64-apple-darwin17.0 (64-bit)
-    # Running under: macOS Mojave 10.14.6
+    # Running under: macOS Catalina 10.15.7
     
   
   ### 1.4 Set working directory 
@@ -110,20 +171,6 @@
     ## b) The path for exporting to the output folder
       project_output_path <- paste0(here('output/'))
     
-    ## c) Source scripts path
-      source_path <- paste("~/Git/source_code/")
-      
-      
-  ### 1.6 Source functions
-    ## a) all_char_to_lower function
-      source(file = paste0(source_path, "all_char_to_lower.R"))
-      
-    ## b) format_var_names function
-      source(file = paste0(source_path, "format_var_names.R"))
-      
-    ## c) format_var_names_dash function
-      source(file = paste0(source_path, "format_var_names_dash.R"))  
-
 
       
 ###############################################################################
@@ -131,220 +178,245 @@
 ###############################################################################  
   
   ### 2.1 Load RData
-    ## a) load RData: updated neosp_data joined to hyena data tables
-      load(paste0(project_data_path, '3_1_determnts_neosp.RData'))
+    ## a) load RData: updated fec_horm_neosp_toxo_data joined to hyena 
+      # data tables
+      load(paste0(project_data_path, '3_neo_toxo_fec_horm.RData'))
      
       
       
 ###############################################################################
-##############  3. Determinants of N. caninum infection models   ##############
+##############           3. Model precision covariates           ##############
 ###############################################################################
     
-### 3.1 Neosp. by sex     
-  ## a) Unadjusted logistic regression neosp_status by Sex
-      sex.log <- glm(neo.status ~ sex , 
-                     subset(neosp_data,
-                            !is.na(x = sex)),family = binomial) 
+### 3.1 Testosterone precision covariates     
+  ## a)  Unadjusted mixed-model: testosterone by sex
+      T.sex.mod <- lme4::lmer(testosterone.ng.g.ln ~ sex 
+                              + (1|hy.id) , 
+                     data = subset(fec_horm_neosp_toxo_data_12,
+                            !is.na(x = sex))) 
       
-      summary(sex.log) # print model summary (log odds scale)
-      confint(sex.log) # 95% CIs (log odds scale)
+      summary(T.sex.mod) # print model summary (ln scale)
+      confint(T.sex.mod) # 95% CIs (ln scale)
+      plot(T.sex.mod) # view fitted vs residuals
+ 
+    # same mode using nlme instead of lme4;the latter produces p-values  
+      T.sex.mod <- nlme::lme(testosterone.ng.g.ln ~ sex, 
+                             random = ~ 1|hy.id, 
+                             data = subset(fec_horm_neosp_toxo_data_12,
+                                           !is.na(x = sex) & 
+                                             !is.na(x = testosterone.ng.g.ln))) 
+      
+      summary(T.sex.mod) # print model summary (ln scale)
+      intervals(T.sex.mod) # 95% CIs (ln scale)
+      plot(T.sex.mod) # view fitted vs residuals
+      
+      
+      
+      
+      
       
       # exponentiate estimates to get onto odds scale
-      exp(cbind (O.R. = coef(sex.log), confint (sex.log)))
+      exp(cbind (beta_est = fixef(T.sex.mod), 
+                 exp(intervals(T.sex.mod, which = c('fixed'))) )
+          
+          T.sex.mod.tdy <- tidy(T.sex.mod) %>%
+            filter(term != '(Intercept)') %>%
+            relabel_predictors(c(toxo.status1 = 'Seropositive'))
+          
+          
+          
+          
+          
+          
       
-      # Wald Chi-square test of significance using 'aod'
-      wald.test(b = coef(sex.log), Sigma = vcov(sex.log), Terms = 2) 
+    ## b) Unadjusted mixed-model: testosterone by age 
+      T.age.mod <- nlme::lme(testosterone.ng.g.ln ~ fecal.age.cat, 
+                             random = ~ 1|hy.id, 
+                             data = subset(fec_horm_neosp_toxo_data_12,
+                                           !is.na(x = fecal.age.mon) & 
+                                             !is.na(x = testosterone.ng.g.ln)))
       
-    ## b) Adjusted logistic regression neosp_status by sex
-      sex.log.adj <- glm(neo.status ~ sex + age.mon.dart 
-                         , 
-                         data = neosp_data,
-                         #data = neosp_data_no_gil_baj, # sensitivity
-                         family = binomial) 
-      #****NOTE...control for continuous age to save power and because ****
-      summary(sex.log.adj) # print model summary (log odds scale)
-      confint(sex.log.adj) # 95% CIs (log odds scale)
+      summary(T.age.mod) # print model summary (ln scale)
+      intervals(T.age.mod) # 95% CIs (ln scale)
+      plot(T.age.mod) # view fitted vs residuals
       
-      # exponentiate estimates to get onto odds scale
-      exp(cbind (O.R. = coef(sex.log.adj), 
-                 confint (sex.log.adj)))
+    ## c) Unadjusted mixed-model: testosterone by reproductive state 
+      T.repro.state.mod <- nlme::lme(testosterone.ng.g.ln ~ state, 
+                             random = ~ 1|hy.id, 
+                             data = subset(fec_horm_neosp_toxo_data_12,
+                                           !is.na(x = state) & 
+                                             !is.na(x = testosterone.ng.g.ln)))
       
-      # Wald Chi-square test of significance using 'aod'
-      wald.test(b = coef(sex.log.adj), 
-                Sigma = vcov(sex.log.adj), 
-                Terms = 2) 
-      
-      
-  ### 3.2 Neosp. by age 
-    ## a) Unadjusted logistic regression neosp_status by age
-      age.log <- glm(neo.status ~ age.cat.dart , 
-                     subset(neosp_data,
-                            !is.na(x = age.cat.dart)),family = binomial) 
-      
-      summary(age.log) # print model summary (log odds scale)
-      confint(age.log) # 95% CIs (log odds scale)
-      
-      # exponentiate estimates to get onto odds scale
-      exp(cbind (O.R. = coef(age.log), confint (age.log)))
-      
-      # Wald Chi-square test of significance using 'aod'
-      wald.test(b = coef(age.log), Sigma = vcov(age.log), Terms = 2:3) 
-      
-    ## b) Adjusted logistic regression neosp_status by age.cat.dart
-      age.cat.dart.log.adj <- glm(neo.status ~ age.cat.dart +  sex  
-                                  , 
-                                  data = neosp_data,
-                                  #data = neosp_data_no_gil_baj, # sensitivity
-                                  family = binomial)  
-      
-      summary(age.cat.dart.log.adj) # print model summary (log odds scale)
-      confint(age.cat.dart.log.adj) # 95% CIs (log odds scale)
-      
-      # exponentiate estimates to get onto odds scale
-      exp(cbind (O.R. = coef(age.cat.dart.log.adj), 
-                 confint (age.cat.dart.log.adj)))
-      
-      # Wald Chi-square test of significance using 'aod'
-      wald.test(b = coef(age.cat.dart.log.adj), 
-                Sigma = vcov(age.cat.dart.log.adj), 
-                Terms = 2) 
-      # Wald Chi-square test of significance using 'aod'
-      wald.test(b = coef(age.cat.dart.log.adj), 
-                Sigma = vcov(age.cat.dart.log.adj), 
-                Terms = 3) 
+      summary(T.repro.state.mod) # print model summary (ln scale)
+      intervals(T.repro.state.mod) # 95% CIs (ln scale)
+      plot(T.repro.state.mod) # view fitted vs residuals
       
       
-  ### 3.3 Neosp. by standardized rank 
-    ## a) Adult female stratified logistic regression neosp_status by 
-      # stanrank.dart
-      stanrank.ad.f.log <- glm(neo.status ~ stan.rank.dart,
-                          data = neosp_data,
-                          subset = (sex == 'f' & age.cat.dart == 'adult'),
-                          family = binomial)
+    ## d) Unadjusted mixed-model: testosterone by fecal sample time of day
+      T.poop.am.pm.mod <- nlme::lme(testosterone.ng.g.ln ~ poop.am.pm, 
+                                     random = ~ 1|hy.id, 
+                                     data = subset(fec_horm_neosp_toxo_data_12,
+                                            !is.na(x = poop.am.pm) & 
+                                            !is.na(x = testosterone.ng.g.ln)))
+      
+      summary(T.poop.am.pm.mod) # print model summary (ln scale)
+      intervals(T.poop.am.pm.mod) # 95% CIs (ln scale)
+      plot(T.poop.am.pm.mod) # view fitted vs residuals
       
       
-      summary(stanrank.ad.f.log) # print model summary (log odds scale)
-      confint(stanrank.ad.f.log) # 95% CIs (log odds scale)
+    ## e) Unadjusted mixed-model: testosterone by fecal sample collection season
+      T.migratn.seas.fec.mod <- nlme::lme(testosterone.ng.g.ln ~ 
+                                            migratn.seas.fec,
+                                    random = ~ 1|hy.id, 
+                                    data = subset(fec_horm_neosp_toxo_data_12,
+                                           !is.na(x = migratn.seas.fec) & 
+                                           !is.na(x = testosterone.ng.g.ln)))
       
-      # exponentiate estimates to get onto odds scale
-      exp(cbind (O.R. = coef(stanrank.ad.f.log),
-                 confint (stanrank.ad.f.log)))
-      
-      # Wald Chi-square test of significance using 'aod'
-      wald.test(b = coef(stanrank.ad.f.log),
-                Sigma = vcov(stanrank.ad.f.log), Terms = 2)
-      
-    ## b) Adult male stratified logistic regression neosp_status by 
-      # stanrank.dart
-      stanrank.ad.m.log <- glm(neo.status ~ stan.rank.dart,
-                               data = neosp_data,
-                               subset = (sex == 'm' & age.cat.dart == 'adult'),
-                               family = binomial)
+      summary(T.migratn.seas.fec.mod) # print model summary (ln scale)
+      intervals(T.migratn.seas.fec.mod) # 95% CIs (ln scale)
+      plot(T.migratn.seas.fec.mod) # view fitted vs residuals
       
       
-      summary(stanrank.ad.m.log) # print model summary (log odds scale)
-      confint(stanrank.ad.m.log) # 95% CIs (log odds scale)
+    ## f) Unadjusted mixed-model: testosterone by human disturance when fecal
+      # sample was collected
+      T.hum.pop.poop.mod <- nlme::lme(testosterone.ng.g.ln ~ hum.pop.poop,
+                                          random = ~ 1|hy.id, 
+                                    data = subset(fec_horm_neosp_toxo_data_12,
+                                          !is.na(x = hum.pop.poop) & 
+                                          !is.na(x = testosterone.ng.g.ln)))
       
-      # exponentiate estimates to get onto odds scale
-      exp(cbind (O.R. = coef(stanrank.ad.m.log),
-                 confint (stanrank.ad.m.log)))
-      
-      # Wald Chi-square test of significance using 'aod'
-      wald.test(b = coef(stanrank.ad.m.log),
-                Sigma = vcov(stanrank.ad.m.log), Terms = 2)
-      
-      
-    ## b) Cub and subadult stratified logistic regression neosp_status by 
-      # stanrank.dart (both sexes)
-      stanrank.cub.sub.log <- glm(neo.status ~ stan.rank.dart,
-                               data = neosp_data,
-                               subset = (age.cat.dart == 'cub' | 
-                                           age.cat.dart == 'subadult'),
-                               family = binomial)
+      summary(T.hum.pop.poop.mod) # print model summary (ln scale)
+      intervals(T.hum.pop.poop.mod) # 95% CIs (ln scale)
+      plot(T.hum.pop.poop.mod) # view fitted vs residuals
       
       
-      summary(stanrank.cub.sub.log) # print model summary (log odds scale)
-      confint(stanrank.cub.sub.log) # 95% CIs (log odds scale)
+  ### 3.2 Corticosterone precision covariates     
+    ## a)  Unadjusted mixed-model: corticosterone by sex
+      cort.sex.mod <- nlme::lme(corticosterone.ng.g.ln ~ sex, 
+                             random = ~ 1|hy.id, 
+                             data = subset(fec_horm_neosp_toxo_data_12,
+                                          !is.na(x = sex) & 
+                                          !is.na(x = corticosterone.ng.g.ln))) 
       
-      # exponentiate estimates to get onto odds scale
-      exp(cbind (O.R. = coef(stanrank.cub.sub.log),
-                 confint (stanrank.cub.sub.log)))
+      summary(cort.sex.mod) # print model summary (ln scale)
+      intervals(cort.sex.mod) # 95% CIs (ln scale)
+      plot(cort.sex.mod) # view fitted vs residuals
       
-      # Wald Chi-square test of significance using 'aod'
-      wald.test(b = coef(stanrank.cub.sub.log),
-                Sigma = vcov(stanrank.cub.sub.log), Terms = 2)
+    ## b) Unadjusted mixed-model: corticosterone by age 
+      cort.age.mod <- nlme::lme(corticosterone.ng.g.ln ~ fecal.age.cat, 
+                             random = ~ 1|hy.id, 
+                             data = subset(fec_horm_neosp_toxo_data_12,
+                                          !is.na(x = fecal.age.mon) & 
+                                          !is.na(x = corticosterone.ng.g.ln)))
       
+      summary(cort.age.mod) # print model summary (ln scale)
+      intervals(cort.age.mod) # 95% CIs (ln scale)
+      plot(cort.age.mod) # view fitted vs residuals
       
-  ### 3.4 Neosp. by human disturbance 
+    ## c) Unadjusted mixed-model: corticosterone by reproductive state 
+      cort.repro.state.mod <- nlme::lme(corticosterone.ng.g.ln ~ state, 
+                                     random = ~ 1|hy.id, 
+                                     data = subset(fec_horm_neosp_toxo_data_12,
+                                          !is.na(x = state) & 
+                                          !is.na(x = corticosterone.ng.g.ln)))
       
-#***NOTE: All cubs are from low disturbance, so cubs removed due to their 
-      # strong influence which leads to an apparent association btwn 
-      # hum.pop.den low and lower infection prevalence; cannot disentagle
-      # effect of age from hum.pop.den
+      summary(cort.repro.state.mod) # print model summary (ln scale)
+      intervals(cort.repro.state.mod) # 95% CIs (ln scale)
+      plot(cort.repro.state.mod) # view fitted vs residuals
       
-    ## a) Interaction logistic regression neosp_status by hum_pop_den * sex
-      hum.pop.sex.log <- glm(neo.status ~ hum.pop.den * sex, 
-                         data = neosp_data,
-                         subset = (age.cat.dart == 'adult' | 
-                                     age.cat.dart == 'subadult'),
-                         family = binomial) 
+ 
+    ## d) Unadjusted mixed-model: corticosterone by fecal sample time of day
+      cort.poop.am.pm.mod <- nlme::lme(corticosterone.ng.g.ln ~ poop.am.pm, 
+                                    random = ~ 1|hy.id, 
+                                    data = subset(fec_horm_neosp_toxo_data_12,
+                                          !is.na(x = poop.am.pm) & 
+                                          !is.na(x = corticosterone.ng.g.ln)))
       
-      summary(hum.pop.sex.log) # print model summary (log odds scale)
-      confint(hum.pop.sex.log) # 95% CIs (log odds scale)
-      
-      # exponentiate estimates to get onto odds scale
-      exp(cbind (O.R. = coef(hum.pop.sex.log), confint (hum.pop.sex.log)))
-      
-      # Wald Chi-square test of significance using 'aod'
-      wald.test(b = coef(hum.pop.sex.log), 
-                Sigma = vcov(hum.pop.sex.log), Terms = 4) 
-      
-      
-    ## b) Unadjusted logistic regression neosp_status by hum_pop_den * sex
-      hum.pop.log <- glm(neo.status ~ hum.pop.den, 
-                             data = neosp_data,
-                             subset = (age.cat.dart == 'adult' | 
-                                         age.cat.dart == 'subadult'),
-                             family = binomial) 
-      
-      summary(hum.pop.log) # print model summary (log odds scale)
-      confint(hum.pop.log) # 95% CIs (log odds scale)
-      
-      # exponentiate estimates to get onto odds scale
-      exp(cbind (O.R. = coef(hum.pop.log), confint (hum.pop.log)))
-      
-      # Wald Chi-square test of significance using 'aod'
-      wald.test(b = coef(hum.pop.log), 
-                Sigma = vcov(hum.pop.log), Terms = 2) 
+      summary(cort.poop.am.pm.mod) # print model summary (ln scale)
+      intervals(cort.poop.am.pm.mod) # 95% CIs (ln scale)
+      plot(cort.poop.am.pm.mod) # view fitted vs residuals
       
       
-    ## c) Adjusted logistic regression neosp_status by hum_pop_den * sex
-      hum.pop.log <- glm(neo.status ~ hum.pop.den + sex + age.mon.dart, 
-                         data = neosp_data,
-                         subset = (age.cat.dart == 'adult' | 
-                                     age.cat.dart == 'subadult'),
-                         family = binomial) 
+    ## e) Unadjusted mixed-model: corticosterone by fecal sample collection season
+      cort.migratn.seas.fec.mod <- nlme::lme(corticosterone.ng.g.ln ~ 
+                                            migratn.seas.fec,
+                                    random = ~ 1|hy.id, 
+                                    data = subset(fec_horm_neosp_toxo_data_12,
+                                          !is.na(x = migratn.seas.fec) & 
+                                          !is.na(x = corticosterone.ng.g.ln)))
       
-      summary(hum.pop.log) # print model summary (log odds scale)
-      confint(hum.pop.log) # 95% CIs (log odds scale)
+      summary(cort.migratn.seas.fec.mod) # print model summary (ln scale)
+      intervals(cort.migratn.seas.fec.mod) # 95% CIs (ln scale)
+      plot(cort.migratn.seas.fec.mod) # view fitted vs residuals
       
-      # exponentiate estimates to get onto odds scale
-      exp(cbind (O.R. = coef(hum.pop.log), confint (hum.pop.log)))
       
-      # Wald Chi-square test of significance using 'aod'
-      wald.test(b = coef(hum.pop.log), 
-                Sigma = vcov(hum.pop.log), Terms = 2) 
+    ## f) Unadjusted mixed-model: corticosterone by human disturance when fecal
+      # sample was collected
+      cort.hum.pop.poop.mod <- nlme::lme(corticosterone.ng.g.ln ~ hum.pop.poop,
+                                     random = ~ 1|hy.id, 
+                                     data = subset(fec_horm_neosp_toxo_data_12,
+                                          !is.na(x = hum.pop.poop) & 
+                                          !is.na(x = corticosterone.ng.g.ln)))
       
+      summary(cort.hum.pop.poop.mod) # print model summary (ln scale)
+      intervals(cort.hum.pop.poop.mod) # 95% CIs (ln scale)
+      plot(cort.hum.pop.poop.mod) # view fitted vs residuals
+      
+   
 
 ###############################################################################
-##############               4. Bivariate analysis               ##############
+##############   4: Infection associations with testosterone     ##############
 ############################################################################### 
       
   ### 4.1 Descriptive bivariate stats neosp status by sex
-
+    ## a) Unadjusted mixed-model: testosterone by T. gondii infection
+      T.toxo.unadj.mod <- lme4::lmer(testosterone.ng.g.ln ~ toxo.status 
+                              + (1|hy.id), 
+                              data = subset(fec_horm_neosp_toxo_data_12,
+                                          !is.na(x = toxo.status) & 
+                                          !is.na(x = testosterone.ng.g.ln)))
+      
+      
+      summary(T.toxo.unadj.mod) # print model summary (ln scale)
+      confint(T.toxo.unadj.mod) # 95% CIs (ln scale)
+      plot(T.toxo.unadj.mod) # view fitted vs residuals
+      
+    ## b) Effect modification mixed-model: 
+      # testosterone by T. gondii infection * sex
+      T.toxo.sex.mod <- lme4::lmer(testosterone.ng.g.ln ~ toxo.status
+                                     * sex
+                                     + (1|hy.id) , 
+                                   data = subset(fec_horm_neosp_toxo_data_12,
+                                          !is.na(x = toxo.status) & 
+                                          !is.na(x = testosterone.ng.g.ln))) 
+      
+      summary(T.toxo.sex.mod) # print model summary (ln scale)
+      confint(T.toxo.sex.mod) # 95% CIs (ln scale)
+      plot(T.toxo.sex.mod) # view fitted vs residuals
             
       
+    ## c) Female, sex stratified, unadjusted mixed-model: 
+      # testosterone by T. gondii infection 
+      T.toxo.f.mod <- lme4::lmer(testosterone.ng.g.ln ~ toxo.status
+                                   + (1|hy.id) , 
+                                   data = subset(fec_horm_neosp_toxo_data_12,
+                                            sex == 'f' & 
+                                            !is.na(x = testosterone.ng.g.ln))) 
       
-
+      summary(T.toxo.f.mod) # print model summary (ln scale)
+      confint(T.toxo.f.mod) # 95% CIs (ln scale)
+      plot(T.toxo.f.mod) # view fitted vs residuals
       
+    ## d) Male, sex stratified, unadjusted mixed-model: 
+      # testosterone by T. gondii infection 
+      T.toxo.m.mod <- lme4::lmer(testosterone.ng.g.ln ~ toxo.status
+                                 + (1|hy.id) , 
+                                 data = subset(fec_horm_neosp_toxo_data_12,
+                                               sex == 'm' & 
+                                          !is.na(x = testosterone.ng.g.ln))) 
+      
+      summary(T.toxo.m.mod) # print model summary (ln scale)
+      confint(T.toxo.m.mod) # 95% CIs (ln scale)
+      plot(T.toxo.m.mod) # view fitted vs residuals
+    
       

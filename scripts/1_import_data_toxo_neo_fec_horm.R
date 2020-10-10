@@ -73,9 +73,9 @@
     sessionInfo()
     
     # Developed in:   
-    # R version 4.0.0 (2020-04-24)
+    # R version 4.0.2 (2020-06-22)
     # Platform: x86_64-apple-darwin17.0 (64-bit)
-    # Running under: macOS Mojave 10.14.6
+    # Running under: macOS Catalina 10.15.7
     
   
   ### 1.5 Set working directory 

@@ -6,7 +6,7 @@
 #############                                                     #############
 #############                  By: Zach Laubach                   #############
 #############                 created: 5 Oct 2020                 #############
-#############               last updated: 6 Oct 2020              #############
+#############               last updated: 9 Oct 2020              #############
 ###############################################################################
 
 
@@ -78,9 +78,9 @@
     sessionInfo()
     
     # Developed in:   
-    # R version 4.0.0 (2020-04-24)
+    # R version 4.0.2 (2020-06-22)
     # Platform: x86_64-apple-darwin17.0 (64-bit)
-    # Running under: macOS Mojave 10.14.6
+    # Running under: macOS Catalina 10.15.7
     
   
   ### 1.4 Set working directory 
@@ -94,20 +94,6 @@
      
     ## b) The path for exporting to the output folder
       project_output_path <- paste0(here('output/'))
-    
-    ## c) Source scripts path
-      source_path <- paste("~/Git/source_code/")
-      
-      
-  ### 1.6 Source functions
-    ## a) all_char_to_lower function
-      source(file = paste0(source_path, "all_char_to_lower.R"))
-      
-    ## b) format_var_names function
-      source(file = paste0(source_path, "format_var_names.R"))
-      
-    ## c) format_var_names_dash function
-      source(file = paste0(source_path, "format_var_names_dash.R"))  
 
 
       
@@ -257,7 +243,43 @@
              height = 3, 
              units = c('in'), dpi = 300, limitsize = TRUE) 
       
-  
+      
+  ### 3.3 Univariate stats T. gondii 
+    ## a) Descriptive stats T. gondii infection prevalence
+      univar_toxo_stat <- fec_horm_neosp_toxo_data_12 %>%
+        group_by(hy.id, toxo.status) %>%
+        summarise(n.status = sum(!is.na(toxo.status))) %>%
+        mutate(freq = n.status / sum(n.status, na.rm = T))
+      
+      univar_toxo_stat <- univar_toxo_stat %>%
+        group_by(toxo.status) %>%
+        summarise(n.status = sum(!is.na(toxo.status))) %>%
+        mutate(freq = n.status / sum(n.status, na.rm = T))
+      
+    ## b) save the data frame of summary stats out as a pdf into output file
+      pdf(here('output/univar_toxo_status.pdf'), height = 4, width = 8)
+      grid.table(univar_toxo_stat)
+      dev.off()
+      
+      
+  ### 3.4 Univariate stats N. caninum 
+    ## a) Descriptive stats N. caninum  infection prevalence
+      univar_neosp_stat <- fec_horm_neosp_toxo_data_12 %>%
+        group_by(hy.id, neo.status) %>%
+        summarise(n.status = sum(!is.na(neo.status))) %>%
+        mutate(freq = n.status / sum(n.status, na.rm = T))
+      
+      univar_neosp_stat <- univar_neosp_stat %>%
+        group_by(neo.status) %>%
+        summarise(n.status = sum(!is.na(neo.status))) %>%
+        mutate(freq = n.status / sum(n.status, na.rm = T))
+      
+    ## b) save the data frame of summary stats out as a pdf into output file
+      pdf(here('output/univar_neosp_status.pdf'), height = 4, width = 8)
+      grid.table(univar_neosp_stat)
+      dev.off()
+      
+      
 
 ###############################################################################
 ##############               4. Bivariate analysis               ##############
@@ -277,12 +299,12 @@
       # summarize T averaged over individuals
       T_sex_ratio_sum <- T_sex_ratio_sum %>%
         group_by (sex) %>%
-        summarise (n.T = sum(!is.na(avg.Test)),
+        summarise (n.id = sum(!is.na(avg.Test)),
                    avg.T = round (mean(avg.Test, 
                                        na.rm = T),2),
                    stdev.T = round (sd(avg.Test, 
                                        na.rm = T), 2))%>%
-        mutate(freq = n.T / sum(n.T))
+        mutate(freq = n.id / sum(n.id))
       
     ## b) save the data frame of summary stats out as a pdf into output file
       pdf(here('output/T_sex_ratio_sum.pdf'), 
@@ -306,12 +328,12 @@
       # summarize T averaged over individuals
       T_age_sum <- T_age_sum %>%
         group_by (fecal.age.cat) %>%
-        summarise (n.T = sum(!is.na(avg.Test)),
+        summarise (n.id = sum(!is.na(avg.Test)),
                    avg.T = round (mean(avg.Test, 
                                        na.rm = T),2),
                    stdev.T = round (sd(avg.Test, 
                                        na.rm = T), 2))%>%
-        mutate(freq = n.T / sum(n.T))
+        mutate(freq = n.id / sum(n.id))
       
     ## b) save the data frame of summary stats out as a pdf into output file
       pdf(here('output/T_age_sum.pdf'), 
@@ -332,12 +354,12 @@
       # summarize T averaged over individuals
       T_sex_age_sum <- T_sex_age_sum %>%
         group_by (sex, fecal.age.cat) %>%
-        summarise (n.T = sum(!is.na(avg.Test)),
+        summarise (n.id = sum(!is.na(avg.Test)),
                    avg.T = round (mean(avg.Test, 
                                        na.rm = T),2),
                    stdev.T = round (sd(avg.Test, 
                                        na.rm = T), 2))%>%
-        mutate(freq = n.T / sum(n.T))
+        mutate(freq = n.id / sum(n.id))
   
     ## d) save the data frame of summary stats out as a pdf into output file
       pdf(here('output/T_sex_age_sum.pdf'), 
@@ -361,12 +383,12 @@
       # summarize T averaged over individuals
       T_repro_sum <- T_repro_sum %>%
         group_by (state) %>%
-        summarise (n.T = sum(!is.na(avg.Test)),
+        summarise (n.id = sum(!is.na(avg.Test)),
                    avg.T = round (mean(avg.Test, 
                                        na.rm = T),2),
                    stdev.T = round (sd(avg.Test, 
                                        na.rm = T), 2))%>%
-        mutate(freq = n.T / sum(n.T))
+        mutate(freq = n.id / sum(n.id))
       
       ## b) save the data frame of summary stats out as a pdf into output file
       pdf(here('output/T_repro_sum.pdf'), 
@@ -390,12 +412,12 @@
       # summarize T averaged over individuals
       T_time_sum <- T_time_sum %>%
         group_by (poop.am.pm) %>%
-        summarise (n.T = sum(!is.na(avg.Test)),
+        summarise (n.id = sum(!is.na(avg.Test)),
                    avg.T = round (mean(avg.Test, 
                                        na.rm = T),2),
                    stdev.T = round (sd(avg.Test, 
                                        na.rm = T), 2))%>%
-        mutate(freq = n.T / sum(n.T))
+        mutate(freq = n.id / sum(n.id))
       
     ## b) save the data frame of summary stats out as a pdf into output file
       pdf(here('output/T_time_sum.pdf'), 
@@ -419,12 +441,12 @@
       # summarize T averaged over individuals
       T_migrtn_seas_sum <- T_migrtn_seas_sum %>%
         group_by (migratn.seas.fec) %>%
-        summarise (n.T = sum(!is.na(avg.Test)),
+        summarise (n.id = sum(!is.na(avg.Test)),
                    avg.T = round (mean(avg.Test, 
                                        na.rm = T),2),
                    stdev.T = round (sd(avg.Test, 
                                        na.rm = T), 2))%>%
-        mutate(freq = n.T / sum(n.T))
+        mutate(freq = n.id / sum(n.id))
       
       ## b) save the data frame of summary stats out as a pdf into output file
       pdf(here('output/T_migrtn_seas_sum.pdf'), 
@@ -438,7 +460,7 @@
     ## a) Human disturbance summary 
       T_hum_disturb_sum <- fec_horm_neosp_toxo_data_12 %>%
         filter(!is.na(testosterone.ng.g)) %>%
-        group_by (hy.id, hum.pop.den) %>%
+        group_by (hy.id, hum.pop.poop) %>%
         summarise (n.Test = sum(!is.na(testosterone.ng.g)),
                    avg.Test = round (mean(testosterone.ng.g, 
                                           na.rm = T),2),
@@ -447,13 +469,13 @@
       
       # summarize T averaged over individuals
       T_hum_disturb_sum <- T_hum_disturb_sum %>%
-        group_by (hum.pop.den) %>%
-        summarise (n.T = sum(!is.na(avg.Test)),
+        group_by (hum.pop.poop) %>%
+        summarise (n.id = sum(!is.na(avg.Test)),
                    avg.T = round (mean(avg.Test, 
                                        na.rm = T),2),
                    stdev.T = round (sd(avg.Test, 
                                        na.rm = T), 2))%>%
-        mutate(freq = n.T / sum(n.T))
+        mutate(freq = n.id / sum(n.id))
       
     ## b) save the data frame of summary stats out as a pdf into output file
       pdf(here('output/T_hum_disturb_sum.pdf'), 
@@ -476,12 +498,12 @@
       # summarize T averaged over individuals
       cort_sex_ratio_sum <- cort_sex_ratio_sum %>%
         group_by (sex) %>%
-        summarise (n.cort = sum(!is.na(avg.Cort)),
+        summarise (n.id = sum(!is.na(avg.Cort)),
                    avg.cort = round (mean(avg.Cort, 
                                        na.rm = T),2),
                    stdev.cort = round (sd(avg.Cort, 
                                        na.rm = T), 2))%>%
-        mutate(freq = n.cort / sum(n.cort))
+        mutate(freq = n.id / sum(n.id))
       
     ## b) save the data frame of summary stats out as a pdf into output file
       pdf(here('output/cort_sex_ratio_sum.pdf'), 
@@ -505,12 +527,12 @@
       # summarize T averaged over individuals
       cort_age_sum <- cort_age_sum %>%
         group_by (fecal.age.cat) %>%
-        summarise (n.cort = sum(!is.na(avg.Cort)),
+        summarise (n.id = sum(!is.na(avg.Cort)),
                    avg.cort = round (mean(avg.Cort, 
                                        na.rm = T),2),
                    stdev.cort = round (sd(avg.Cort, 
                                        na.rm = T), 2))%>%
-        mutate(freq = n.cort / sum(n.cort))
+        mutate(freq = n.id / sum(n.id))
       
     ## b) save the data frame of summary stats out as a pdf into output file
       pdf(here('output/cort_age_sum.pdf'), 
@@ -531,12 +553,12 @@
       # summarize T averaged over individuals
       cort_sex_age_sum <- cort_sex_age_sum %>%
         group_by (sex, fecal.age.cat) %>%
-        summarise (n.cort = sum(!is.na(avg.Cort)),
+        summarise (n.id = sum(!is.na(avg.Cort)),
                    avg.cort = round (mean(avg.Cort, 
                                        na.rm = T),2),
                    stdev.cort = round (sd(avg.Cort, 
                                        na.rm = T), 2))%>%
-        mutate(freq = n.cort / sum(n.cort))
+        mutate(freq = n.id / sum(n.id))
       
     ## d) save the data frame of summary stats out as a pdf into output file
       pdf(here('output/cort_sex_age_sum.pdf'), 
@@ -560,12 +582,12 @@
       # summarize T averaged over individuals
       cort_repro_sum <- cort_repro_sum %>%
         group_by (state) %>%
-        summarise (n.cort = sum(!is.na(avg.Cort)),
+        summarise (n.id = sum(!is.na(avg.Cort)),
                    avg.cort = round (mean(avg.Cort, 
                                        na.rm = T),2),
                    stdev.cort = round (sd(avg.Cort, 
                                        na.rm = T), 2))%>%
-        mutate(freq = n.cort / sum(n.cort))
+        mutate(freq = n.id / sum(n.id))
       
     ## b) save the data frame of summary stats out as a pdf into output file
       pdf(here('output/cort_repro_sum.pdf'), 
@@ -589,12 +611,12 @@
       # summarize T averaged over individuals
       cort_time_sum <- cort_time_sum %>%
         group_by (poop.am.pm) %>%
-        summarise (n.cort = sum(!is.na(avg.Cort)),
+        summarise (n.id = sum(!is.na(avg.Cort)),
                    avg.cort = round (mean(avg.Cort, 
                                        na.rm = T),2),
                    stdev.cort = round (sd(avg.Cort, 
                                        na.rm = T), 2))%>%
-        mutate(freq = n.cort / sum(n.cort))
+        mutate(freq = n.id / sum(n.id))
       
     ## b) save the data frame of summary stats out as a pdf into output file
       pdf(here('output/cort_time_sum.pdf'), 
@@ -618,12 +640,12 @@
       # summarize T averaged over individuals
       cort_migrtn_seas_sum <- cort_migrtn_seas_sum %>%
         group_by (migratn.seas.fec) %>%
-        summarise (n.cort = sum(!is.na(avg.Cort)),
+        summarise (n.id = sum(!is.na(avg.Cort)),
                    avg.cort = round (mean(avg.Cort, 
                                        na.rm = T),2),
                    stdev.cort = round (sd(avg.Cort, 
                                        na.rm = T), 2))%>%
-        mutate(freq = n.cort / sum(n.cort))
+        mutate(freq = n.id / sum(n.id))
       
     ## b) save the data frame of summary stats out as a pdf into output file
       pdf(here('output/cort_migrtn_seas_sum.pdf'), 
@@ -632,12 +654,12 @@
       dev.off()   
       
       
-  ### 4.12 Descriptive bivariate stats corticosterone status by human disturbance
-      # when fecal sample was collected
+  ### 4.12 Descriptive bivariate stats corticosterone status by human 
+      # disturbance when fecal sample was collected
     ## a) Human disturbance summary 
       cort_hum_disturb_sum <- fec_horm_neosp_toxo_data_12 %>%
         filter(!is.na(corticosterone.ng.g)) %>%
-        group_by (hy.id, hum.pop.den) %>%
+        group_by (hy.id, hum.pop.poop) %>%
         summarise (n.Cort = sum(!is.na(corticosterone.ng.g)),
                    avg.Cort = round (mean(corticosterone.ng.g, 
                                           na.rm = T),2),
@@ -646,19 +668,35 @@
       
       # summarize T averaged over individuals
       cort_hum_disturb_sum <- cort_hum_disturb_sum %>%
-        group_by (hum.pop.den) %>%
-        summarise (n.cort = sum(!is.na(avg.Cort)),
+        group_by (hum.pop.poop) %>%
+        summarise (n.id = sum(!is.na(avg.Cort)),
                    avg.cort = round (mean(avg.Cort, 
                                        na.rm = T),2),
                    stdev.cort = round (sd(avg.Cort, 
                                        na.rm = T), 2))%>%
-        mutate(freq = n.cort / sum(n.cort))
+        mutate(freq = n.id / sum(n.id))
       
     ## b) save the data frame of summary stats out as a pdf into output file
       pdf(here('output/cort_hum_disturb_sum.pdf'), 
           height = 4, width = 5)
       grid.table(cort_hum_disturb_sum)
       dev.off()
+      
+      
+      
+###############################################################################
+##############               5. Export data files                ##############
+###############################################################################
+      
+      ### 5.1 Export data to an RData file     
+      ## a) Save and export raw data tables 
+      # Files are saved in the 'data' folder in the working directory as an
+      # RData file.
+      save(file = paste0(project_data_path, 
+                         '3_neo_toxo_fec_horm.RData'), 
+           list = c('fec_horm_neosp_toxo_data', 'fec_horm_neosp_toxo_data_12',
+                    'fec_horm_toxo_data_restrict', 
+                    'fec_horm_neosp_data_restrict'))
       
 
      
