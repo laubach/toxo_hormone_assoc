@@ -2,15 +2,15 @@
 #############        Associations of Toxoplasma gondii and        #############
 #############        Neospora caninum with hormone levels         #############
 #############                                                     #############
-#############               2. Tidy and Join Data                 #############
+#############               1. Tidy and Join Data                 #############
 #############                                                     #############
 #############                  By: Zach Laubach                   #############
 #############                created: 19 Sept 2020                #############
-#############              last updated: 9 Oct 2020               #############
+#############             last updated: 26 Oct 2020               #############
 ###############################################################################
 
 
-  ### PURPOSE: 
+  ### PURPOSE: Tidy and join data in preparation for downstream analyses
   
   
   # Code Blocks
@@ -34,26 +34,16 @@
       options(stringsAsFactors = FALSE)
   
 
-  ### 1.2 Install and load CRAN packages   
+  ### 1.2 Install and load CRAN packages
     ## a) Data Manipulation and Descriptive Stats Packages
       # Check for tidyverse and install if not already installed
-        if (!'tidyverse' %in% installed.packages()[,1]){
-          install.packages ('tidyyverse')
-        }
+     
       # load tidyverse packages
         library ('tidyverse')
       
-      # Check for lubridate and install if not already installed
-        if (!'lubridate' %in% installed.packages()[,1]){
-          install.packages ('lubridate')
-        }
       # load lubridate packages
         library ('lubridate') 
-        
-      # Check for here and install if not already installed
-        if (!'here' %in% installed.packages()[,1]){
-          install.packages ('here')
-        }
+     
       # load here packages
         library ('here')
 

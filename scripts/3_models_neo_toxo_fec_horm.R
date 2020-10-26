@@ -39,112 +39,51 @@
 
   ### 1.2 Install and load CRAN packages   
     ## a) Data Manipulation and Descriptive Stats Packages
-      # Check for tidyverse and install if not already installed
-        if (!'tidyverse' %in% installed.packages()[,1]){
-          install.packages ('tidyyverse')
-        }
+      
       # load tidyverse packages
         library ('tidyverse')
       
-      # Check for lubridate and install if not already installed
-        if (!'lubridate' %in% installed.packages()[,1]){
-          install.packages ('lubridate')
-        }
       # load lubridate packages
         library ('lubridate') 
-        
-      # Check for here and install if not already installed
-        if (!'here' %in% installed.packages()[,1]){
-          install.packages ('here')
-        }
+  
       # load here packages
         library ('here')
      
     ## b) Graph Plotting and Visualization Packages
-      # Check for ggplot2 and install if not already installed
-      if (!'ggplot2' %in% installed.packages()[,1]){
-        install.packages ('ggplot2')
-      }
+    
       # load ggplot2 packages
       library ('ggplot2')
       
-      # Check for gridExtra and install if not already installed
-      if (!'gridExtra' %in% installed.packages()[,1]){
-        install.packages ('gridExtra')
-      }
       # load gridExtra packages
       library ('gridExtra')
-      
-      # Check for aod and install if not already installed
-      if (!'aod' %in% installed.packages()[,1]){
-        install.packages ('aod')
-      }
+ 
       # load aod packages (used to for Wald test)
       library ('aod')
-      
-      # Check for car and install if not already installed
-      if (!'car' %in% installed.packages()[,1]){
-        install.packages ('car')
-      }
-      # load car packages (used for type II and type III SS test)
+ 
+      # load car packages (used for type II and type III SS test and VIF)
       library ('car')
-      #options(contrasts = c('contr.sum', 'contr.poly'))
-      
-      # Check for dotwhisker and install if not already installed
-      # used with broom to graph beta estimates
-      if (!'dotwhisker' %in% installed.packages()[,1]){
-        install.packages ('dotwhisker')
-      }
-      # load dotwhisker packages
+   
+      # load dotwhisker packages; used with broom to graph beta estimates
       library ('dotwhisker')
       
     ## c) Modeling Packages
-      # Check for broom and install if not already installed
-      if (!'broom' %in% installed.packages()[,1]){
-        install.packages ('broom')
-      }
+     
       # load broom packages
       library ('broom')
       
-      # install broom.mixed, a package under development by Ben Bolker
+      # load broom.mixed, a package under development by Ben Bolker
       # similar to broom but extends bey lm and glm
-      install.packages("remotes")
-      remotes::install_github("bbolker/broom.mixed")
-      
-      # Check for nlme and install if not already installed
-      if (!'nlme' %in% installed.packages()[,1]){
-        install.packages ('nlme')
-      }
+      library ('broom.mixed')
+   
       # load nlme packages
       library ('nlme')
-      
-      # Check for lme4 and install if not already installed
-      if (!'lme4' %in% installed.packages()[,1]){
-        install.packages ('lme4')
-      }
+  
       # load lme4 packages
       library ('lme4')
-      
-      # Check for boot and install if not already installed
-      # used to generate boot strap CI from LME4
-      if (!'boot' %in% installed.packages()[,1]){
-        install.packages ('boot')
-      }
-      # load boot packages
+  
+      # load boot packages; used to generate boot strap CI from LME4
       library ('boot')
-      
-      # Check for car and install if not already installed
-      # includes vif function
-      if (!'car' %in% installed.packages()[,1]){
-        install.packages ('car')
-      }
-      # load car packages
-      library ('car')
-      
-      # Check for merTools and install if not already installed
-      if (!'merTools' %in% installed.packages()[,1]){
-        install.packages ('merTools')
-      }
+   
       # load merTools packages
       library ('merTools')
 

@@ -32,43 +32,24 @@
 
     ## b) prevent R from automatically reading charater strins as factors
       options(stringsAsFactors = FALSE)
+    
   
 
   ### 1.2 Install and load CRAN packages   
     ## a) Data Manipulation and Descriptive Stats Packages
-      # Check for tidyverse and install if not already installed
-        if (!'tidyverse' %in% installed.packages()[,1]){
-          install.packages ('tidyyverse')
-        }
       # load tidyverse packages
         library ('tidyverse')
-      
-      # Check for lubridate and install if not already installed
-        if (!'lubridate' %in% installed.packages()[,1]){
-          install.packages ('lubridate')
-        }
+
       # load lubridate packages
         library ('lubridate') 
-        
-      # Check for here and install if not already installed
-        if (!'here' %in% installed.packages()[,1]){
-          install.packages ('here')
-        }
+
       # load here packages
         library ('here')
      
     ## b) Graph Plotting and Visualization Packages
-      # Check for ggplot2 and install if not already installed
-      if (!'ggplot2' %in% installed.packages()[,1]){
-        install.packages ('ggplot2')
-      }
       # load ggplot2 packages
       library ('ggplot2')
-      
-      # Check for gridExtra and install if not already installed
-      if (!'gridExtra' %in% installed.packages()[,1]){
-        install.packages ('gridExtra')
-      }
+
       # load gridExtra packages
       library ('gridExtra')
       
