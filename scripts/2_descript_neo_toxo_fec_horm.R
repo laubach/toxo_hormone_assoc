@@ -6,7 +6,7 @@
 #############                                                     #############
 #############                  By: Zach Laubach                   #############
 #############                 created: 5 Oct 2020                 #############
-#############               last updated: 9 Oct 2020              #############
+#############               last updated: 26 Oct 2020              #############
 ###############################################################################
 
 
@@ -100,7 +100,13 @@
                    avg.T = round (mean(testosterone.ng.g, 
                                               na.rm = T),2),
                    stdev.T = round (sd(testosterone.ng.g, 
-                                              na.rm = T), 2)) 
+                                              na.rm = T), 2),
+                   med.T = round(median(testosterone.ng.g,
+                                        na.rm = T), 2),
+                   min.T = round(min(testosterone.ng.g,
+                                         na.rm = T), 2),
+                   max.T = round(max(testosterone.ng.g,
+                                     na.rm = T), 2))
       
     ## b) save the data frame of summary stats out as a pdf into output file
       pdf(here('output/univar_T_stat.pdf'), height = 4, width = 8)
@@ -114,7 +120,13 @@
                    avg.T = round (mean(testosterone.ng.g, 
                                        na.rm = T),2),
                    stdev.T = round (sd(testosterone.ng.g, 
-                                       na.rm = T), 2)) 
+                                       na.rm = T), 2),
+                   med.T = round(median(testosterone.ng.g,
+                                        na.rm = T), 2),
+                   min.T = round(min(testosterone.ng.g,
+                                     na.rm = T), 2),
+                   max.T = round(max(testosterone.ng.g,
+                                     na.rm = T), 2)) 
       
     ## d) Histogram fecal testosterone
       hist_plot_T <- ggplot(data=fec_horm_neosp_toxo_data_12, 
@@ -166,7 +178,13 @@
                    avg.cort = round (mean(corticosterone.ng.g, 
                                        na.rm = T),2),
                    stdev.cort = round (sd(corticosterone.ng.g, 
-                                       na.rm = T), 2)) 
+                                       na.rm = T), 2),
+                   med.cort = round(median(corticosterone.ng.g,
+                                        na.rm = T), 2),
+                   min.cort = round(min(corticosterone.ng.g,
+                                     na.rm = T), 2),
+                   max.cort = round(max(corticosterone.ng.g,
+                                     na.rm = T), 2)) 
       
     ## b) save the data frame of summary stats out as a pdf into output file
       pdf(here('output/univar_cort_stat.pdf'), height = 4, width = 8)
@@ -180,7 +198,13 @@
                    avg.cort = round (mean(corticosterone.ng.g, 
                                        na.rm = T),2),
                    stdev.cort = round (sd(corticosterone.ng.g, 
-                                       na.rm = T), 2)) 
+                                       na.rm = T), 2),
+                   med.cort = round(median(corticosterone.ng.g,
+                                           na.rm = T), 2),
+                   min.cort = round(min(corticosterone.ng.g,
+                                        na.rm = T), 2),
+                   max.cort = round(max(corticosterone.ng.g,
+                                        na.rm = T), 2)) 
       
     ## d) Histogram fecal corticosterone
       hist_plot_T <- ggplot(data=fec_horm_neosp_toxo_data_12, 
@@ -267,8 +291,8 @@
 ############################################################################### 
       
   ### 4.1 Descriptive bivariate stats testosterone status by sex
-    ## a) Sex ratio summary 
-      T_sex_ratio_sum <- fec_horm_neosp_toxo_data_12 %>%
+    ## a) Sex summary 
+      T_sex_sum <- fec_horm_neosp_toxo_data_12 %>%
         filter(!is.na(testosterone.ng.g)) %>%
         group_by (hy.id, sex) %>%
         summarise (n.Test = sum(!is.na(testosterone.ng.g)),
@@ -278,7 +302,7 @@
                                        na.rm = T), 2)) 
       
       # summarize T averaged over individuals
-      T_sex_ratio_sum <- T_sex_ratio_sum %>%
+      T_sex_sum <- T_sex_sum %>%
         group_by (sex) %>%
         summarise (n.id = sum(!is.na(avg.Test)),
                    avg.T = round (mean(avg.Test, 
@@ -288,11 +312,37 @@
         mutate(freq = n.id / sum(n.id))
       
     ## b) save the data frame of summary stats out as a pdf into output file
-      pdf(here('output/T_sex_ratio_sum.pdf'), 
+      pdf(here('output/T_sex_sum.pdf'), 
           height = 4, width = 5)
-      grid.table(T_sex_ratio_sum)
+      grid.table(T_sex_sum)
       dev.off() 
       
+    ## c) Sex by toxo.status 
+      T_sex_toxo_sum <- fec_horm_neosp_toxo_data_12 %>%
+        filter(!is.na(testosterone.ng.g)) %>%
+        group_by (hy.id, sex) %>%
+        summarise (n.Test = sum(!is.na(testosterone.ng.g)),
+                   avg.Test = round (mean(testosterone.ng.g, 
+                                          na.rm = T),2),
+                   stdev.Test = round (sd(testosterone.ng.g, 
+                                          na.rm = T), 2), 
+                   toxo.status = first(toxo.status)) 
+      
+      # summarize sex by toxo.status T averaged over individuals
+      T_sex_toxo_sum <- T_sex_toxo_sum %>%
+        group_by (sex, toxo.status) %>%
+        summarise (n.id = sum(!is.na(avg.Test)),
+                   avg.T = round (mean(avg.Test, 
+                                       na.rm = T),2),
+                   stdev.T = round (sd(avg.Test, 
+                                       na.rm = T), 2))%>%
+        mutate(freq = n.id / sum(n.id))
+      
+      ## d) save the data frame of summary stats out as a pdf into output file
+      pdf(here('output/T_sex_toxo_sum.pdf'), 
+          height = 4, width = 5)
+      grid.table(T_sex_toxo_sum)
+      dev.off() 
       
   ### 4.2 Descriptive bivariate stats testosterone status by categorical age
       # when fecal sample was collected
@@ -322,31 +372,32 @@
       grid.table(T_age_sum)
       dev.off() 
       
-    ## c) Sex by Age summary 
-      T_sex_age_sum <- fec_horm_neosp_toxo_data_12 %>%
+    ## c) Age by toxo.status 
+      T_age_toxo_sum <- fec_horm_neosp_toxo_data_12 %>%
         filter(!is.na(testosterone.ng.g)) %>%
-        group_by (hy.id, sex, fecal.age.cat) %>%
+        group_by (hy.id, fecal.age.cat) %>%
         summarise (n.Test = sum(!is.na(testosterone.ng.g)),
                    avg.Test = round (mean(testosterone.ng.g, 
                                           na.rm = T),2),
                    stdev.Test = round (sd(testosterone.ng.g, 
-                                          na.rm = T), 2)) 
+                                          na.rm = T), 2), 
+                   toxo.status = first(toxo.status)) 
       
-      # summarize T averaged over individuals
-      T_sex_age_sum <- T_sex_age_sum %>%
-        group_by (sex, fecal.age.cat) %>%
+    # summarize age by toxo.status T averaged over individuals
+      T_age_toxo_sum <- T_age_toxo_sum %>%
+        group_by (fecal.age.cat, toxo.status) %>%
         summarise (n.id = sum(!is.na(avg.Test)),
                    avg.T = round (mean(avg.Test, 
                                        na.rm = T),2),
                    stdev.T = round (sd(avg.Test, 
                                        na.rm = T), 2))%>%
         mutate(freq = n.id / sum(n.id))
-  
-    ## d) save the data frame of summary stats out as a pdf into output file
-      pdf(here('output/T_sex_age_sum.pdf'), 
-          height = 5, width = 5)
-      grid.table(T_sex_age_sum)
-      dev.off() 
+      
+      ## d) save the data frame of summary stats out as a pdf into output file
+      pdf(here('output/T_age_toxo_sum.pdf'), 
+          height = 4, width = 5)
+      grid.table(T_age_toxo_sum)
+      dev.off()
       
       
   ### 4.3 Descriptive bivariate stats testosterone status by reproductive state
@@ -466,8 +517,8 @@
       
       
   ### 4.7 Descriptive bivariate stats corticosterone status by sex
-    ## a) Sex ratio summary 
-      cort_sex_ratio_sum <- fec_horm_neosp_toxo_data_12 %>%
+    ## a) Sex summary 
+      cort_sex_sum <- fec_horm_neosp_toxo_data_12 %>%
         filter(!is.na(corticosterone.ng.g)) %>%
         group_by (hy.id, sex) %>%
         summarise (n.Cort = sum(!is.na(corticosterone.ng.g)),
@@ -476,8 +527,8 @@
                    stdev.Cort = round (sd(corticosterone.ng.g, 
                                           na.rm = T), 2)) 
       
-      # summarize T averaged over individuals
-      cort_sex_ratio_sum <- cort_sex_ratio_sum %>%
+      # summarize Cort averaged over individuals
+      cort_sex_sum <- cort_sex_sum %>%
         group_by (sex) %>%
         summarise (n.id = sum(!is.na(avg.Cort)),
                    avg.cort = round (mean(avg.Cort, 
@@ -487,9 +538,36 @@
         mutate(freq = n.id / sum(n.id))
       
     ## b) save the data frame of summary stats out as a pdf into output file
-      pdf(here('output/cort_sex_ratio_sum.pdf'), 
+      pdf(here('output/cort_sex_sum.pdf'), 
           height = 4, width = 5)
-      grid.table(cort_sex_ratio_sum)
+      grid.table(cort_sex_sum)
+      dev.off() 
+      
+    ## c) Sex by toxo.status 
+      cort_sex_toxo_sum <- fec_horm_neosp_toxo_data_12 %>%
+        filter(!is.na(corticosterone.ng.g)) %>%
+        group_by (hy.id, sex) %>%
+        summarise (n.cort = sum(!is.na(corticosterone.ng.g)),
+                   avg.cort = round (mean(corticosterone.ng.g, 
+                                          na.rm = T),2),
+                   stdev.cort = round (sd(corticosterone.ng.g, 
+                                          na.rm = T), 2), 
+                   toxo.status = first(toxo.status)) 
+      
+      # summarize sex by toxo.status Cort averaged over individuals
+      cort_sex_toxo_sum <- cort_sex_toxo_sum %>%
+        group_by (sex, toxo.status) %>%
+        summarise (n.id = sum(!is.na(avg.cort)),
+                   avg.cort = round (mean(avg.cort, 
+                                       na.rm = T),2),
+                   stdev.cort = round (sd(avg.cort, 
+                                       na.rm = T), 2))%>%
+        mutate(freq = n.id / sum(n.id))
+      
+    ## d) save the data frame of summary stats out as a pdf into output file
+      pdf(here('output/cort_sex_toxo_sum.pdf'), 
+          height = 4, width = 5)
+      grid.table(cort_sex_toxo_sum)
       dev.off() 
       
       
@@ -521,30 +599,31 @@
       grid.table(cort_age_sum)
       dev.off() 
       
-    ## c) Sex by Age summary 
-      cort_sex_age_sum <- fec_horm_neosp_toxo_data_12 %>%
+    ## c) Age by toxo.status 
+      cort_age_toxo_sum <- fec_horm_neosp_toxo_data_12 %>%
         filter(!is.na(corticosterone.ng.g)) %>%
-        group_by (hy.id, sex, fecal.age.cat) %>%
-        summarise (n.Cort = sum(!is.na(corticosterone.ng.g)),
-                   avg.Cort = round (mean(corticosterone.ng.g, 
+        group_by (hy.id, fecal.age.cat) %>%
+        summarise (n.cort = sum(!is.na(corticosterone.ng.g)),
+                   avg.cort = round (mean(corticosterone.ng.g, 
                                           na.rm = T),2),
-                   stdev.Cort = round (sd(corticosterone.ng.g, 
-                                          na.rm = T), 2)) 
+                   stdev.cort = round (sd(corticosterone.ng.g, 
+                                          na.rm = T), 2), 
+                   toxo.status = first(toxo.status)) 
       
-      # summarize T averaged over individuals
-      cort_sex_age_sum <- cort_sex_age_sum %>%
-        group_by (sex, fecal.age.cat) %>%
-        summarise (n.id = sum(!is.na(avg.Cort)),
-                   avg.cort = round (mean(avg.Cort, 
-                                       na.rm = T),2),
-                   stdev.cort = round (sd(avg.Cort, 
-                                       na.rm = T), 2))%>%
+      # summarize age by toxo.status Cort averaged over individuals
+      cort_age_toxo_sum <- cort_age_toxo_sum %>%
+        group_by (fecal.age.cat, toxo.status) %>%
+        summarise (n.id = sum(!is.na(avg.cort)),
+                   avg.cort = round (mean(avg.cort, 
+                                          na.rm = T),2),
+                   stdev.cort = round (sd(avg.cort, 
+                                          na.rm = T), 2))%>%
         mutate(freq = n.id / sum(n.id))
       
     ## d) save the data frame of summary stats out as a pdf into output file
-      pdf(here('output/cort_sex_age_sum.pdf'), 
-          height = 5, width = 5)
-      grid.table(cort_sex_age_sum)
+      pdf(here('output/cort_age_toxo_sum.pdf'), 
+          height = 4, width = 5)
+      grid.table(cort_age_toxo_sum)
       dev.off() 
       
       

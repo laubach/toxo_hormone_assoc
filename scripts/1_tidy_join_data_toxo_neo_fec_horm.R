@@ -110,7 +110,7 @@
     ## c) Convert hormone concentrations to numeric
       # make list of variable namges that contain 'ng.g'
       horm_columns <- fecal_horm %>%
-        select(contains('ng.g')) %>%
+        select(contains("ng.g")) %>%
         colnames()
       # convert variables (from horm_columns list) to character first 
       fecal_horm <- fecal_horm %>%
