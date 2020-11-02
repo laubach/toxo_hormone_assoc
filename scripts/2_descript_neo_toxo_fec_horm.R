@@ -2,11 +2,11 @@
 #############        Associations of Toxoplasma gondii and        #############
 #############        Neospora caninum with hormone levels         #############
 #############                                                     #############
-#############             3. Descriptive statsistics              #############
+#############       2. Descriptive statsistics fecal data         #############
 #############                                                     #############
 #############                  By: Zach Laubach                   #############
 #############                 created: 5 Oct 2020                 #############
-#############               last updated: 26 Oct 2020              #############
+#############               last updated: 2 Nov 2020              #############
 ###############################################################################
 
 
@@ -85,7 +85,7 @@
   ### 2.1 Load RData
     ## a) load RData: updated fec_horm_neosp_toxo_data joined to hyena 
       # data tables
-      load(paste0(project_data_path, '2_tidy_data_neo_toxo_fec_horm.RData'))
+      load(paste0(project_data_path, '2_tidy_data_neo_toxo_horm.RData'))
      
       
       
@@ -115,6 +115,8 @@
       
     ## c) Descriptive stats fecal testosterone (T) data grouped by ID
       univar_T_id_stat <- fec_horm_neosp_toxo_data_12 %>%
+      # univar_T_id_stat <- fec_horm_toxo_data_restrict %>%
+      # univar_T_id_stat <- fec_horm_neosp_data_restrict %>%
         group_by(hy.id) %>%
         summarise (n.T = sum(!is.na(testosterone.ng.g)),
                    avg.T = round (mean(testosterone.ng.g, 
@@ -146,6 +148,12 @@
     ## e) Natural log transformation of T data 
       fec_horm_neosp_toxo_data_12$testosterone.ng.g.ln <- 
         log(fec_horm_neosp_toxo_data_12$testosterone.ng.g)
+      
+      fec_horm_toxo_data_restrict$testosterone.ng.g.ln <- 
+        log(fec_horm_toxo_data_restrict$testosterone.ng.g)
+      
+      fec_horm_neosp_data_restrict$testosterone.ng.g.ln <- 
+        log(fec_horm_neosp_data_restrict$testosterone.ng.g)
       
     ## f) Histogram of Nat. Log. of fecal testosterone
       hist_plot_ln_T <- ggplot(data=fec_horm_neosp_toxo_data_12, 
@@ -193,6 +201,8 @@
       
     ## c) Descriptive stats fecal corticosterone (cort) data grouped by ID
       univar_cort_id_stat <- fec_horm_neosp_toxo_data_12 %>%
+      # univar_cort_stat <- fec_horm_toxo_data_restrict %>%
+      # univar_cort_stat <- fec_horm_neosp_data_restrict %>%
         group_by(hy.id) %>%
         summarise (n.cort = sum(!is.na(corticosterone.ng.g)),
                    avg.cort = round (mean(corticosterone.ng.g, 
@@ -221,9 +231,15 @@
       
       print(hist_plot_T)
       
-    ## e) Natural log transformation of T data 
+    ## e) Natural log transformation of cort data 
       fec_horm_neosp_toxo_data_12$corticosterone.ng.g.ln <- 
         log(fec_horm_neosp_toxo_data_12$corticosterone.ng.g)
+      
+      fec_horm_toxo_data_restrict$corticosterone.ng.g.ln <- 
+        log(fec_horm_toxo_data_restrict$corticosterone.ng.g)
+      
+      fec_horm_neosp_data_restrict$corticosterone.ng.g.ln <- 
+        log(fec_horm_neosp_data_restrict$corticosterone.ng.g)
       
     ## f) Histogram of Nat. Log. of fecal corticosterone
       hist_plot_ln_T <- ggplot(data=fec_horm_neosp_toxo_data_12, 
@@ -405,7 +421,7 @@
     ## a) Reproductive state (for females) or males 
       T_repro_sum <- fec_horm_neosp_toxo_data_12 %>%
         filter(!is.na(testosterone.ng.g)) %>%
-        group_by (hy.id, state) %>%
+        group_by (hy.id, poop.state) %>%
         summarise (n.Test = sum(!is.na(testosterone.ng.g)),
                    avg.Test = round (mean(testosterone.ng.g, 
                                           na.rm = T),2),
@@ -414,7 +430,7 @@
       
       # summarize T averaged over individuals
       T_repro_sum <- T_repro_sum %>%
-        group_by (state) %>%
+        group_by (poop.state) %>%
         summarise (n.id = sum(!is.na(avg.Test)),
                    avg.T = round (mean(avg.Test, 
                                        na.rm = T),2),
@@ -627,12 +643,12 @@
       dev.off() 
       
       
-  ### 4.9 Descriptive bivariate stats corticosterone status by reproductive state
-      # when fecal sample was collected
+  ### 4.9 Descriptive bivariate stats corticosterone status by reproductive 
+      # state when fecal sample was collected
     ## a) Reproductive state (for females) or males 
       cort_repro_sum <- fec_horm_neosp_toxo_data_12 %>%
         filter(!is.na(corticosterone.ng.g)) %>%
-        group_by (hy.id, state) %>%
+        group_by (hy.id, poop.state) %>%
         summarise (n.Cort = sum(!is.na(corticosterone.ng.g)),
                    avg.Cort = round (mean(corticosterone.ng.g, 
                                           na.rm = T),2),
@@ -641,7 +657,7 @@
       
       # summarize T averaged over individuals
       cort_repro_sum <- cort_repro_sum %>%
-        group_by (state) %>%
+        group_by (poop.state) %>%
         summarise (n.id = sum(!is.na(avg.Cort)),
                    avg.cort = round (mean(avg.Cort, 
                                        na.rm = T),2),
@@ -748,7 +764,7 @@
 ##############               5. Export data files                ##############
 ###############################################################################
       
-      ### 5.1 Export data to an RData file     
+    ### 5.1 Export data to an RData file     
       ## a) Save and export raw data tables 
       # Files are saved in the 'data' folder in the working directory as an
       # RData file.

@@ -6,7 +6,7 @@
 #############                                                     #############
 #############                  By: Zach Laubach                   #############
 #############                created: 19 Sept 2020                #############
-#############             last updated: 26 Oct 2020               #############
+#############              last updated: 2 Nov 2020               #############
 ###############################################################################
 
 
@@ -17,8 +17,9 @@
     # 1: Configure workspace
     # 2: Load RData
     # 3: Tidy data tables
-    # 4: Join tables and re-tidy data 
-    # 5: Export data files
+    # 4: Join tables and re-tidy: Fecal data 
+    # 5: Join tables and re-tidy: Plasma data 
+    # 6: Export data files
   
 
 
@@ -198,11 +199,31 @@
                                             levels = c("f", 
                                                        "m")))
     
+  ### 3.5 Tidy plasma_horm data
+    ## a) Convert all text to lower case
+      plasma_horm <- AllCharactersToLower(plasma_horm)
       
+    ## b) Format variable names (lowercase and separated by '.')
+      plasma_horm <- FormatVarNames(plasma_horm) 
+      
+    ## c) Rename darting.date as dart.date 
+      plasma_horm <- plasma_horm %>%
+        rename('dart.date' = 'darting.date')
+      
+    ## d) Rename id as hy.id
+      plasma_horm <- plasma_horm %>%
+        rename('hy.id' = 'id')
+      
+      
+    ## e) Format the darting dart.date in plasma_horm    
+      plasma_horm <- plasma_horm %>%
+        mutate(dart.date = as.Date(plasma_horm$dart.date,
+                                   format = '%m/%d/%y'))
+   
+ 
 
-      
 ###############################################################################
-##############          4. Join tables and re-tidy data          ##############
+##############      4. Join tables and re-tidy: Fecal data       ##############
 ###############################################################################         
       
   ### 4.1 Make the fecal_data dataframe
@@ -264,6 +285,10 @@
                          'poop.date' = 'poop.date',
                          'poop.time' = 'poop.time')) 
       
+    ## d) Rename state as poop.state (repro state when poop sample collected)
+      fecal_data <- fecal_data %>%
+        rename('poop.state' = 'state')
+      
 
   ### 4.3 Combine fecal_data with neosp_toxo_data into a long dataframe
     ## a) Left join neosp_toxo_data to fecal_data, retains all columns from both
@@ -281,16 +306,17 @@
     
     ## d) Rename clan as poop.clan
       clan_status <- clan_status %>%
-        rename('poop.clan' = 'clan')
+        rename('poop.clan' = 'clan') %>%
+        rename('poop.status' = 'status')
       
     ## e) Left join clan_status to fec_horm_neosp_toxo_data
       fec_horm_neosp_toxo_data <- fec_horm_neosp_toxo_data %>%
-        left_join(select(clan_status, c(ids, dates, poop.clan)),
+        left_join(select(clan_status, c(ids, dates, poop.clan, poop.status)),
                   by = c('hy.id' = 'ids',
                          'poop.date' = 'dates'))
       
       
-  ### 4.4 Tidy fec_horm_neosp_toxo_data including preciion covariates 
+  ### 4.4 Tidy fec_horm_neosp_toxo_data including precision covariates 
     ## a) Create a varialbes, 'fecal.age.days', and 'fecal.age.mon,' 
       # which indicates how old hyena was on the poop.date using lubridate
       fec_horm_neosp_toxo_data <- fec_horm_neosp_toxo_data  %>%
@@ -388,9 +414,9 @@
                                                   levels = c("am", 
                                                              "pm"))) 
       
-    ## k) Change state to character
-      fec_horm_neosp_toxo_data$state <- 
-        as.character(fec_horm_neosp_toxo_data$state)
+    ## k) Change poop.state to character
+      fec_horm_neosp_toxo_data$poop.state <- 
+        as.character(fec_horm_neosp_toxo_data$poop.state)
       
     ## l) Replaces NA with repro state
       # *** NOTE *** Hyena's less than ~750 days old are not in tblReprostates,  
@@ -399,24 +425,25 @@
       # cub goes missing - HERE WE MADE DECISION to classify these
       # animals' rerpro state as o = other
       fec_horm_neosp_toxo_data <- fec_horm_neosp_toxo_data  %>%
-        mutate(state = case_when(!is.na(fec_horm_neosp_toxo_data$state)
-                                 ~ state,
-                                 sex == 'f' & 
-                                   is.na(fec_horm_neosp_toxo_data$state) &
-                                   fecal.age.days < 750
-                                 ~ c('n'),
-                                 sex == 'f' & 
-                                   is.na(fec_horm_neosp_toxo_data$state) &
-                                   fecal.age.days > 750
-                                 ~ c('o'),
-                                 sex == 'm'
-                                 ~ c('m')))
+        mutate(poop.state = 
+                 case_when(!is.na(fec_horm_neosp_toxo_data$poop.state)
+                           ~ poop.state,
+                           sex == 'f' & 
+                             is.na(fec_horm_neosp_toxo_data$poop.state) &
+                             fecal.age.days < 750
+                           ~ c('n'),
+                           sex == 'f' & 
+                             is.na(fec_horm_neosp_toxo_data$poop.state) &
+                             fecal.age.days > 750
+                           ~ c('o'),
+                           sex == 'm'
+                           ~ c('m')))
       
     ## m) Re-code *nominal* factor (with ordered levels)  
-      # Set levels (odering) of state variable and sets the reference level 
+      # Set levels (odering) of poop.state variable and sets the reference level 
       # to 'n' makes this
       fec_horm_neosp_toxo_data <- transform( fec_horm_neosp_toxo_data, 
-                               state = factor(state,
+                               poop.state = factor(poop.state,
                                               levels = c("n", "p", 
                                                          "l", "o", "m")))
       
@@ -426,19 +453,18 @@
       
     ## o) Create a 2-level ordinal factor indicating human pastoralist presence
       # /disturbance based Green et. al 2018 when fecal sample was collected
-      # 
       fec_horm_neosp_toxo_data <- fec_horm_neosp_toxo_data %>%
         mutate(hum.pop.poop = case_when(fec_horm_neosp_toxo_data$poop.clan
                                         %in% c('talek', 'talek.e', 'kcm', 
                                                'fig tree') &
-                                          fec_horm_neosp_toxo_data$poop.yr >= 2000
+                                    fec_horm_neosp_toxo_data$poop.yr >= 2000
                                         ~ c('hi'),
-                                        fec_horm_neosp_toxo_data$poop.clan
+                                    fec_horm_neosp_toxo_data$poop.clan
                                         %in% c('talek', 'talek.e', 'kcm',
                                                'fig tree') &
-                                        fec_horm_neosp_toxo_data$poop.yr < 2000 
+                                    fec_horm_neosp_toxo_data$poop.yr < 2000 
                                         ~ c('low'),
-                                        fec_horm_neosp_toxo_data$poop.clan 
+                                    fec_horm_neosp_toxo_data$poop.clan 
                                         %in% c('serena.n', 'serena.s',
                                                'happy.zebra')
                                         ~ c('low')))
@@ -493,9 +519,193 @@
       
  
       
-
 ###############################################################################
-##############               5. Export data files                ##############
+##############      5. Join tables and re-tidy: Plasma data      ##############
+###############################################################################     
+      
+  ### 5.1  Combine repro_state w plasma_horm
+    ## a) Make an empty data frame
+      # This is an empty data frame that can store the overlaping 
+      # plasma_repro_data and repro_states data
+      plasma_repro_data  <- c()   
+      
+      ## b) For loop to find overlap
+      # Iterate over plasma data (hy.id and dart.date), to find interseciton
+      # with repro_state data
+      for (i in 1:nrow(plasma_horm)) { 
+        
+        # loop through 1:n IDs in plasma_horm
+        id <- paste (plasma_horm$hy.id[i])  
+        
+        # loop through 1:n dates in plasma_horm
+        dart.date <- (plasma_horm$dart.date[i])
+        
+        # create a dataframe to store the rows from repro_states where the
+        # id matches hy.id, and dart.date is in between cycle start and stop 
+        overlap_plasma_repro <- filter(repro_state, id == hy.id & 
+                                         dart.date >= cycle.start & 
+                                         dart.date <= cycle.stop)
+        
+        # Control flow
+        # if there is no id match and date overlap, 
+        # then go to next loop iteration in fecal_data
+        if (nrow(overlap_plasma_repro) < 1) {
+          next
+        }
+        
+        # add the poop.date onto the overlap_plasma_repro data
+        overlap_plasma_repro <- cbind(overlap_plasma_repro, dart.date)
+        
+        # add the filtered overlap_plasma_repro data to a new dataframe
+        # over each iteration of the loop
+        plasma_repro_data <- rbind(plasma_repro_data, 
+                                   overlap_plasma_repro)
+      }
+      
+    ## c) Join repro state data to plasma_horm
+      plasma_horm <- plasma_horm %>%
+        left_join(select(plasma_repro_data, c(hy.id, dart.date,  
+                                             state, cycle.start, cycle.stop, 
+                                             trimester, parity)),
+                  by = c('hy.id' = 'hy.id',
+                         'dart.date' = 'dart.date')) 
+      
+    ## d) Rename state as dart.state
+      plasma_horm <- plasma_horm %>%
+        rename('dart.state' = 'state')
+      
+      
+      
+  ### 5.2 Combine plasma_horm with neosp_toxo_data into a long dataframe
+    ## a) Left join neosp_toxo_data to plasma_horm, retains all columns from both
+      plasma_horm_neosp_toxo_data <- plasma_horm %>%
+        select(-c(sex, kay.code)) %>%
+        left_join(neosp_toxo_data, by = 'hy.id')
+      
+    ## b) Remove fecal hormone data that does not have corresponding neosp
+      # and/or toxo data
+      plasma_horm_neosp_toxo_data <- plasma_horm_neosp_toxo_data %>%
+        filter(!is.na(toxo.status) | !is.na(neo.status)) %>%
+        filter(dart.date.x == dart.date.y)
+      
+    ## c) Remove extra dart.date.y and rename
+      plasma_horm_neosp_toxo_data <- plasma_horm_neosp_toxo_data %>%
+        select(-c(dart.date.y)) %>%
+        rename('dart.date' = 'dart.date.x')
+      
+    ## d) Get the clan status for each hyena on their poop date
+      clan_status <- hyenadata::get_clan_status(
+        plasma_horm_neosp_toxo_data$hy.id,
+        plasma_horm_neosp_toxo_data$dart.date)
+      
+    ## e) Rename clan as poop.clan
+      clan_status <- clan_status %>%
+        rename('dart.clan' = 'clan') %>%
+        rename('dart.status' = 'status')
+      
+    ## f) Left join clan_status to plasma_horm_neosp_toxo_data
+      plasma_horm_neosp_toxo_data <- plasma_horm_neosp_toxo_data %>%
+        left_join(select(clan_status, c(ids, dates, dart.clan, dart.status)),
+                  by = c('hy.id' = 'ids',
+                         'dart.date' = 'dates'))
+      
+      
+  ### 5.3 Tidy plasma_horm_neosp_toxo_data including precision covariates 
+    ## a) Create a varialbes, 'fecal.age.days', and 'fecal.age.mon,' 
+      # which indicates how old hyena was on the poop.date using lubridate
+      plasma_horm_neosp_toxo_data <- plasma_horm_neosp_toxo_data  %>%
+        mutate(dart.age.days = round(interval(dob.date,
+                                               poop.date) %/% days(1), 1))
+ 
+      
+    ## b) Extract month and year from poop.date
+      # Use lubridate to extract the month/yr during which a poop sample was 
+      # collected and make a new variable  
+      plasma_horm_neosp_toxo_data$dart.mon <- 
+        month(plasma_horm_neosp_toxo_data$dart.date)
+      plasma_horm_neosp_toxo_data$dart.yr <- 
+        year(plasma_horm_neosp_toxo_data$dart.date)
+      
+    ## c) Create a varialbe, 'migratn.seas.fec,' which indicates if a poop 
+      # sample was collected in migration (June 1 - Oct 31)
+      plasma_horm_neosp_toxo_data <- plasma_horm_neosp_toxo_data  %>%
+        mutate(migratn.seas.fec = ifelse(dart.mon >= 6 & dart.mon<= 10, 
+                                         'migration', 'none'))
+  
+    ## d) Re-code *nominal* factor (with ordered levels)  
+      # Set levels (odering) of migratn.seas.fec variable and sets the reference  
+      # level to 'none'
+      plasma_horm_neosp_toxo_data <- transform(plasma_horm_neosp_toxo_data, 
+                                            migratn.seas.fec = 
+                                              factor(migratn.seas.fec,
+                                                     levels = c("none", 
+                                                                "migration")))  
+      
+    ## e) Change dart.state (repro state when dartede) to character
+      plasma_horm_neosp_toxo_data$dart.state <- 
+        as.character(plasma_horm_neosp_toxo_data$dart.state)
+      
+    ## f) Replaces NA with repro state
+      # *** NOTE *** Hyena's less than ~750 days old are not in tblReprostates,  
+      # but are by default n = nulliparous. Animals older than ~750 days
+      # sometimes have missing data on repro state, possibly because
+      # cub goes missing - HERE WE MADE DECISION to classify these
+      # animals' rerpro state as o = other
+      plasma_horm_neosp_toxo_data <- plasma_horm_neosp_toxo_data  %>%
+        mutate(dart.state = 
+                 case_when(!is.na(plasma_horm_neosp_toxo_data$dart.state)
+                           ~ dart.state, 
+                           sex == 'f' & 
+                             is.na(plasma_horm_neosp_toxo_data$dart.state) &
+                             dart.age.days < 750
+                           ~ c('n'),
+                           sex == 'f' & 
+                             is.na(plasma_horm_neosp_toxo_data$dart.state) &
+                            dart.age.days > 750
+                           ~ c('o'),
+                           sex == 'm'
+                           ~ c('m')))
+      
+    ## g) Re-code *nominal* factor (with ordered levels)  
+      # Set levels (odering) of state variable and sets the reference level 
+      # to 'n' makes this
+      plasma_horm_neosp_toxo_data <- transform( plasma_horm_neosp_toxo_data, 
+                                             state = factor(dart.state,
+                                                        levels = c("n", "p", 
+                                                                   "l", "o", 
+                                                                   "m")))
+      
+    ## h) Rename existing human disturbance variable (which is based on dob)
+      plasma_horm_neosp_toxo_data <- plasma_horm_neosp_toxo_data %>%
+        rename('hum.pop.dob' = 'hum.pop.den')
+      
+    ## i) Create a 2-level ordinal factor indicating human pastoralist presence
+      # /disturbance based Green et. al 2018 when darting sample was collected
+      plasma_horm_neosp_toxo_data <- plasma_horm_neosp_toxo_data %>%
+        mutate(hum.pop.dart = case_when(plasma_horm_neosp_toxo_data$dart.clan
+                                        %in% c('talek', 'talek.e', 'kcm', 
+                                               'fig tree') &
+                                  plasma_horm_neosp_toxo_data$dart.yr >= 2000
+                                        ~ c('hi'),
+                                  plasma_horm_neosp_toxo_data$dart.clan
+                                        %in% c('talek', 'talek.e', 'kcm',
+                                               'fig tree') &
+                                  plasma_horm_neosp_toxo_data$dart.yr < 2000 
+                                        ~ c('low'),
+                                  plasma_horm_neosp_toxo_data$dart.clan 
+                                        %in% c('serena.n', 'serena.s',
+                                               'happy.zebra')
+                                        ~ c('low')))
+      
+    ## j) Re-code hum.dist as nominal factor and set level (order)
+      plasma_horm_neosp_toxo_data <- transform(plasma_horm_neosp_toxo_data,
+                                            hum.pop.dart = factor(hum.pop.dart,
+                                                      levels = c('hi','low')))
+      
+
+      
+###############################################################################
+##############               6. Export data files                ##############
 ###############################################################################
       
   ### 5.1 Export data to an RData file     
@@ -503,12 +713,10 @@
       # Files are saved in the 'data' folder in the working directory as an
       # RData file.
       save(file = paste0(project_data_path, 
-                         '2_tidy_data_neo_toxo_fec_horm.RData'), 
+                         '2_tidy_data_neo_toxo_horm.RData'), 
            list = c('fec_horm_neosp_toxo_data', 'fec_horm_neosp_toxo_data_12',
                     'fec_horm_toxo_data_restrict', 
-                    'fec_horm_neosp_data_restrict'))
-      
-      
+                    'fec_horm_neosp_data_restrict', 
+                    'plasma_horm_neosp_toxo_data'))
 
-      
-      
+    
