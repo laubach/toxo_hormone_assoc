@@ -110,5 +110,6 @@
       save(file = paste0(project_data_path, 
                          '1_raw_data_neo_toxo_fec_horm.RData'), 
            list = c('neosp_toxo_data', 'fecal_horm', 
-                    'fecal_repos', 'repro_state', 'plasma_horm'))
+                    'fecal_repos', 'repro_state', 'plasma_horm',
+                    'tblClanMembership'))
     

@@ -2,12 +2,12 @@
 #############        Associations of Toxoplasma gondii and        #############
 #############        Neospora caninum with hormone levels         #############
 #############                                                     #############
-#############       3 Models: Toxo. and Neosp. associations       #############
+#############     3 Models: Precision covariate associations      #############
 #############                  w/fecal hormones                   #############
 #############                                                     #############
 #############                  By: Zach Laubach                   #############
 #############                 created: 6 Oct 2020                 #############
-#############               last updated: 2 Nov 2020              #############
+#############              last updated: 12 Nov 2020              #############
 ###############################################################################
 
 
@@ -20,8 +20,6 @@
     # 1: Configure workspace
     # 2: Load RData
     # 3: Model precision covariates
-    # 4: Infection associations with testosterone
-    # 5: Infection associations with corticosterone
 
 
 
@@ -131,54 +129,185 @@
 ###############################################################################
     
 ### 3.1 Testosterone precision covariates     
-  ## a)  Unadjusted mixed-model: testosterone by sex
-      T.sex.mod <- lme4::lmer(testosterone.ng.g.ln ~ sex 
-                              + (1|hy.id) , 
-                     data = subset(fec_horm_neosp_toxo_data_4,
-                            !is.na(x = sex))) 
-      
-      summary(T.sex.mod) # print model summary (ln scale)
-      confint(T.sex.mod) # 95% CIs (ln scale)
-      plot(T.sex.mod) # view fitted vs residuals
- 
-    # same mode using nlme instead of lme4;the latter produces p-values  
-      T.sex.mod <- nlme::lme(testosterone.ng.g.ln ~ sex, 
+  ## a)  Unadjusted mixed-model: female testosterone by fecal.age.cat
+      T.age.mod.f <- nlme::lme(testosterone.ng.g.ln ~ fecal.age.cat, 
                              random = ~ 1|hy.id, 
-                             data = subset(fec_horm_neosp_toxo_data_4,
-                                           !is.na(x = sex) & 
-                                             !is.na(x = testosterone.ng.g.ln))) 
-      
-      summary(T.sex.mod) # print model summary (ln scale)
-      intervals(T.sex.mod) # 95% CIs (ln scale)
-      plot(T.sex.mod) # view fitted vs residuals
-      Anova(T.sex.mod, type = 'II') # type II SS from Car package
-      
-    # Use emmeans to estimate marginal means
-      T.sex.mmean <- emmeans(T.sex.mod, 'sex')
-      summary(T.sex.mmean)
-      
-      
-    ## b) Unadjusted mixed-model: testosterone by age 
-      T.age.mod <- nlme::lme(testosterone.ng.g.ln ~ fecal.age.cat, 
-                             random = ~ 1|hy.id, 
-                             data = subset(fec_horm_toxo_data_restrict,
+                             data = subset(fec_horm_neosp_toxo_data_6,
                                            sex == 'f' &
-                                           !is.na(x = fecal.age.mon) & 
-                                             !is.na(x = testosterone.ng.g.ln)))
+                                        !is.na(x = fecal.age.cat) & 
+                                        !is.na(x = testosterone.ng.g.ln)))
       
-      summary(T.age.mod) # print model summary (ln scale)
-      intervals(T.age.mod) # 95% CIs (ln scale)
-      plot(T.age.mod) # view fitted vs residuals
-      Anova(T.age.mod, type = 'II') # type II SS from Car package
+      summary(T.age.mod.f) # print model summary (ln scale)
+      intervals(T.age.mod.f) # 95% CIs (ln scale)
+      plot(T.age.mod.f) # view fitted vs residuals
+      Anova(T.age.mod.f, type = 'II') # type II SS from Car package
       
       # Use emmeans to estimate marginal means
-      T.age.mmean <- emmeans(T.age.mod, 'fecal.age.cat')
-      summary(T.age.mmean)
+      T.age.mmean.f <- emmeans(T.age.mod.f, 'fecal.age.cat')
+      summary(T.age.mmean.f)
+  
+  ## b) Unadjusted mixed-model: male testosterone by fecal.age.cat 
+      T.age.mod.m <- nlme::lme(testosterone.ng.g.ln ~ fecal.age.cat, 
+                             random = ~ 1|hy.id, 
+                             data = subset(fec_horm_neosp_toxo_data_6,
+                                           sex == 'm' &
+                                        !is.na(x = fecal.age.cat) & 
+                                        !is.na(x = testosterone.ng.g.ln)))
+      
+      summary(T.age.mod.m) # print model summary (ln scale)
+      intervals(T.age.mod.m) # 95% CIs (ln scale)
+      plot(T.age.mod.m) # view fitted vs residuals
+      Anova(T.age.mod.m, type = 'II') # type II SS from Car package
+      
+      # Use emmeans to estimate marginal means
+      T.age.mmean.m <- emmeans(T.age.mod.m, 'fecal.age.cat')
+      summary(T.age.mmean.m)
+      
+    ## c) Unadjusted mixed-model: female testosterone by poop.am.pm
+      T.poop.am.pm.mod.f <- nlme::lme(testosterone.ng.g.ln ~ poop.am.pm, 
+                               random = ~ 1|hy.id, 
+                               data = subset(fec_horm_neosp_toxo_data_6,
+                                             sex == 'f' &
+                                          !is.na(x = poop.am.pm) & 
+                                          !is.na(x = testosterone.ng.g.ln)))
+      
+      summary(T.poop.am.pm.mod.f) # print model summary (ln scale)
+      intervals(T.poop.am.pm.mod.f) # 95% CIs (ln scale)
+      plot(T.poop.am.pm.mod.f) # view fitted vs residuals
+      Anova(T.poop.am.pm.mod.f, type = 'II') # type II SS from Car package
+      
+      # Use emmeans to estimate marginal means
+      T.poop.am.pm.mmean.f <- emmeans(T.poop.am.pm.mod.f, 'poop.am.pm')
+      summary(T.poop.am.pm.mmean.f)
+      
+    ## d) Unadjusted mixed-model: male testosterone by poop.am.pm 
+      T.poop.am.pm.mod.m <- nlme::lme(testosterone.ng.g.ln ~ poop.am.pm, 
+                               random = ~ 1|hy.id, 
+                               data = subset(fec_horm_neosp_toxo_data_6,
+                                             sex == 'm' &
+                                        !is.na(x = poop.am.pm) & 
+                                        !is.na(x = testosterone.ng.g.ln)))
+      
+      summary(T.poop.am.pm.mod.m) # print model summary (ln scale)
+      intervals(T.poop.am.pm.mod.m) # 95% CIs (ln scale)
+      plot(T.poop.am.pm.mod.m) # view fitted vs residuals
+      Anova(T.poop.am.pm.mod.m, type = 'II') # type II SS from Car package
+      
+      # Use emmeans to estimate marginal means
+      T.poop.am.pm.mmean.m <- emmeans(T.poop.am.pm.mod.m, 'poop.am.pm')
+      summary(T.poop.am.pm.mmean.m)
+      
+    ## e) Unadjusted mixed-model: female testosterone by migratn.seas.fec
+      T.migratn.seas.fec.mod.f <- nlme::lme(testosterone.ng.g.ln ~ 
+                                              migratn.seas.fec, 
+                                      random = ~ 1|hy.id, 
+                                      data = subset(fec_horm_neosp_toxo_data_6,
+                                                    sex == 'f' &
+                                              !is.na(x = migratn.seas.fec) & 
+                                            !is.na(x = testosterone.ng.g.ln)))
+      
+      summary(T.migratn.seas.fec.mod.f) # print model summary (ln scale)
+      intervals(T.migratn.seas.fec.mod.f) # 95% CIs (ln scale)
+      plot(T.migratn.seas.fec.mod.f) # view fitted vs residuals
+      Anova(T.migratn.seas.fec.mod.f, type = 'II') # type II SS from Car package
+      
+      # Use emmeans to estimate marginal means
+      T.migratn.seas.fec.mmean.f <- emmeans(T.migratn.seas.fec.mod.f, 
+                                        'migratn.seas.fec')
+      summary(T.migratn.seas.fec.mmean.f)
+      
+    ## f) Unadjusted mixed-model: male testosterone by migratn.seas.fec 
+      T.migratn.seas.fec.mod.m <- nlme::lme(testosterone.ng.g.ln ~ 
+                                              migratn.seas.fec, 
+                                      random = ~ 1|hy.id, 
+                                      data = subset(fec_horm_neosp_toxo_data_6,
+                                                    sex == 'm' &
+                                            !is.na(x = migratn.seas.fec) & 
+                                            !is.na(x = testosterone.ng.g.ln)))
+      
+      summary(T.migratn.seas.fec.mod.m) # print model summary (ln scale)
+      intervals(T.migratn.seas.fec.mod.m) # 95% CIs (ln scale)
+      plot(T.migratn.seas.fec.mod.m) # view fitted vs residuals
+      Anova(T.migratn.seas.fec.mod.m, type = 'II') # type II SS from Car package
+      
+      # Use emmeans to estimate marginal means
+      T.migratn.seas.fec.mmean.m <- emmeans(T.migratn.seas.fec.mod.m, 
+                                            'migratn.seas.fec')
+      summary(T.migratn.seas.fec.mmean.m)
+     
+    ## g) Unadjusted mixed-model: female testosterone by hum.pop.poop
+      T.hum.pop.poop.mod.f <- nlme::lme(testosterone.ng.g.ln ~ 
+                                              hum.pop.poop, 
+                                            random = ~ 1|hy.id, 
+                                      data = subset(fec_horm_neosp_toxo_data_6,
+                                                          sex == 'f' &
+                                      !is.na(x = hum.pop.poop) & 
+                                      !is.na(x = testosterone.ng.g.ln)))
+      
+      summary(T.hum.pop.poop.mod.f) # print model summary (ln scale)
+      intervals(T.hum.pop.poop.mod.f) # 95% CIs (ln scale)
+      plot(T.hum.pop.poop.mod.f) # view fitted vs residuals
+      Anova(T.hum.pop.poop.mod.f, type = 'II') # type II SS from Car package
+      
+      # Use emmeans to estimate marginal means
+      T.hum.pop.poop.mmean.f <- emmeans(T.hum.pop.poop.mod.f, 
+                                            'hum.pop.poop')
+      summary(T.hum.pop.poop.mmean.f)
+      
+    ## h) Unadjusted mixed-model: male testosterone by hum.pop.poop 
+      T.hum.pop.poop.mod.m <- nlme::lme(testosterone.ng.g.ln ~ 
+                                              hum.pop.poop, 
+                                            random = ~ 1|hy.id, 
+                                      data = subset(fec_horm_neosp_toxo_data_6,
+                                                          sex == 'm' &
+                                      !is.na(x = hum.pop.poop) & 
+                                      !is.na(x = testosterone.ng.g.ln)))
+      
+      summary(T.hum.pop.poop.mod.m) # print model summary (ln scale)
+      intervals(T.hum.pop.poop.mod.m) # 95% CIs (ln scale)
+      plot(T.hum.pop.poop.mod.m) # view fitted vs residuals
+      Anova(T.hum.pop.poop.mod.m, type = 'II') # type II SS from Car package
+      
+      # Use emmeans to estimate marginal means
+      T.hum.pop.poop.mmean.m <- emmeans(T.hum.pop.poop.mod.m, 
+                                            'hum.pop.poop')
+      summary(T.hum.pop.poop.mmean.m)
+      
+      
+    ## i) Unadjusted mixed-model: female testosterone by poop.state
+      T.poop.state.mod.f <- nlme::lme(testosterone.ng.g.ln ~ 
+                                          poop.state, 
+                                        random = ~ 1|hy.id, 
+                                  data = subset(fec_horm_neosp_toxo_data_6,
+                                                      sex == 'f' &
+                                  !is.na(x = poop.state) & 
+                                  !is.na(x = testosterone.ng.g.ln)))
+      
+      summary(T.poop.state.mod.f) # print model summary (ln scale)
+      intervals(T.poop.state.mod.f) # 95% CIs (ln scale)
+      plot(T.poop.state.mod.f) # view fitted vs residuals
+      Anova(T.poop.state.mod.f, type = 'II') # type II SS from Car package
+      
+      # Use emmeans to estimate marginal means
+      T.poop.state.mmean.f <- emmeans(T.poop.state.mod.f, 
+                                        'poop.state')
+      summary(T.poop.state.mmean.f)
+      
+      
+      
+      
+      
+      
+      poop.state
+      hum.pop.poop
+      migratn.seas.fec
+      
+      
       
     ## c) Unadjusted mixed-model: testosterone by reproductive state 
       T.repro.state.mod <- nlme::lme(testosterone.ng.g.ln ~ poop.state, 
                              random = ~ 1|hy.id, 
-                             data = subset(fec_horm_neosp_toxo_data_4,
+                             data = subset(fec_horm_neosp_toxo_data_6,
                                            !is.na(x = poop.state) & 
                                              !is.na(x = testosterone.ng.g.ln)))
       
@@ -195,7 +324,7 @@
     ## d) Unadjusted mixed-model: testosterone by fecal sample time of day
       T.poop.am.pm.mod <- nlme::lme(testosterone.ng.g.ln ~ poop.am.pm, 
                                      random = ~ 1|hy.id, 
-                                     data = subset(fec_horm_neosp_toxo_data_4,
+                                     data = subset(fec_horm_neosp_toxo_data_6,
                                             !is.na(x = poop.am.pm) & 
                                             !is.na(x = testosterone.ng.g.ln)))
       
@@ -213,7 +342,7 @@
       T.migratn.seas.fec.mod <- nlme::lme(testosterone.ng.g.ln ~ 
                                             migratn.seas.fec,
                                     random = ~ 1|hy.id, 
-                                    data = subset(fec_horm_neosp_toxo_data_4,
+                                    data = subset(fec_horm_neosp_toxo_data_6,
                                            !is.na(x = migratn.seas.fec) & 
                                            !is.na(x = testosterone.ng.g.ln)))
       
@@ -227,12 +356,11 @@
                                       'migratn.seas.fec')
       summary(T.migratn.seas.mmean)
       
-      
     ## f) Unadjusted mixed-model: testosterone by human disturance when fecal
       # sample was collected
       T.hum.pop.poop.mod <- nlme::lme(testosterone.ng.g.ln ~ hum.pop.poop,
                                           random = ~ 1|hy.id, 
-                                    data = subset(fec_horm_neosp_toxo_data_4,
+                                    data = subset(fec_horm_neosp_toxo_data_6,
                                           !is.na(x = hum.pop.poop) & 
                                           !is.na(x = testosterone.ng.g.ln)))
       
@@ -250,7 +378,7 @@
     ## a)  Unadjusted mixed-model: corticosterone by sex
       cort.sex.mod <- nlme::lme(corticosterone.ng.g.ln ~ sex, 
                              random = ~ 1|hy.id, 
-                             data = subset(fec_horm_neosp_toxo_data_4,
+                             data = subset(fec_horm_neosp_toxo_data_6,
                                           !is.na(x = sex) & 
                                           !is.na(x = corticosterone.ng.g.ln))) 
       
@@ -266,7 +394,7 @@
     ## b) Unadjusted mixed-model: corticosterone by age 
       cort.age.mod <- nlme::lme(corticosterone.ng.g.ln ~ fecal.age.cat, 
                              random = ~ 1|hy.id, 
-                             data = subset(fec_horm_neosp_toxo_data_4,
+                             data = subset(fec_horm_neosp_toxo_data_6,
                                           !is.na(x = fecal.age.mon) & 
                                           !is.na(x = corticosterone.ng.g.ln)))
       
@@ -282,7 +410,7 @@
     ## c) Unadjusted mixed-model: corticosterone by reproductive state 
       cort.repro.state.mod <- nlme::lme(corticosterone.ng.g.ln ~ poop.state, 
                                      random = ~ 1|hy.id, 
-                                     data = subset(fec_horm_neosp_toxo_data_4,
+                                     data = subset(fec_horm_neosp_toxo_data_6,
                                           !is.na(x = poop.state) & 
                                           !is.na(x = corticosterone.ng.g.ln)))
       
@@ -299,7 +427,7 @@
     ## d) Unadjusted mixed-model: corticosterone by fecal sample time of day
       cort.poop.am.pm.mod <- nlme::lme(corticosterone.ng.g.ln ~ poop.am.pm, 
                                     random = ~ 1|hy.id, 
-                                    data = subset(fec_horm_neosp_toxo_data_4,
+                                    data = subset(fec_horm_neosp_toxo_data_6,
                                           !is.na(x = poop.am.pm) & 
                                           !is.na(x = corticosterone.ng.g.ln)))
       
@@ -318,7 +446,7 @@
       cort.migratn.seas.fec.mod <- nlme::lme(corticosterone.ng.g.ln ~ 
                                             migratn.seas.fec,
                                     random = ~ 1|hy.id, 
-                                    data = subset(fec_horm_neosp_toxo_data_4,
+                                    data = subset(fec_horm_neosp_toxo_data_6,
                                           !is.na(x = migratn.seas.fec) & 
                                           !is.na(x = corticosterone.ng.g.ln)))
       
@@ -337,7 +465,7 @@
       # sample was collected
       cort.hum.pop.poop.mod <- nlme::lme(corticosterone.ng.g.ln ~ hum.pop.poop,
                                      random = ~ 1|hy.id, 
-                                     data = subset(fec_horm_neosp_toxo_data_4,
+                                     data = subset(fec_horm_neosp_toxo_data_6,
                                           !is.na(x = hum.pop.poop) & 
                                           !is.na(x = corticosterone.ng.g.ln)))
       
@@ -361,8 +489,8 @@
     ## a) Unadjusted mixed-model: testosterone by T. gondii infection
       T.toxo.unadj.mod <- lme4::lmer(testosterone.ng.g.ln ~ toxo.status 
                               + (1|hy.id), 
-                              data = subset(fec_horm_neosp_toxo_data_4,
-                              #data = subset(fec_horm_toxo_data_restrict,
+                              data = subset(fec_horm_neosp_toxo_data_6,
+                              #data = subset(fec_horm_neosp_toxo_data_6,
                                           !is.na(x = toxo.status) & 
                                           !is.na(x = testosterone.ng.g.ln)))
       
@@ -374,8 +502,8 @@
     ## b) Unadjusted mixed-model: corticosterone by T. gondii infection
       cort.toxo.unadj.mod <- lme4::lmer(corticosterone.ng.g.ln ~ toxo.status 
                                      + (1|hy.id), 
-                                     data = subset(fec_horm_neosp_toxo_data_4,
-                                     #data = subset(fec_horm_toxo_data_restrict,
+                                     data = subset(fec_horm_neosp_toxo_data_6,
+                                     #data = subset(fec_horm_neosp_toxo_data_6,
                                           !is.na(x = toxo.status) & 
                                           !is.na(x = corticosterone.ng.g.ln)))
       
@@ -387,7 +515,7 @@
     #   # testosterone by T. gondii infection * sex
     #   T.toxo.sex.mod <- nlme::lme(corticosterone.ng.g.ln ~ toxo.status*sex,
     #                              random = ~ 1|hy.id, 
-    #                              data = subset(fec_horm_neosp_toxo_data_4,
+    #                              data = subset(fec_horm_neosp_toxo_data_6,
     #                                       !is.na(x = sex) & 
     #                                       !is.na(x = corticosterone.ng.g.ln)))
     #   
@@ -402,7 +530,7 @@
     #   T.toxo.age.mod <- nlme::lme(corticosterone.ng.g.ln ~ toxo.status*
     #                                 fecal.age.cat,
     #                                 random = ~ 1|hy.id, 
-    #                                 data = subset(fec_horm_neosp_toxo_data_4,
+    #                                 data = subset(fec_horm_neosp_toxo_data_6,
     #                                       !is.na(x = fecal.age.cat) & 
     #                                       !is.na(x = corticosterone.ng.g.ln)))
     #   
@@ -417,8 +545,8 @@
       # testosterone by T. gondii infection 
       T.toxo.f.mod <- lme4::lmer(testosterone.ng.g.ln ~ toxo.status
                                    + (1|hy.id) , 
-                                  data = subset(fec_horm_neosp_toxo_data_4,
-                                  #data = subset(fec_horm_toxo_data_restrict,
+                                  data = subset(fec_horm_neosp_toxo_data_6,
+                                  #data = subset(fec_horm_neosp_toxo_data_6,
                                             sex == 'f' & 
                                             !is.na(x = testosterone.ng.g.ln))) 
       
@@ -432,8 +560,8 @@
                                      + poop.state 
                                  + fecal.age.cat
                                  + (1|hy.id) , 
-                                data = subset(fec_horm_neosp_toxo_data_4,
-                                #data = subset(fec_horm_toxo_data_restrict,
+                                data = subset(fec_horm_neosp_toxo_data_6,
+                                #data = subset(fec_horm_neosp_toxo_data_6,
                                                sex == 'f' & 
                                           !is.na(x = testosterone.ng.g.ln))) 
       
@@ -445,8 +573,8 @@
       # testosterone by T. gondii infection 
       T.toxo.m.mod <- lme4::lmer(testosterone.ng.g.ln ~ toxo.status
                                  + (1|hy.id) , 
-                                 data = subset(fec_horm_neosp_toxo_data_4,
-                                 #data = subset(fec_horm_toxo_data_restrict,
+                                 data = subset(fec_horm_neosp_toxo_data_6,
+                                 #data = subset(fec_horm_neosp_toxo_data_6,
                                                sex == 'm' & 
                                           !is.na(x = testosterone.ng.g.ln))) 
       
@@ -459,8 +587,8 @@
       T.toxo.m.adj.mod <- lme4::lmer(testosterone.ng.g.ln ~ toxo.status
                                  + fecal.age.cat
                                  + (1|hy.id) , 
-                                data = subset(fec_horm_neosp_toxo_data_4,
-                                #data = subset(fec_horm_toxo_data_restrict,
+                                data = subset(fec_horm_neosp_toxo_data_6,
+                                #data = subset(fec_horm_neosp_toxo_data_6,
                                                sex == 'm' & 
                                         !is.na(x = testosterone.ng.g.ln))) 
       
@@ -475,8 +603,8 @@
       # corticosterone by T. gondii infection 
       cort.toxo.f.mod <- lme4::lmer(corticosterone.ng.g.ln ~ toxo.status
                                  + (1|hy.id) , 
-                                 data = subset(fec_horm_neosp_toxo_data_4,
-                                 #data = subset(fec_horm_toxo_data_restrict,
+                                 data = subset(fec_horm_neosp_toxo_data_6,
+                                 #data = subset(fec_horm_neosp_toxo_data_6,
                                                sex == 'f' & 
                                           !is.na(x = corticosterone.ng.g.ln))) 
       
@@ -491,8 +619,8 @@
                                  + fecal.age.cat + poop.am.pm 
                                  + migratn.seas.fec + hum.pop.poop
                                  + (1|hy.id) , 
-                                 data = subset(fec_horm_neosp_toxo_data_4,
-                                 #data = subset(fec_horm_toxo_data_restrict,
+                                 data = subset(fec_horm_neosp_toxo_data_6,
+                                 #data = subset(fec_horm_neosp_toxo_data_6,
                                                sex == 'f' & 
                                           !is.na(x = corticosterone.ng.g.ln))) 
       
@@ -504,8 +632,8 @@
       # corticosterone by T. gondii infection 
       cort.toxo.m.mod <- lme4::lmer(corticosterone.ng.g.ln ~ toxo.status
                                  + (1|hy.id) , 
-                                 data = subset(fec_horm_neosp_toxo_data_4,
-                                 #data = subset(fec_horm_toxo_data_restrict,
+                                 data = subset(fec_horm_neosp_toxo_data_6,
+                                 #data = subset(fec_horm_neosp_toxo_data_6,
                                                sex == 'm' & 
                                           !is.na(x = corticosterone.ng.g.ln))) 
       
@@ -519,8 +647,8 @@
                                  + fecal.age.cat + poop.am.pm 
                                  + migratn.seas.fec + hum.pop.poop
                                  + (1|hy.id) , 
-                                 data = subset(fec_horm_neosp_toxo_data_4,
-                                 #data = subset(fec_horm_toxo_data_restrict,
+                                 data = subset(fec_horm_neosp_toxo_data_6,
+                                 #data = subset(fec_horm_neosp_toxo_data_6,
                                                sex == 'm' & 
                                           !is.na(x = corticosterone.ng.g.ln))) 
       
@@ -534,7 +662,7 @@
       # testosterone by T. gondii infection 
       T.toxo.c.mod <- lme4::lmer(testosterone.ng.g.ln ~ toxo.status
                                  + (1|hy.id) , 
-                                 data = subset(fec_horm_neosp_toxo_data_4,
+                                 data = subset(fec_horm_neosp_toxo_data_6,
                                                fecal.age.cat == 'cub' & 
                                             !is.na(x = testosterone.ng.g.ln))) 
       
@@ -548,7 +676,7 @@
                                  # note sex is part of repro state 
                                  # all female cubs nulliporous
                                  + (1|hy.id) , 
-                                 data = subset(fec_horm_neosp_toxo_data_4,
+                                 data = subset(fec_horm_neosp_toxo_data_6,
                                                fecal.age.cat == 'cub' & 
                                             !is.na(x = testosterone.ng.g.ln))) 
       
@@ -560,7 +688,7 @@
       # testosterone by T. gondii infection 
       T.toxo.sa.mod <- lme4::lmer(testosterone.ng.g.ln ~ toxo.status
                                  + (1|hy.id) , 
-                                 data = subset(fec_horm_neosp_toxo_data_4,
+                                 data = subset(fec_horm_neosp_toxo_data_6,
                                                fecal.age.cat == 'subadult' & 
                                             !is.na(x = testosterone.ng.g.ln))) 
       
@@ -574,7 +702,7 @@
                                      # note sex is part of repro state 
                                      # all female subadults nulliporous
                                      + (1|hy.id) , 
-                                     data = subset(fec_horm_neosp_toxo_data_4,
+                                     data = subset(fec_horm_neosp_toxo_data_6,
                                                 fecal.age.cat == 'subadult' & 
                                           !is.na(x = testosterone.ng.g.ln))) 
       
@@ -586,7 +714,7 @@
       # testosterone by T. gondii infection 
       T.toxo.a.mod <- lme4::lmer(testosterone.ng.g.ln ~ toxo.status
                                   + (1|hy.id) , 
-                                  data = subset(fec_horm_neosp_toxo_data_4,
+                                  data = subset(fec_horm_neosp_toxo_data_6,
                                                 fecal.age.cat == 'adult' & 
                                             !is.na(x = testosterone.ng.g.ln))) 
       
@@ -600,7 +728,7 @@
                                      + poop.state
                                       # note sex is part of repro states
                                       + (1|hy.id) , 
-                                      data = subset(fec_horm_neosp_toxo_data_4,
+                                      data = subset(fec_horm_neosp_toxo_data_6,
                                                 fecal.age.cat == 'adult' & 
                                               !is.na(x = testosterone.ng.g.ln))) 
       
@@ -617,7 +745,7 @@
       # corticosterone by T. gondii infection 
       cort.toxo.c.mod <- lme4::lmer(corticosterone.ng.g.ln ~ toxo.status
                                  + (1|hy.id) , 
-                                 data = subset(fec_horm_neosp_toxo_data_4,
+                                 data = subset(fec_horm_neosp_toxo_data_6,
                                                fecal.age.cat == 'cub' & 
                                           !is.na(x = corticosterone.ng.g.ln))) 
       
@@ -633,7 +761,7 @@
                                      # note sex is part of repro state 
                                      # all female cubs nulliporous
                                      + (1|hy.id) , 
-                                  data = subset(fec_horm_neosp_toxo_data_4,
+                                  data = subset(fec_horm_neosp_toxo_data_6,
                                               fecal.age.cat == 'cub' & 
                                           !is.na(x = corticosterone.ng.g.ln))) 
       
@@ -645,7 +773,7 @@
       # corticosterone by T. gondii infection 
       cort.toxo.sa.mod <- lme4::lmer(corticosterone.ng.g.ln ~ toxo.status
                                   + (1|hy.id) , 
-                                  data = subset(fec_horm_neosp_toxo_data_4,
+                                  data = subset(fec_horm_neosp_toxo_data_6,
                                                 fecal.age.cat == 'subadult' & 
                                           !is.na(x = corticosterone.ng.g.ln))) 
       
@@ -661,7 +789,7 @@
                                       # note sex is part of repro state 
                                       # all female subadults nulliporous
                                       + (1|hy.id) , 
-                                      data = subset(fec_horm_neosp_toxo_data_4,
+                                      data = subset(fec_horm_neosp_toxo_data_6,
                                           fecal.age.cat == 'subadult' & 
                                           !is.na(x = corticosterone.ng.g.ln))) 
       
@@ -673,7 +801,7 @@
       # corticosterone by T. gondii infection 
       cort.toxo.a.mod <- lme4::lmer(corticosterone.ng.g.ln ~ toxo.status
                                  + (1|hy.id) , 
-                                 data = subset(fec_horm_neosp_toxo_data_4,
+                                 data = subset(fec_horm_neosp_toxo_data_6,
                                                fecal.age.cat == 'adult' & 
                                         !is.na(x = corticosterone.ng.g.ln))) 
       
@@ -688,7 +816,7 @@
                                      + migratn.seas.fec + hum.pop.poop
                                      # note sex is part of repro states
                                      + (1|hy.id) , 
-                                     data = subset(fec_horm_neosp_toxo_data_4,
+                                     data = subset(fec_horm_neosp_toxo_data_6,
                                                    fecal.age.cat == 'adult' & 
                                           !is.na(x = corticosterone.ng.g.ln))) 
       
