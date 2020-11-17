@@ -135,18 +135,31 @@
       
       print(hist_plot_plasma_T)
       
-    ## d) Natural log transformation of T data 
-      plasma_horm_neosp_toxo_data $t.ln <- 
-        log(plasma_horm_neosp_toxo_data $t)
       
-    ## e) Histogram of Nat. Log. of plasma testosterone
+#********************** Data Inclusion/Exclusion Criteria ********************** 
+      
+    ## d) Set Zero's to 1/2 the minimum detected value
+      plasma_horm_neosp_toxo_data <- plasma_horm_neosp_toxo_data  %>%
+        mutate(t.adj = ifelse(t == 0, 
+           (0.5*min(plasma_horm_neosp_toxo_data[,'t']
+                    [which(plasma_horm_neosp_toxo_data[,'t']> 0)])),
+            plasma_horm_neosp_toxo_data$t))
+      
+#********************** Data Inclusion/Exclusion Criteria **********************      
+
+      
+    ## e) Natural log transformation of T data 
+      plasma_horm_neosp_toxo_data $t.ln <- 
+        log(plasma_horm_neosp_toxo_data$t.adj)
+      
+    ## f) Histogram of Nat. Log. of plasma testosterone
       hist_plot_ln_plasma_T <- ggplot(data=plasma_horm_neosp_toxo_data , 
                             aes(x=t.ln)) + 
         geom_histogram(aes(y = ..count..),
-                       breaks=seq(0, 3, by = 0.125), 
+                       breaks=seq(-5, 3, by = 0.5), 
                        col='black',
                        fill = 'dark grey') +
-        xlim(c(0, 3)) +
+        xlim(c(-5, 3)) +
         labs(title = 'Histogram of Nat. Log. Plasma Testosterone 
 (repeated measures)') +
         theme(plot.title = element_text(hjust = 0.5)) + # center title
@@ -198,9 +211,20 @@
       
       print(hist_plot_plasma_c)
       
+#********************** Data Inclusion/Exclusion Criteria ********************** 
+      
+    ## d) Set Zero's to 1/2 the minimum detected value
+      plasma_horm_neosp_toxo_data <- plasma_horm_neosp_toxo_data  %>%
+        mutate(c.adj = ifelse(c == 0, 
+                              (0.5*min(plasma_horm_neosp_toxo_data[,'c']
+                                [which(plasma_horm_neosp_toxo_data[,'c']> 0)])),
+                              plasma_horm_neosp_toxo_data$c))
+      
+#********************** Data Inclusion/Exclusion Criteria **********************      
+      
     ## e) Natural log transformation of cort data 
       plasma_horm_neosp_toxo_data $c.ln <- 
-        log(plasma_horm_neosp_toxo_data $c )
+        log(plasma_horm_neosp_toxo_data$c.adj )
       
     ## f) Histogram of Nat. Log. of plasma corticosterone
       hist_plot_ln_plasma_c <- ggplot(data=plasma_horm_neosp_toxo_data , 
@@ -259,7 +283,7 @@
       
   ### 4.1 Descriptive bivariate plots testosterone status by sex
     ## a) Scatter plot plasma testosterone by age by sex  
-      plasam_T_scatter <- ggplot(plasma_horm_neosp_toxo_data, 
+      plasma_T_scatter <- ggplot(plasma_horm_neosp_toxo_data, 
                               aes(x = age.cat.dart, y = t, 
                               shape = dart.state, color = sex)) +
         geom_point(position = position_jitter(h=0.0, w=0.3), cex = 2) +
@@ -278,7 +302,7 @@
         # annotate(geom="text", label = '5 SD', x = 1, 
         #          y = round(sd(plasma_horm_neosp_toxo_data$t, 
         #                       na.rm = T), 2) * 5, vjust=-1) +
-        labs(title = 'Scatter plot of plasma testoserone by age by sex',
+        labs(title = 'Scatter plot of plasma testosterone by age by sex',
              x ='Hyena age class (darting date)', 
              y ='Plasma testosterone ug/dL') +
         theme(plot.title = element_text(hjust = 0.5)) + # center title
@@ -287,10 +311,10 @@
         theme(panel.background = element_rect(fill = 'white')) 
       # add major axes
       
-      print(plasam_T_scatter)
+      print(plasma_T_scatter)
       
       ## b) Save scatter plot
-      ggsave('plasam_T_scatter.pdf', plot = plasam_T_scatter, 
+      ggsave('plasma_T_scatter.pdf', plot = plasma_T_scatter, 
              device = NULL, 
              path = here('output/'), scale = 1, width = 8, 
              height = 5, 
@@ -300,7 +324,7 @@
       
   ### 4.2 Descriptive bivariate plots corticosterone status by sex
     ## a) Scatter plot plasma corticosterone by age by sex  
-      plasam_cort_scatter <- ggplot(plasma_horm_neosp_toxo_data, 
+      plasma_cort_scatter <- ggplot(plasma_horm_neosp_toxo_data, 
                                  aes(x = age.cat.dart, y = c, 
                                      shape = dart.state, color = sex)) +
         geom_point(position = position_jitter(h=0.0, w=0.3), cex = 2) +
@@ -319,7 +343,7 @@
       # annotate(geom="text", label = '5 SD', x = 1, 
       #          y = round(sd(plasma_horm_neosp_toxo_data$c, 
       #                       na.rm = T), 2) * 5, vjust=-1) +
-      labs(title = 'Scatter plot of plasma testoserone by age by sex',
+      labs(title = 'Scatter plot of plasma corticosterone by age by sex',
            x ='Hyena age class (darting date)', 
            y ='Plasma corticosterone ug/dL') +
         theme(plot.title = element_text(hjust = 0.5)) + # center title
@@ -331,7 +355,7 @@
       print(plasam_cort_scatter)
       
       ## b) Save scatter plot
-      ggsave('plasam_cort_scatter.pdf', plot = plasam_cort_scatter, 
+      ggsave('plasma_cort_scatter.pdf', plot = plasma_cort_scatter, 
              device = NULL, 
              path = here('output/'), scale = 1, width = 8, 
              height = 5, 
@@ -342,7 +366,7 @@
     ## a) Testosterone by toxo.status by sex by age
       plasma_T_toxo_sex_age_sum <- plasma_horm_neosp_toxo_data %>%
         filter(!is.na(t)) %>%
-        group_by (toxo.status, sex, age.cat.dart) %>%
+        group_by (sex, age.cat.dart, toxo.status) %>%
         summarise (n.id = sum(!is.na(t)),
                    avg.T = round(mean(t, na.rm = T),2),
                    stdev.T = round(sd(t, na.rm = T), 2),
@@ -353,7 +377,7 @@
       
     ## b) save the data frame of summary stats out as a pdf into output file
       pdf(here('output/plasma_T_toxo_sex_age_sum.pdf'), 
-          height = 4, width = 5)
+          height = 4, width = 8)
       grid.table(plasma_T_toxo_sex_age_sum)
       dev.off()
       
@@ -363,7 +387,7 @@
       ## a) Corticosterone by toxo.status by sex by age
       plasma_cort_toxo_sex_age_sum <- plasma_horm_neosp_toxo_data %>%
         filter(!is.na(c)) %>%
-        group_by (toxo.status, sex, age.cat.dart) %>%
+        group_by (sex, age.cat.dart, toxo.status) %>%
         summarise (n.id = sum(!is.na(c)),
                    avg.cort = round(mean(c, na.rm = T),2),
                    stdev.cort = round(sd(c, na.rm = T), 2),
@@ -374,18 +398,9 @@
       
       ## b) save the data frame of summary stats out as a pdf into output file
       pdf(here('output/plasma_cort_toxo_sex_age_sum.pdf'), 
-          height = 4, width = 5)
+          height = 4, width = 8)
       grid.table(plasma_cort_toxo_sex_age_sum)
       dev.off() 
-      
-      
-      
-  
-      
-      
-      
-      
-    
       
       
       
@@ -399,7 +414,7 @@
       # RData file.
       save(file = paste0(project_data_path, 
                          '3_neo_toxo_plasma_horm.RData'), 
-           list = c('plasma_horm_neosp_toxo_data '))
+           list = c('plasma_horm_neosp_toxo_data'))
       
 
      
