@@ -14,8 +14,8 @@
              # of toxo. and neosp. with plasma horomones in spotted hyenas
 
   ### NOTE: Cortisol data include only samples collected <= 13 minutes post
-      # darting - measures baseline stress. Also only stress state categories
-      # 1 and 2 are included in analyses.
+            # darting - measures baseline stress. Also only stress state
+            #  categories 1 and 2 are included in analyses.
   
   
   # Code Blocks

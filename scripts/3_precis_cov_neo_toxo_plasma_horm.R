@@ -3,17 +3,22 @@
 #############        Neospora caninum with hormone levels         #############
 #############                                                     #############
 #############     3 Models: Precision covariate associations      #############
-#############                  w/fecal hormones                   #############
+#############                   plasma hormones                   #############
 #############                                                     #############
 #############                  By: Zach Laubach                   #############
 #############                 created: 6 Oct 2020                 #############
-#############              last updated: 12 Nov 2020              #############
+#############              last updated: 30 Nov 2020              #############
 ###############################################################################
 
 
 
   ### PURPOSE: Model associations between T. gondii infection with fecal 
              # testosterone and corticosterone levels in spotted hyenas
+
+  ### NOTE: Cortisol data include only samples collected <= 13 minutes post
+          # darting - measures baseline stress. Also only stress state 
+          # categories 1 and 2 are included in analyses.
+
   
   
   # Code Blocks
@@ -128,336 +133,260 @@
 ##############           3. Model precision covariates           ##############
 ###############################################################################
     
-  ### 3.1 Testosterone precision covariates     
-    ## a)  Unadjusted mixed-model: female testosterone by fecal.age.cat
-      T.age.mod.f <- nlme::lme(testosterone.ng.g.ln ~ fecal.age.cat, 
-                             random = ~ 1|hy.id, 
-                             data = subset(fec_horm_neosp_toxo_data_6,
-                                           sex == 'f' &
-                                        !is.na(x = fecal.age.cat) & 
-                                        !is.na(x = testosterone.ng.g.ln)))
+  ### 3.1 Associations between precision covariates and testosterone levels
+    ## a) Unadjusted model: Females
+      # testosterone by age 
+      T.age.mod.f <- lm(t.ln ~ age.cat.dart, 
+                                     data = subset(plasma_horm_neosp_toxo_data,
+                                                   sex == 'f' & 
+                                                     !is.na(x = t.ln)))
       
       summary(T.age.mod.f) # print model summary (ln scale)
-      intervals(T.age.mod.f) # 95% CIs (ln scale)
-      plot(T.age.mod.f) # view fitted vs residuals
+      confint(T.age.mod.f) # 95% CIs (ln scale)
+      #plot(T.age.mod.f) # view fitted vs residuals
       Anova(T.age.mod.f, type = 'II') # type II SS from Car package
       
       # Use emmeans to estimate marginal means
-      T.age.mmean.f <- emmeans(T.age.mod.f, 'fecal.age.cat')
+      T.age.mmean.f <- emmeans(T.age.mod.f, 
+                                            'age.cat.dart')
       summary(T.age.mmean.f)
   
-    ## b) Unadjusted mixed-model: male testosterone by fecal.age.cat 
-      T.age.mod.m <- nlme::lme(testosterone.ng.g.ln ~ fecal.age.cat, 
-                             random = ~ 1|hy.id, 
-                             data = subset(fec_horm_neosp_toxo_data_6,
-                                           sex == 'm' &
-                                        !is.na(x = fecal.age.cat) & 
-                                        !is.na(x = testosterone.ng.g.ln)))
+      
+    ## b) Unadjusted model: Males
+      # testosterone by age 
+      T.age.mod.m <- lm(t.ln ~ age.cat.dart, 
+                        data = subset(plasma_horm_neosp_toxo_data,
+                                      sex == 'm' & 
+                                        !is.na(x = t.ln)))
       
       summary(T.age.mod.m) # print model summary (ln scale)
-      intervals(T.age.mod.m) # 95% CIs (ln scale)
-      plot(T.age.mod.m) # view fitted vs residuals
+      confint(T.age.mod.m) # 95% CIs (ln scale)
+      #plot(T.age.mod.m) # view fitted vs residuals
       Anova(T.age.mod.m, type = 'II') # type II SS from Car package
       
       # Use emmeans to estimate marginal means
-      T.age.mmean.m <- emmeans(T.age.mod.m, 'fecal.age.cat')
+      T.age.mmean.m <- emmeans(T.age.mod.m, 
+                               'age.cat.dart')
       summary(T.age.mmean.m)
       
-    ## c) Unadjusted mixed-model: female testosterone by poop.am.pm
-      T.poop.am.pm.mod.f <- nlme::lme(testosterone.ng.g.ln ~ poop.am.pm, 
-                               random = ~ 1|hy.id, 
-                               data = subset(fec_horm_neosp_toxo_data_6,
-                                             sex == 'f' &
-                                          !is.na(x = poop.am.pm) & 
-                                          !is.na(x = testosterone.ng.g.ln)))
+    ## c) Unadjusted model: Female adults
+      # testosterone by reproductive state 
+      T.state.mod.f.adult <- lm(t.ln ~ dart.state, 
+                        data = subset(plasma_horm_neosp_toxo_data,
+                                      sex == 'f' & age.cat.dart == 'adult'
+                                      & !is.na(x = t.ln)))
       
-      summary(T.poop.am.pm.mod.f) # print model summary (ln scale)
-      intervals(T.poop.am.pm.mod.f) # 95% CIs (ln scale)
-      plot(T.poop.am.pm.mod.f) # view fitted vs residuals
-      Anova(T.poop.am.pm.mod.f, type = 'II') # type II SS from Car package
-      
-      # Use emmeans to estimate marginal means
-      T.poop.am.pm.mmean.f <- emmeans(T.poop.am.pm.mod.f, 'poop.am.pm')
-      summary(T.poop.am.pm.mmean.f)
-      
-    ## d) Unadjusted mixed-model: male testosterone by poop.am.pm 
-      T.poop.am.pm.mod.m <- nlme::lme(testosterone.ng.g.ln ~ poop.am.pm, 
-                               random = ~ 1|hy.id, 
-                               data = subset(fec_horm_neosp_toxo_data_6,
-                                             sex == 'm' &
-                                        !is.na(x = poop.am.pm) & 
-                                        !is.na(x = testosterone.ng.g.ln)))
-      
-      summary(T.poop.am.pm.mod.m) # print model summary (ln scale)
-      intervals(T.poop.am.pm.mod.m) # 95% CIs (ln scale)
-      plot(T.poop.am.pm.mod.m) # view fitted vs residuals
-      Anova(T.poop.am.pm.mod.m, type = 'II') # type II SS from Car package
+      summary(T.state.mod.f.adult) # print model summary (ln scale)
+      confint(T.state.mod.f.adult) # 95% CIs (ln scale)
+      #plot(T.state.mod.f.adult) # view fitted vs residuals
+      Anova(T.state.mod.f.adult, type = 'II') # type II SS from Car package
       
       # Use emmeans to estimate marginal means
-      T.poop.am.pm.mmean.m <- emmeans(T.poop.am.pm.mod.m, 'poop.am.pm')
-      summary(T.poop.am.pm.mmean.m)
+      T.state.mmean.f.adult <- emmeans(T.state.mod.f.adult, 
+                               'dart.state')
+      summary(T.state.mmean.f.adult)
       
-    ## e) Unadjusted mixed-model: female testosterone by migratn.seas.fec
-      T.migratn.seas.fec.mod.f <- nlme::lme(testosterone.ng.g.ln ~ 
-                                              migratn.seas.fec, 
-                                      random = ~ 1|hy.id, 
-                                      data = subset(fec_horm_neosp_toxo_data_6,
-                                                    sex == 'f' &
-                                              !is.na(x = migratn.seas.fec) & 
-                                            !is.na(x = testosterone.ng.g.ln)))
+    ## d) Unadjusted model: Male adults
+      # testosterone by residency status
+      T.status.mod.m.adult <- lm(t.ln ~ status, 
+                                data = subset(plasma_horm_neosp_toxo_data,
+                                          sex == 'm' & age.cat.dart == 'adult'
+                                              & !is.na(x = t.ln)))
       
-      summary(T.migratn.seas.fec.mod.f) # print model summary (ln scale)
-      intervals(T.migratn.seas.fec.mod.f) # 95% CIs (ln scale)
-      plot(T.migratn.seas.fec.mod.f) # view fitted vs residuals
-      Anova(T.migratn.seas.fec.mod.f, type = 'II') # type II SS from Car package
-      
-      # Use emmeans to estimate marginal means
-      T.migratn.seas.fec.mmean.f <- emmeans(T.migratn.seas.fec.mod.f, 
-                                        'migratn.seas.fec')
-      summary(T.migratn.seas.fec.mmean.f)
-      
-    ## f) Unadjusted mixed-model: male testosterone by migratn.seas.fec 
-      T.migratn.seas.fec.mod.m <- nlme::lme(testosterone.ng.g.ln ~ 
-                                              migratn.seas.fec, 
-                                      random = ~ 1|hy.id, 
-                                      data = subset(fec_horm_neosp_toxo_data_6,
-                                                    sex == 'm' &
-                                            !is.na(x = migratn.seas.fec) & 
-                                            !is.na(x = testosterone.ng.g.ln)))
-      
-      summary(T.migratn.seas.fec.mod.m) # print model summary (ln scale)
-      intervals(T.migratn.seas.fec.mod.m) # 95% CIs (ln scale)
-      plot(T.migratn.seas.fec.mod.m) # view fitted vs residuals
-      Anova(T.migratn.seas.fec.mod.m, type = 'II') # type II SS from Car package
+      summary(T.status.mod.m.adult) # print model summary (ln scale)
+      confint(T.status.mod.m.adult) # 95% CIs (ln scale)
+      #plot(T.status.mod.m.adult) # view fitted vs residuals
+      Anova(T.status.mod.m.adult, type = 'II') # type II SS from Car package
       
       # Use emmeans to estimate marginal means
-      T.migratn.seas.fec.mmean.m <- emmeans(T.migratn.seas.fec.mod.m, 
-                                            'migratn.seas.fec')
-      summary(T.migratn.seas.fec.mmean.m)
-     
-    ## g) Unadjusted mixed-model: female testosterone by hum.pop.poop
-      T.hum.pop.poop.mod.f <- nlme::lme(testosterone.ng.g.ln ~ 
-                                              hum.pop.poop, 
-                                            random = ~ 1|hy.id, 
-                                      data = subset(fec_horm_neosp_toxo_data_6,
-                                                          sex == 'f' &
-                                      !is.na(x = hum.pop.poop) & 
-                                      !is.na(x = testosterone.ng.g.ln)))
+      T.status.mmean.m.adult <- emmeans(T.status.mod.m.adult, 
+                                       'status')
+      summary(T.status.mmean.m.adult)
       
-      summary(T.hum.pop.poop.mod.f) # print model summary (ln scale)
-      intervals(T.hum.pop.poop.mod.f) # 95% CIs (ln scale)
-      plot(T.hum.pop.poop.mod.f) # view fitted vs residuals
-      Anova(T.hum.pop.poop.mod.f, type = 'II') # type II SS from Car package
+    ## e) Unadjusted model: Male adults
+      # testosterone by time of day
+      #*** NOTE: no female model becaus all samples from am
+      T.am.pm.mod.m.adult <- lm(t.ln ~ dart.am.pm, 
+                                 data = subset(plasma_horm_neosp_toxo_data,
+                                          sex == 'm' & age.cat.dart == 'adult'
+                                               & !is.na(x = t.ln)))
       
-      # Use emmeans to estimate marginal means
-      T.hum.pop.poop.mmean.f <- emmeans(T.hum.pop.poop.mod.f, 
-                                            'hum.pop.poop')
-      summary(T.hum.pop.poop.mmean.f)
-      
-    ## h) Unadjusted mixed-model: male testosterone by hum.pop.poop 
-      T.hum.pop.poop.mod.m <- nlme::lme(testosterone.ng.g.ln ~ 
-                                              hum.pop.poop, 
-                                            random = ~ 1|hy.id, 
-                                      data = subset(fec_horm_neosp_toxo_data_6,
-                                                          sex == 'm' &
-                                      !is.na(x = hum.pop.poop) & 
-                                      !is.na(x = testosterone.ng.g.ln)))
-      
-      summary(T.hum.pop.poop.mod.m) # print model summary (ln scale)
-      intervals(T.hum.pop.poop.mod.m) # 95% CIs (ln scale)
-      plot(T.hum.pop.poop.mod.m) # view fitted vs residuals
-      Anova(T.hum.pop.poop.mod.m, type = 'II') # type II SS from Car package
+      summary(T.am.pm.mod.m.adult) # print model summary (ln scale)
+      confint(T.am.pm.mod.m.adult) # 95% CIs (ln scale)
+      #plot(T.am.pm.mod.m.adult) # view fitted vs residuals
+      Anova(T.am.pm.mod.m.adult, type = 'II') # type II SS from Car package
       
       # Use emmeans to estimate marginal means
-      T.hum.pop.poop.mmean.m <- emmeans(T.hum.pop.poop.mod.m, 
-                                            'hum.pop.poop')
-      summary(T.hum.pop.poop.mmean.m)
+      T.am.pm.mmean.m.adult <- emmeans(T.am.pm.mod.m.adult, 
+                                        'dart.am.pm')
+      summary(T.am.pm.mmean.m.adult)
       
+    ## f) Unadjusted model: Female adults
+      # testosterone by migration season
+      #*** NOTE: no female model becaus all samples from am
+      T.migrtn.mod.f.adult <- lm(t.ln ~ migratn.seas.dart, 
+                                data = subset(plasma_horm_neosp_toxo_data,
+                                          sex == 'f' & age.cat.dart == 'adult'
+                                              & !is.na(x = t.ln)))
       
-    ## i) Unadjusted mixed-model: female testosterone by poop.state
-      T.poop.state.mod.f <- nlme::lme(testosterone.ng.g.ln ~ 
-                                          poop.state, 
-                                        random = ~ 1|hy.id, 
-                                  data = subset(fec_horm_neosp_toxo_data_6,
-                                                      sex == 'f' &
-                                  !is.na(x = poop.state) & 
-                                  !is.na(x = testosterone.ng.g.ln)))
-      
-      summary(T.poop.state.mod.f) # print model summary (ln scale)
-      intervals(T.poop.state.mod.f) # 95% CIs (ln scale)
-      plot(T.poop.state.mod.f) # view fitted vs residuals
-      Anova(T.poop.state.mod.f, type = 'II') # type II SS from Car package
+      summary(T.migrtn.mod.f.adult) # print model summary (ln scale)
+      confint(T.migrtn.mod.f.adult) # 95% CIs (ln scale)
+      #plot(T.migrtn.mod.f.adult) # view fitted vs residuals
+      Anova(T.migrtn.mod.f.adult, type = 'II') # type II SS from Car package
       
       # Use emmeans to estimate marginal means
-      T.poop.state.mmean.f <- emmeans(T.poop.state.mod.f, 
-                                        'poop.state')
-      summary(T.poop.state.mmean.f)
+      T.migrtn.mmean.f.adult <- emmeans(T.migrtn.mod.f.adult, 
+                                       'migratn.seas.dart')
+      summary(T.migrtn.mmean.f.adult)
       
+    ## g) Unadjusted model: Male adults
+      # testosterone by migration season
+      #*** NOTE: no female model becaus all samples from am
+      T.migrtn.mod.m.adult <- lm(t.ln ~ migratn.seas.dart, 
+                                 data = subset(plasma_horm_neosp_toxo_data,
+                                        sex == 'm' & age.cat.dart == 'adult'
+                                               & !is.na(x = t.ln)))
       
-  ### 3.2 Corticosterone precision covariates     
-    ## a)  Unadjusted mixed-model: female corticosterone by fecal.age.cat
-      cort.age.mod.f <- nlme::lme(corticosterone.ng.g.ln ~ fecal.age.cat, 
-                               random = ~ 1|hy.id, 
-                               data = subset(fec_horm_neosp_toxo_data_6,
-                                             sex == 'f' &
-                                        !is.na(x = fecal.age.cat) & 
-                                        !is.na(x = corticosterone.ng.g.ln)))
+      summary(T.migrtn.mod.m.adult) # print model summary (ln scale)
+      confint(T.migrtn.mod.m.adult) # 95% CIs (ln scale)
+      #plot(T.migrtn.mod.m.adult) # view fitted vs residuals
+      Anova(T.migrtn.mod.m.adult, type = 'II') # type II SS from Car package
+      
+      # Use emmeans to estimate marginal means
+      T.migrtn.mmean.m.adult <- emmeans(T.migrtn.mod.m.adult, 
+                                        'migratn.seas.dart')
+      summary(T.migrtn.mmean.m.adult)
+      
+    
+  ### 3.2 Associations between precision covariates and corticosterone levels
+    ## a) Unadjusted model: Females
+      # corticosterone by age 
+      cort.age.mod.f <- lm(c.ln ~ age.cat.dart, 
+                        data = subset(plasma_horm_neosp_toxo_data,
+                                      sex == 'f' & 
+                                      dart.time.diff <= 13 & stressca <=2 &
+                                        !is.na(x = c.ln)))
       
       summary(cort.age.mod.f) # print model summary (ln scale)
-      intervals(cort.age.mod.f) # 95% CIs (ln scale)
-      plot(cort.age.mod.f) # view fitted vs residuals
+      confint(cort.age.mod.f) # 95% CIs (ln scale)
+      #plot(cort.age.mod.f) # view fitted vs residuals
       Anova(cort.age.mod.f, type = 'II') # type II SS from Car package
       
       # Use emmeans to estimate marginal means
-      cort.age.mmean.f <- emmeans(cort.age.mod.f, 'fecal.age.cat')
+      cort.age.mmean.f <- emmeans(cort.age.mod.f, 
+                               'age.cat.dart')
       summary(cort.age.mmean.f)
       
-    ## b) Unadjusted mixed-model: male corticosterone by fecal.age.cat 
-      cort.age.mod.m <- nlme::lme(corticosterone.ng.g.ln ~ fecal.age.cat, 
-                               random = ~ 1|hy.id, 
-                               data = subset(fec_horm_neosp_toxo_data_6,
-                                             sex == 'm' &
-                                          !is.na(x = fecal.age.cat) & 
-                                          !is.na(x = corticosterone.ng.g.ln)))
+    ## b) Unadjusted model: Males
+      # corticosterone by age 
+      cort.age.mod.m <- lm(c.ln ~ age.cat.dart, 
+                        data = subset(plasma_horm_neosp_toxo_data,
+                                      sex == 'm' & 
+                                        dart.time.diff <= 13 & stressca <=2 &
+                                        !is.na(x = c.ln)))
       
       summary(cort.age.mod.m) # print model summary (ln scale)
-      intervals(cort.age.mod.m) # 95% CIs (ln scale)
-      plot(cort.age.mod.m) # view fitted vs residuals
+      confint(cort.age.mod.m) # 95% CIs (ln scale)
+      #plot(cort.age.mod.m) # view fitted vs residuals
       Anova(cort.age.mod.m, type = 'II') # type II SS from Car package
       
       # Use emmeans to estimate marginal means
-      cort.age.mmean.m <- emmeans(cort.age.mod.m, 'fecal.age.cat')
+      cort.age.mmean.m <- emmeans(cort.age.mod.m, 
+                               'age.cat.dart')
       summary(cort.age.mmean.m)
       
-    ## c) Unadjusted mixed-model: female corticosterone by poop.am.pm
-      cort.poop.am.pm.mod.f <- nlme::lme(corticosterone.ng.g.ln ~ poop.am.pm, 
-                                      random = ~ 1|hy.id, 
-                                      data = subset(fec_horm_neosp_toxo_data_6,
-                                                    sex == 'f' &
-                                          !is.na(x = poop.am.pm) & 
-                                          !is.na(x = corticosterone.ng.g.ln)))
+    ## c) Unadjusted model: Female adults
+      # corticosterone by reproductive state 
+      cort.state.mod.f.adult <- lm(c.ln ~ dart.state, 
+                                data = subset(plasma_horm_neosp_toxo_data,
+                                        sex == 'f' & age.cat.dart == 'adult' &
+                                        dart.time.diff <= 13 & stressca <=2 &
+                                        !is.na(x = c.ln)))
       
-      summary(cort.poop.am.pm.mod.f) # print model summary (ln scale)
-      intervals(cort.poop.am.pm.mod.f) # 95% CIs (ln scale)
-      plot(cort.poop.am.pm.mod.f) # view fitted vs residuals
-      Anova(cort.poop.am.pm.mod.f, type = 'II') # type II SS from Car package
-      
-      # Use emmeans to estimate marginal means
-      cort.poop.am.pm.mmean.f <- emmeans(cort.poop.am.pm.mod.f, 'poop.am.pm')
-      summary(cort.poop.am.pm.mmean.f)
-      
-    ## d) Unadjusted mixed-model: male corticosterone by poop.am.pm 
-      cort.poop.am.pm.mod.m <- nlme::lme(corticosterone.ng.g.ln ~ poop.am.pm, 
-                                      random = ~ 1|hy.id, 
-                                      data = subset(fec_horm_neosp_toxo_data_6,
-                                                    sex == 'm' &
-                                          !is.na(x = poop.am.pm) & 
-                                          !is.na(x = corticosterone.ng.g.ln)))
-      
-      summary(cort.poop.am.pm.mod.m) # print model summary (ln scale)
-      intervals(cort.poop.am.pm.mod.m) # 95% CIs (ln scale)
-      plot(cort.poop.am.pm.mod.m) # view fitted vs residuals
-      Anova(cort.poop.am.pm.mod.m, type = 'II') # type II SS from Car package
+      summary(cort.state.mod.f.adult) # print model summary (ln scale)
+      confint(cort.state.mod.f.adult) # 95% CIs (ln scale)
+      #plot(cort.state.mod.f.adult) # view fitted vs residuals
+      Anova(cort.state.mod.f.adult, type = 'II') # type II SS from Car package
       
       # Use emmeans to estimate marginal means
-      cort.poop.am.pm.mmean.m <- emmeans(cort.poop.am.pm.mod.m, 'poop.am.pm')
-      summary(cort.poop.am.pm.mmean.m)
+      cort.state.mmean.f.adult <- emmeans(cort.state.mod.f.adult, 
+                                       'dart.state')
+      summary(cort.state.mmean.f.adult)
       
-    ## e) Unadjusted mixed-model: female corticosterone by migratn.seas.fec
-      cort.migratn.seas.fec.mod.f <- nlme::lme(corticosterone.ng.g.ln ~ 
-                                              migratn.seas.fec, 
-                                            random = ~ 1|hy.id, 
-                                  data = subset(fec_horm_neosp_toxo_data_6,
-                                                          sex == 'f' &
-                                  !is.na(x = migratn.seas.fec) & 
-                                  !is.na(x = corticosterone.ng.g.ln)))
+    ## d) Unadjusted model: Male adults
+      # corticosterone by residency status
+      cort.status.mod.m.adult <- lm(c.ln ~ status, 
+                                 data = subset(plasma_horm_neosp_toxo_data,
+                                        sex == 'm' & age.cat.dart == 'adult' &
+                                        dart.time.diff <= 13 & stressca <=2 &
+                                        !is.na(x = c.ln)))
       
-      summary(cort.migratn.seas.fec.mod.f) # print model summary (ln scale)
-      intervals(cort.migratn.seas.fec.mod.f) # 95% CIs (ln scale)
-      plot(cort.migratn.seas.fec.mod.f) # view fitted vs residuals
-      Anova(cort.migratn.seas.fec.mod.f, type = 'II') # type II SS from Car 
-      
-      # Use emmeans to estimate marginal means
-      cort.migratn.seas.fec.mmean.f <- emmeans(cort.migratn.seas.fec.mod.f, 
-                                            'migratn.seas.fec')
-      summary(cort.migratn.seas.fec.mmean.f)
-      
-    ## f) Unadjusted mixed-model: male corticosterone by migratn.seas.fec 
-      cort.migratn.seas.fec.mod.m <- nlme::lme(corticosterone.ng.g.ln ~ 
-                                              migratn.seas.fec, 
-                                            random = ~ 1|hy.id, 
-                                  data = subset(fec_horm_neosp_toxo_data_6,
-                                                          sex == 'm' &
-                                  !is.na(x = migratn.seas.fec) & 
-                                  !is.na(x = corticosterone.ng.g.ln)))
-      
-      summary(cort.migratn.seas.fec.mod.m) # print model summary (ln scale)
-      intervals(cort.migratn.seas.fec.mod.m) # 95% CIs (ln scale)
-      plot(cort.migratn.seas.fec.mod.m) # view fitted vs residuals
-      Anova(cort.migratn.seas.fec.mod.m, type = 'II') # type II SS from Car 
+      summary(cort.status.mod.m.adult) # print model summary (ln scale)
+      confint(cort.status.mod.m.adult) # 95% CIs (ln scale)
+      #plot(cort.status.mod.m.adult) # view fitted vs residuals
+      Anova(cort.status.mod.m.adult, type = 'II') # type II SS from Car package
       
       # Use emmeans to estimate marginal means
-      cort.migratn.seas.fec.mmean.m <- emmeans(cort.migratn.seas.fec.mod.m, 
-                                            'migratn.seas.fec')
-      summary(cort.migratn.seas.fec.mmean.m)
+      cort.status.mmean.m.adult <- emmeans(cort.status.mod.m.adult, 
+                                        'status')
+      summary(cort.status.mmean.m.adult)
       
-    ## g) Unadjusted mixed-model: female corticosterone by hum.pop.poop
-      cort.hum.pop.poop.mod.f <- nlme::lme(corticosterone.ng.g.ln ~ 
-                                          hum.pop.poop, 
-                                        random = ~ 1|hy.id, 
-                                  data = subset(fec_horm_neosp_toxo_data_6,
-                                                      sex == 'f' &
-                                  !is.na(x = hum.pop.poop) & 
-                                  !is.na(x = corticosterone.ng.g.ln)))
+    ## e) Unadjusted model: Male adults
+      # corticosterone by time of day
+      #*** NOTE: no female model becaus all samples from am
+      cort.am.pm.mod.m.adult <- lm(c.ln ~ dart.am.pm, 
+                                data = subset(plasma_horm_neosp_toxo_data,
+                                       sex == 'm' & age.cat.dart == 'adult'&
+                                       dart.time.diff <= 13 & stressca <=2 &
+                                               !is.na(x = c.ln)))
       
-      summary(cort.hum.pop.poop.mod.f) # print model summary (ln scale)
-      intervals(cort.hum.pop.poop.mod.f) # 95% CIs (ln scale)
-      plot(cort.hum.pop.poop.mod.f) # view fitted vs residuals
-      Anova(cort.hum.pop.poop.mod.f, type = 'II') # type II SS from Car package
-      
-      # Use emmeans to estimate marginal means
-      cort.hum.pop.poop.mmean.f <- emmeans(cort.hum.pop.poop.mod.f, 
-                                        'hum.pop.poop')
-      summary(cort.hum.pop.poop.mmean.f)
-      
-    ## h) Unadjusted mixed-model: male corticosterone by hum.pop.poop 
-      cort.hum.pop.poop.mod.m <- nlme::lme(corticosterone.ng.g.ln ~ 
-                                          hum.pop.poop, 
-                                        random = ~ 1|hy.id, 
-                                  data = subset(fec_horm_neosp_toxo_data_6,
-                                                      sex == 'm' &
-                                  !is.na(x = hum.pop.poop) & 
-                                  !is.na(x = corticosterone.ng.g.ln)))
-      
-      summary(cort.hum.pop.poop.mod.m) # print model summary (ln scale)
-      intervals(cort.hum.pop.poop.mod.m) # 95% CIs (ln scale)
-      plot(cort.hum.pop.poop.mod.m) # view fitted vs residuals
-      Anova(cort.hum.pop.poop.mod.m, type = 'II') # type II SS from Car package
+      summary(cort.am.pm.mod.m.adult) # print model summary (ln scale)
+      confint(cort.am.pm.mod.m.adult) # 95% CIs (ln scale)
+      #plot(cort.am.pm.mod.m.adult) # view fitted vs residuals
+      Anova(cort.am.pm.mod.m.adult, type = 'II') # type II SS from Car package
       
       # Use emmeans to estimate marginal means
-      cort.hum.pop.poop.mmean.m <- emmeans(cort.hum.pop.poop.mod.m, 
-                                        'hum.pop.poop')
-      summary(cort.hum.pop.poop.mmean.m)
+      cort.am.pm.mmean.m.adult <- emmeans(cort.am.pm.mod.m.adult, 
+                                       'dart.am.pm')
+      summary(cort.am.pm.mmean.m.adult)
       
+    ## f) Unadjusted model: Female adults
+      # corticosterone by migration season
+      #*** NOTE: no female model becaus all samples from am
+      cort.migrtn.mod.f.adult <- lm(c.ln ~ migratn.seas.dart, 
+                                 data = subset(plasma_horm_neosp_toxo_data,
+                                        sex == 'f' & age.cat.dart == 'adult' &
+                                        dart.time.diff <= 13 & stressca <=2 &
+                                                !is.na(x = c.ln)))
       
-    ## i) Unadjusted mixed-model: female corticosterone by poop.state
-      cort.poop.state.mod.f <- nlme::lme(corticosterone.ng.g.ln ~ 
-                                        poop.state, 
-                                      random = ~ 1|hy.id, 
-                                      data = subset(fec_horm_neosp_toxo_data_6,
-                                                    sex == 'f' &
-                                                      !is.na(x = poop.state) & 
-                                                      !is.na(x = corticosterone.ng.g.ln)))
-      
-      summary(cort.poop.state.mod.f) # print model summary (ln scale)
-      intervals(cort.poop.state.mod.f) # 95% CIs (ln scale)
-      plot(cort.poop.state.mod.f) # view fitted vs residuals
-      Anova(cort.poop.state.mod.f, type = 'II') # type II SS from Car package
+      summary(cort.migrtn.mod.f.adult) # print model summary (ln scale)
+      confint(cort.migrtn.mod.f.adult) # 95% CIs (ln scale)
+      #plot(cort.migrtn.mod.f.adult) # view fitted vs residuals
+      Anova(cort.migrtn.mod.f.adult, type = 'II') # type II SS from Car package
       
       # Use emmeans to estimate marginal means
-      cort.poop.state.mmean.f <- emmeans(cort.poop.state.mod.f, 
-                                      'poop.state')
-      summary(cort.poop.state.mmean.f)
+      cort.migrtn.mmean.f.adult <- emmeans(cort.migrtn.mod.f.adult, 
+                                        'migratn.seas.dart')
+      summary(cort.migrtn.mmean.f.adult)
       
+    ## g) Unadjusted model: Male adults
+      # corticosterone by migration season
+      #*** NOTE: no female model becaus all samples from am
+      cort.migrtn.mod.m.adult <- lm(c.ln ~ migratn.seas.dart, 
+                                 data = subset(plasma_horm_neosp_toxo_data,
+                                        sex == 'm' & age.cat.dart == 'adult' &
+                                        dart.time.diff <= 13 & stressca <=2 &
+                                                !is.na(x = c.ln)))
       
+      summary(cort.migrtn.mod.m.adult) # print model summary (ln scale)
+      confint(cort.migrtn.mod.m.adult) # 95% CIs (ln scale)
+      #plot(cort.migrtn.mod.m.adult) # view fitted vs residuals
+      Anova(cort.migrtn.mod.m.adult, type = 'II') # type II SS from Car package
       
+      # Use emmeans to estimate marginal means
+      cort.migrtn.mmean.m.adult <- emmeans(cort.migrtn.mod.m.adult, 
+                                        'migratn.seas.dart')
+      summary(cort.migrtn.mmean.m.adult)
+      
+     
+    
