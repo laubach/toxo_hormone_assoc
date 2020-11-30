@@ -6,7 +6,7 @@
 #############                                                     #############
 #############                  By: Zach Laubach                   #############
 #############                created: 19 Sept 2020                #############
-#############              last updated: 12 Nov 2020              #############
+#############              last updated: 30 Nov 2020              #############
 ###############################################################################
 
 
@@ -39,16 +39,19 @@
     ## a) Data Manipulation and Descriptive Stats Packages
       # Check for tidyverse and install if not already installed
      
-      # load tidyverse packages
-        library ('tidyverse')
+      # load tidyverse package
+        library('tidyverse')
       
-      # load lubridate packages
-        library ('lubridate') 
+      # load lubridate package
+        library('lubridate') 
      
-      # load here packages
-        library ('here')
+      # load here package
+        library('here')
+      
+      # load lubridate package
+        library ('lubridate')
+      
 
-        
   ### 1.3 Get Version and Session Info
     R.Version()
     sessionInfo()
@@ -151,8 +154,16 @@
       repro_state <- repro_state %>%
         rename('hy.id' = 'mom')
       
+      
+  ### 3.3 Tidy tblDarting
+    ## a) Convert all text to lower case
+      darting <- AllCharactersToLower(darting)
+      
+    ## b) Format variable names (lowercase and separated by '.')
+      darting <- FormatVarNames(darting)
+      
     
-  ### 3.4 Tidy neosp_toxo_data
+  ### 3.5 Tidy neosp_toxo_data
     ## a) Convert all text to lower case
       neosp_toxo_data <- AllCharactersToLower(neosp_toxo_data)
       
@@ -199,7 +210,7 @@
                                             levels = c("f", 
                                                        "m")))
     
-  ### 3.5 Tidy plasma_horm data
+  ### 3.6 Tidy plasma_horm data
     ## a) Convert all text to lower case
       plasma_horm <- AllCharactersToLower(plasma_horm)
       
@@ -213,7 +224,6 @@
     ## d) Rename id as hy.id
       plasma_horm <- plasma_horm %>%
         rename('hy.id' = 'id')
-      
       
     ## e) Format the darting dart.date in plasma_horm    
       plasma_horm <- plasma_horm %>%
@@ -407,6 +417,7 @@
       fec_horm_neosp_toxo_data <- fec_horm_neosp_toxo_data  %>%
         mutate(poop.am.pm = ifelse(lubridate::am(poop.time), 'am', 
                                    'pm'))
+      class(fec_horm_neosp_toxo_data$poop.time)
       
     ## j) Re-code *nominal* factor (with ordered levels)  
       # Set levels (odering) of poop.am.pm variable and sets the reference  
@@ -583,14 +594,13 @@
         rename('dart.state' = 'state')
 
 
-
-  ### 5.2 Combine plasma_horm with neosp_toxo_data into a long dataframe
+  ### 5.2 Combine plasma_horm with neosp_toxo_data into a dataframe
     ## a) Left join neosp_toxo_data to plasma_horm, retains all columns from both
       plasma_horm_neosp_toxo_data <- plasma_horm %>%
         select(-c(sex, kay.code)) %>%
         left_join(neosp_toxo_data, by = 'hy.id')
 
-    ## b) Remove fecal hormone data that does not have corresponding neosp
+    ## b) Remove plasma hormone data that does not have corresponding neosp
       # and/or toxo data
       plasma_horm_neosp_toxo_data <- plasma_horm_neosp_toxo_data %>%
         filter(!is.na(toxo.status) | !is.na(neo.status)) %>%
@@ -616,33 +626,40 @@
         left_join(select(clan_status, c(ids, dates, dart.clan, dart.status)),
                   by = c('hy.id' = 'ids',
                          'dart.date' = 'dates'))
+      
+    ## g) Left join darting info to plasma_horm_neosp_toxo_data
+      plasma_horm_neosp_toxo_data <- plasma_horm_neosp_toxo_data %>%
+        left_join(select(darting, c(id, collection.date, found.dead, 
+                                    darting.time, time.down, 
+                                    blood.sampling.time, gnrh.challenge)),
+                  by = c('hy.id' = 'id',
+                         'dart.date' = 'collection.date'))  
 
 
   ### 5.3 Tidy plasma_horm_neosp_toxo_data including precision covariates
-    ## a) Create a varialbes, 'fecal.age.days', and 'fecal.age.mon,'
-      # which indicates how old hyena was on the poop.date using lubridate
+    ## a) Create a varialbes, 'dart.age.days', and 'dart.age.mon,'
+      # which indicates how old hyena was on the dart.date using lubridate
       plasma_horm_neosp_toxo_data <- plasma_horm_neosp_toxo_data  %>%
         mutate(dart.age.days = round(interval(dob.date,
-                                               poop.date) %/% days(1), 1))
+                                              dart.date) %/% days(1), 1))
 
-
-    ## b) Extract month and year from poop.date
-      # Use lubridate to extract the month/yr during which a poop sample was
+    ## b) Extract month and year from dart.date
+      # Use lubridate to extract the month/yr during which a plasma sample was
       # collected and make a new variable
       plasma_horm_neosp_toxo_data$dart.mon <-
         month(plasma_horm_neosp_toxo_data$dart.date)
       plasma_horm_neosp_toxo_data$dart.yr <-
         year(plasma_horm_neosp_toxo_data$dart.date)
 
-    ## c) Create a varialbe, 'migratn.seas.dart,' which indicates if a poop
+    ## c) Create a varialbe, 'migratn.seas.dart,' which indicates if a plasma
       # sample was collected in migration (June 1 - Oct 31)
       plasma_horm_neosp_toxo_data <- plasma_horm_neosp_toxo_data  %>%
         mutate(migratn.seas.dart = ifelse(dart.mon >= 6 & dart.mon<= 10,
                                          'migration', 'none'))
 
     ## d) Re-code *nominal* factor (with ordered levels)
-      # Set levels (odering) of migratn.seas.dart variable and sets the reference
-      # level to 'none'
+      # Set levels (odering) of migratn.seas.dart variable and sets the 
+      # reference level to 'none'
       plasma_horm_neosp_toxo_data <- transform(plasma_horm_neosp_toxo_data,
                                                migratn.seas.dart =
                                               factor(migratn.seas.dart,
@@ -719,8 +736,64 @@
                                                         levels = c('cub',
                                                                    'subadult',
                                                                    'adult')))
-
-
+      
+    ## l) Convert darting.time to a datetime class
+      plasma_horm_neosp_toxo_data$darting.time <- 
+        as.POSIXct(paste(plasma_horm_neosp_toxo_data$dart.date,
+                         plasma_horm_neosp_toxo_data$darting.time), 
+                   format = '%Y-%m-%d %H:%M:%S')
+      
+    ## m) Convert time.down to a datetime class
+      plasma_horm_neosp_toxo_data$time.down <- 
+        as.POSIXct(paste(plasma_horm_neosp_toxo_data$dart.date,
+                         plasma_horm_neosp_toxo_data$time.down), 
+                   format = '%Y-%m-%d %H:%M:%S')
+      
+    ## n) Convert blood.sampling.time to a datetime class
+      plasma_horm_neosp_toxo_data$blood.sampling.time <- 
+        as.POSIXct(paste(plasma_horm_neosp_toxo_data$dart.date,
+                         plasma_horm_neosp_toxo_data$blood.sampling.time), 
+                   format = '%Y-%m-%d %H:%M:%S')
+      
+    ## o) calculate the number of mintues between darting and blood draw
+      plasma_horm_neosp_toxo_data <- plasma_horm_neosp_toxo_data  %>%
+        mutate(dart.time.diff = difftime(blood.sampling.time, darting.time,
+                                         units = 'mins'))
+      
+    ## p) Extract am vs. pm from darting.time
+      # Use lubridate to extract the month during which a poop sample was 
+      # collected and make a new variable
+      plasma_horm_neosp_toxo_data <- plasma_horm_neosp_toxo_data  %>%
+        mutate(dart.am.pm = ifelse(lubridate::am(darting.time), 'am', 
+                                   'pm'))
+      
+    ## q) Re-code *nominal* factor (with ordered levels)  
+      # Set levels (odering) of dart.am.pm variable and sets the reference  
+      # level to 'am' 
+      plasma_horm_neosp_toxo_data <- transform(plasma_horm_neosp_toxo_data, 
+                                            dart.am.pm = factor(dart.am.pm,
+                                                  levels = c('am', 'pm'))) 
+    
+    
+  ### 5.3 Tidy plasma_horm_neosp_toxo_data by removing extra variables
+    ## a) Make list of variables to keep
+      var_list <- c('hy.id', 'dart.date', 'tucb', 'a4ucb', 't', 'p', 'c', 'e',
+                    'a' , 'lh', 'stressca', 'testes', 'plate', 'ifa.neospora', 
+                    'diagnosis.neo', 'neo.status','toxo.status', 'spratio', 
+                    'diagnosis.toxo', 'hum.pop.dob', 'kay.code',
+                    'sample.origin', 'notes.appearance', 'dart.year', 
+                    'dob.date', 'dob.event.data', 'sex', 'status', 'mom', 
+                    'dad', 'dob.yr', 'age.cat.dart', 'hum.dist.dob', 
+                    'rank.dart', 'stan.rank.dart', 'dart.clan', 'dart.status', 
+                    'found.dead', 'darting.time', 'time.down', 
+                    'blood.sampling.time', 'gnrh.challenge', 'dart.age.days',
+                    'dart.mon', 'dart.yr', 'migratn.seas.dart', 'dart.state', 
+                    'hum.pop.dart', 'dart.time.diff','dart.am.pm')
+      
+    ## b) Select variables according to var_list
+      plasma_horm_neosp_toxo_data <- plasma_horm_neosp_toxo_data %>%
+        select(all_of(var_list))
+   
       
 ###############################################################################
 ##############               6. Export data files                ##############

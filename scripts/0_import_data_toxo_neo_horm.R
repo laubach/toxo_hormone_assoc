@@ -92,6 +92,7 @@
       fecal_horm <- tblFecalHormones
       fecal_repos <- tblFecalRepository
       repro_state <- tblReproStates
+      darting <- tblDarting
   
     ## c) Manually load tblHormones2005 csv file
       plasma_horm <- read_csv(paste0(project_data_path,
@@ -110,6 +111,6 @@
       save(file = paste0(project_data_path, 
                          '1_raw_data_neo_toxo_fec_horm.RData'), 
            list = c('neosp_toxo_data', 'fecal_horm', 
-                    'fecal_repos', 'repro_state', 'plasma_horm',
+                    'fecal_repos', 'repro_state', 'plasma_horm', 'darting',
                     'tblClanMembership'))
     

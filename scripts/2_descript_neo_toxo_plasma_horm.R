@@ -6,12 +6,16 @@
 #############                                                     #############
 #############                  By: Zach Laubach                   #############
 #############                 created: 5 Oct 2020                 #############
-#############               last updated: 2 Nov 2020              #############
+#############              last updated: 30 Nov 2020              #############
 ###############################################################################
 
 
   ### PURPOSE: Do univariate and bivariate associations for associations 
              # of toxo. and neosp. with plasma horomones in spotted hyenas
+
+  ### NOTE: Cortisol data include only samples collected <= 13 minutes post
+      # darting - measures baseline stress. Also only stress state categories
+      # 1 and 2 are included in analyses.
   
   
   # Code Blocks
@@ -352,7 +356,7 @@
         theme(panel.background = element_rect(fill = 'white')) 
       # add major axes
       
-      print(plasam_cort_scatter)
+      print(plasma_cort_scatter)
       
       ## b) Save scatter plot
       ggsave('plasma_cort_scatter.pdf', plot = plasma_cort_scatter, 
@@ -381,12 +385,105 @@
       grid.table(plasma_T_toxo_sex_age_sum)
       dev.off()
       
+    ## c) Testosterone by sex by age
+      plasma_T_sex_age_sum <- plasma_horm_neosp_toxo_data %>%
+        filter(!is.na(t.ln)) %>%
+       #filter(!is.na(t.ln) & sex == 'm' & age.cat.dart == 'subadult') %>%
+        group_by (sex, age.cat.dart) %>%
+        summarise (n.id = sum(!is.na(t.ln)),
+                   avg.T = round(mean(t.ln, na.rm = T),2),
+                   stdev.T = round(sd(t.ln, na.rm = T), 2),
+                   min.T = round(min(t.ln, na.rm = T), 2),
+                   med.T = round(median(t.ln, na.rm = T), 2),
+                   max.T = round(max(t.ln, na.rm =T), 2))%>%
+        mutate(freq = n.id / sum(n.id))
+      
+    ## d) save the data frame of summary stats out as a pdf into output file
+      pdf(here('output/plasma_T_sex_age_sum.pdf'), 
+          height = 4, width = 8)
+      grid.table(plasma_T_sex_age_sum)
+      dev.off()
+      
+    ## e) Testosterone by reproductive state (adult females only)
+      plasma_T_state_sum_adult_f <- plasma_horm_neosp_toxo_data %>%
+        filter(!is.na(t.ln) & sex == 'f' & 
+                 age.cat.dart == 'adult') %>%
+        group_by (dart.state) %>%
+        summarise (n.id = sum(!is.na(t.ln)),
+                   avg.T = round(mean(t.ln, na.rm = T),2),
+                   stdev.T = round(sd(t.ln, na.rm = T), 2),
+                   min.T = round(min(t.ln, na.rm = T), 2),
+                   med.T = round(median(t.ln, na.rm = T), 2),
+                   max.T = round(max(t.ln, na.rm =T), 2))%>%
+        mutate(freq = n.id / sum(n.id))
+      
+    ## f) save the data frame of summary stats out as a pdf into output file
+      pdf(here('output/plasma_T_state_sum_adult_f.pdf'), 
+          height = 4, width = 8)
+      grid.table(plasma_T_state_sum_adult_f)
+      dev.off()
+      
+    ## g) Testosterone by residency (adult males only)
+      plasma_T_status_sum_adult_m <- plasma_horm_neosp_toxo_data %>%
+        filter(!is.na(t.ln) & sex == 'm' & 
+                 age.cat.dart == 'adult') %>%
+        group_by (status) %>%
+        summarise (n.id = sum(!is.na(t.ln)),
+                   avg.T = round(mean(t.ln, na.rm = T),2),
+                   stdev.T = round(sd(t.ln, na.rm = T), 2),
+                   min.T = round(min(t.ln, na.rm = T), 2),
+                   med.T = round(median(t.ln, na.rm = T), 2),
+                   max.T = round(max(t.ln, na.rm =T), 2))%>%
+        mutate(freq = n.id / sum(n.id))
+      
+    ## h) save the data frame of summary stats out as a pdf into output file
+      pdf(here('output/plasma_T_status_sum_adult_m.pdf'), 
+          height = 4, width = 8)
+      grid.table(plasma_T_status_sum_adult_m)
+      dev.off()
+      
+      
+    ## i) Testosterone by time of day (adult females and males only)
+      plasma_T_time_sum_adult_f_m <- plasma_horm_neosp_toxo_data %>%
+        filter(!is.na(t.ln) & age.cat.dart == 'adult') %>%
+        group_by (sex, dart.am.pm) %>%
+        summarise (n.id = sum(!is.na(t.ln)),
+                   avg.T = round(mean(t.ln, na.rm = T),2),
+                   stdev.T = round(sd(t.ln, na.rm = T), 2),
+                   min.T = round(min(t.ln, na.rm = T), 2),
+                   med.T = round(median(t.ln, na.rm = T), 2),
+                   max.T = round(max(t.ln, na.rm =T), 2))%>%
+        mutate(freq = n.id / sum(n.id))
+      
+    ## j) save the data frame of summary stats out as a pdf into output file
+      pdf(here('output/plasma_T_time_sum_adult_f_m.pdf'), 
+          height = 4, width = 8)
+      grid.table(plasma_T_time_sum_adult_f_m)
+      dev.off()
+      
+    ## k) Testosterone by migration season (adult females and males only)
+      plasma_T_migrtn_sum_adult_f_m <- plasma_horm_neosp_toxo_data %>%
+        filter(!is.na(t.ln) & age.cat.dart == 'adult') %>%
+        group_by (sex, migratn.seas.dart) %>%
+        summarise (n.id = sum(!is.na(t.ln)),
+                   avg.T = round(mean(t.ln, na.rm = T),2),
+                   stdev.T = round(sd(t.ln, na.rm = T), 2),
+                   min.T = round(min(t.ln, na.rm = T), 2),
+                   med.T = round(median(t.ln, na.rm = T), 2),
+                   max.T = round(max(t.ln, na.rm =T), 2))%>%
+        mutate(freq = n.id / sum(n.id))
+      
+    ## l) save the data frame of summary stats out as a pdf into output file
+      pdf(here('output/plasma_T_migrtn_sum_adult_f_m.pdf'), 
+          height = 4, width = 8)
+      grid.table(plasma_T_migrtn_sum_adult_f_m)
+      dev.off()  
       
       
   ### 4.4 Descriptive bivariate stats corticosterone    
       ## a) Corticosterone by toxo.status by sex by age
       plasma_cort_toxo_sex_age_sum <- plasma_horm_neosp_toxo_data %>%
-        filter(!is.na(c)) %>%
+        filter(!is.na(c) & dart.time.diff <= 13 & stressca <=2) %>%
         group_by (sex, age.cat.dart, toxo.status) %>%
         summarise (n.id = sum(!is.na(c)),
                    avg.cort = round(mean(c, na.rm = T),2),
@@ -396,12 +493,108 @@
                    max.cort = round(max(c, na.rm =T), 2))%>%
         mutate(freq = n.id / sum(n.id))
       
-      ## b) save the data frame of summary stats out as a pdf into output file
+    ## b) save the data frame of summary stats out as a pdf into output file
       pdf(here('output/plasma_cort_toxo_sex_age_sum.pdf'), 
           height = 4, width = 8)
       grid.table(plasma_cort_toxo_sex_age_sum)
       dev.off() 
       
+    ## c) Corticosterone by sex by age
+      plasma_cort_sex_age_sum <- plasma_horm_neosp_toxo_data %>%
+        filter(!is.na(c.ln) & dart.time.diff <= 13 & stressca <=2) %>%
+        #filter(!is.na(c.ln) & sex == 'm' & age.cat.dart == 'subadult') %>%
+        group_by (sex, age.cat.dart) %>%
+        summarise (n.id = sum(!is.na(c.ln)),
+                   avg.cort = round(mean(c.ln, na.rm = T),2),
+                   stdev.cort = round(sd(c.ln, na.rm = T), 2),
+                   min.cort = round(min(c.ln, na.rm = T), 2),
+                   med.cort = round(median(c.ln, na.rm = T), 2),
+                   max.cort = round(max(c.ln, na.rm =T), 2))%>%
+        mutate(freq = n.id / sum(n.id))
+      
+    ## d) save the data frame of summary stats out as a pdf into output file
+      pdf(here('output/plasma_cort_sex_age_sum.pdf'), 
+          height = 4, width = 8)
+      grid.table(plasma_cort_sex_age_sum)
+      dev.off()
+      
+     ## e) Corticosterone by reproductive state (adult females only)
+      plasma_cort_state_sum_adult_f <- plasma_horm_neosp_toxo_data %>%
+        filter(!is.na(c.ln) & sex == 'f' & age.cat.dart == 'adult'
+               & dart.time.diff <= 13 & stressca <=2) %>%
+        group_by (dart.state) %>%
+        summarise (n.id = sum(!is.na(c.ln)),
+                   avg.cort = round(mean(c.ln, na.rm = T),2),
+                   stdev.cort = round(sd(c.ln, na.rm = T), 2),
+                   min.cort = round(min(c.ln, na.rm = T), 2),
+                   med.cort = round(median(c.ln, na.rm = T), 2),
+                   max.cort = round(max(c.ln, na.rm =T), 2))%>%
+        mutate(freq = n.id / sum(n.id))
+      
+    ## f) save the data frame of summary stats out as a pdf into output file
+      pdf(here('output/plasma_cort_state_sum_adult_f.pdf'), 
+          height = 4, width = 8)
+      grid.table(plasma_cort_state_sum_adult_f)
+      dev.off()
+      
+    ## g) Corticosterone by residency (adult males only)
+      plasma_cort_status_sum_adult_m <- plasma_horm_neosp_toxo_data %>%
+        filter(!is.na(c.ln) & sex == 'm' & age.cat.dart == 'adult'
+               & dart.time.diff <= 13 & stressca <=2) %>%
+        group_by (status) %>%
+        summarise (n.id = sum(!is.na(c.ln)),
+                   avg.cort = round(mean(c.ln, na.rm = T),2),
+                   stdev.cort = round(sd(c.ln, na.rm = T), 2),
+                   min.cort = round(min(c.ln, na.rm = T), 2),
+                   med.cort = round(median(c.ln, na.rm = T), 2),
+                   max.cort = round(max(c.ln, na.rm =T), 2))%>%
+        mutate(freq = n.id / sum(n.id))
+      
+    ## h) save the data frame of summary stats out as a pdf into output file
+      pdf(here('output/plasma_cort_status_sum_adult_m.pdf'), 
+          height = 4, width = 8)
+      grid.table(plasma_cort_status_sum_adult_m)
+      dev.off()
+      
+      
+    ## i) Corticosterone by time of day (adult females and males only)
+      plasma_cort_time_sum_adult_f_m <- plasma_horm_neosp_toxo_data %>%
+        filter(!is.na(c.ln) & age.cat.dart == 'adult'
+               & dart.time.diff <= 13 & stressca <=2) %>%
+        group_by (sex, dart.am.pm) %>%
+        summarise (n.id = sum(!is.na(c.ln)),
+                   avg.cort = round(mean(c.ln, na.rm = T),2),
+                   stdev.cort = round(sd(c.ln, na.rm = T), 2),
+                   min.cort = round(min(c.ln, na.rm = T), 2),
+                   med.cort = round(median(c.ln, na.rm = T), 2),
+                   max.cort = round(max(c.ln, na.rm =T), 2))%>%
+        mutate(freq = n.id / sum(n.id))
+      
+    ## j) save the data frame of summary stats out as a pdf into output file
+      pdf(here('output/plasma_cort_time_sum_adult_f_m.pdf'), 
+          height = 4, width = 8)
+      grid.table(plasma_cort_time_sum_adult_f_m)
+      dev.off()
+      
+    ## k) Testosterone by migration season (adult females and males only)
+      plasma_cort_migrtn_sum_adult_f_m <- plasma_horm_neosp_toxo_data %>%
+        filter(!is.na(c.ln) & age.cat.dart == 'adult'
+               & dart.time.diff <= 13 & stressca <=2) %>%
+        group_by (sex, migratn.seas.dart) %>%
+        summarise (n.id = sum(!is.na(c.ln)),
+                   avg.cort = round(mean(c.ln, na.rm = T),2),
+                   stdev.cort = round(sd(c.ln, na.rm = T), 2),
+                   min.cort = round(min(c.ln, na.rm = T), 2),
+                   med.cort = round(median(c.ln, na.rm = T), 2),
+                   max.cort = round(max(c.ln, na.rm =T), 2))%>%
+        mutate(freq = n.id / sum(n.id))
+      
+    ## l) save the data frame of summary stats out as a pdf into output file
+      pdf(here('output/plasma_cort_migrtn_sum_adult_f_m.pdf'), 
+          height = 4, width = 8)
+      grid.table(plasma_cort_migrtn_sum_adult_f_m)
+      dev.off()  
+   
       
       
 ###############################################################################

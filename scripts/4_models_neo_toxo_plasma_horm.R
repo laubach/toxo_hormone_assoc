@@ -122,7 +122,7 @@
 ###############################################################################  
   
   ### 2.1 Load RData
-    ## a) load RData: updated fec_horm_neosp_toxo_data joined to hyena 
+    ## a) load RData: updated 3_neo_toxo_plasma_horm.RData joined to hyena 
       # data tables
       load(paste0(project_data_path, '3_neo_toxo_plasma_horm.RData'))
      
