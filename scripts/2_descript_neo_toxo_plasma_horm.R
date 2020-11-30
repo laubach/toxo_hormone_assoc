@@ -502,7 +502,7 @@
     ## c) Corticosterone by sex by age
       plasma_cort_sex_age_sum <- plasma_horm_neosp_toxo_data %>%
         filter(!is.na(c.ln) & dart.time.diff <= 13 & stressca <=2) %>%
-        #filter(!is.na(c.ln) & sex == 'm' & age.cat.dart == 'subadult') %>%
+           #     & sex == 'f' & age.cat.dart == 'adult') %>%
         group_by (sex, age.cat.dart) %>%
         summarise (n.id = sum(!is.na(c.ln)),
                    avg.cort = round(mean(c.ln, na.rm = T),2),

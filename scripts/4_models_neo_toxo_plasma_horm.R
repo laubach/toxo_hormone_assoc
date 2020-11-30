@@ -7,13 +7,17 @@
 #############                                                     #############
 #############                  By: Zach Laubach                   #############
 #############                created: 15 Oct 2020                 #############
-#############              last updated: 15 Nov 2020              #############
+#############              last updated: 30 Nov 2020              #############
 ###############################################################################
 
 
 
   ### PURPOSE: Model associations between T. gondii infection with plasma 
              # testosterone and corticosterone levels in spotted hyenas
+
+  ### NOTE: Cortisol data include only samples collected <= 13 minutes post
+            # darting - measures baseline stress. Also only stress state 
+            # categories 1 and 2 are included in analyses.
   
   
   # Code Blocks
@@ -217,7 +221,7 @@
         # NOTE: we flipped x and y axes above, so the 'xlab' is actually
         # 'ylab' and vice versa. 
         xlab(expression(atop(bold('Mean +/- SE'), 
-                             paste(italic('Nat. Log. testosterone (ug/dL)'))))) +
+                          paste(italic('Nat. Log. testosterone (ug/dL)'))))) +
         #scale_y_discrete(labels = c('Seropostive hyenas')) +
         ylab('')
     
@@ -244,10 +248,11 @@
       # Corticosterone by T. gondii infection
       cort.toxo.unadj.mod.m.adult <- lm(c.ln ~ toxo.status, 
                                      data = subset(plasma_horm_neosp_toxo_data,
-                                                   sex == 'm' & 
-                                                     age.cat.dart == 'adult' &
-                                                     !is.na(x = toxo.status) &
-                                                     !is.na(x = c.ln)))
+                                            sex == 'm' & 
+                                            age.cat.dart == 'adult' &
+                                        dart.time.diff <= 13 & stressca <=2 &
+                                            !is.na(x = toxo.status) &
+                                            !is.na(x = c.ln)))
       
       summary(cort.toxo.unadj.mod.m.adult) # print model summary (ln scale)
       confint(cort.toxo.unadj.mod.m.adult) # 95% CIs (ln scale)
@@ -256,29 +261,37 @@
       # Use emmeans to estimate marginal means
       cort.toxo.unadj.mmean.m.adult <- emmeans(cort.toxo.unadj.mod.m.adult, 
                                             'toxo.status')
+      
       summary(cort.toxo.unadj.mmean.m.adult)
       
-    # ## b) Unadjusted model: Female adults
-    #   # Corticosterone by T. gondii infection
-    #   cort.toxo.unadj.mod.f.adult <- lm(c.ln ~ toxo.status, 
-    #                                 data = subset(plasma_horm_neosp_toxo_data,
-    #                                   sex == 'f' & 
-    #                                   age.cat.dart == 'adult' &
-    #                                   !is.na(x = toxo.status) &
-    #                                   !is.na(x = c.ln)))
-    #   
-    #   summary(cort.toxo.unadj.mod.f.adult) # print model summary (ln scale)
-    #   confint(cort.toxo.unadj.mod.f.adult) # 95% CIs (ln scale)
-    #   plot(cort.toxo.unadj.mod.f.adult) # view fitted vs residuals
-    #   
+    ## b) Adjusted model: Male adults
+      # Corticosterone by T. gondii infection
+      cort.toxo.adj.mod.m.adult <- lm(c.ln ~ toxo.status + dart.am.pm, 
+                                        data = subset(plasma_horm_neosp_toxo_data,
+                                        sex == 'm' & 
+                                        age.cat.dart == 'adult' &
+                                        dart.time.diff <= 13 & stressca <=2 &
+                                        !is.na(x = toxo.status) &
+                                        !is.na(x = c.ln)))
+      
+      summary(cort.toxo.adj.mod.m.adult) # print model summary (ln scale)
+      confint(cort.toxo.adj.mod.m.adult) # 95% CIs (ln scale)
+      #plot(cort.toxo.adj.mod.m.adult) # view fitted vs residuals
+      
+      # Use emmeans to estimate marginal means
+      cort.toxo.adj.mmean.m.adult <- emmeans(cort.toxo.adj.mod.m.adult, 
+                                               'toxo.status')
+      
+      summary(cort.toxo.adj.mmean.m.adult)
       
     ## c) Unadjusted model: Male Cubs and Subadults
       # Corticosterone by T. gondii infection
       cort.toxo.unadj.mod.m.cub.sub <- lm(c.ln ~ toxo.status, 
                                         data = subset(plasma_horm_neosp_toxo_data,
                                          sex == 'm' & 
-                                        (age.cat.dart == 'cub' | 
+                                         (age.cat.dart == 'cub' | 
                                            age.cat.dart == 'subadult') &
+                                         dart.time.diff <= 13 & stressca <=2 &
                                          !is.na(x = toxo.status) &
                                          !is.na(x = c.ln)))
       
@@ -292,13 +305,14 @@
       
       summary(cort.toxo.unadj.mmean.m.cub.sub)
       
-    ## d) Unadjusted model: Feale Cubs and Subadults
+    ## d) Unadjusted model: Female Cubs and Subadults
       # Corticosterone by T. gondii infection
       cort.toxo.unadj.mod.f.cub.sub <- lm(c.ln ~ toxo.status, 
                                     data = subset(plasma_horm_neosp_toxo_data,
                                     sex == 'f' & 
                                     (age.cat.dart == 'cub' | 
                                         age.cat.dart == 'subadult') &
+                                    dart.time.diff <= 13 & stressca <=2 &
                                     !is.na(x = toxo.status) &
                                     !is.na(x = c.ln)))
       
@@ -323,264 +337,3 @@
       
       
   
-      
-      
-      
-  ## b) Adjusted mixed-model: Female cub and subadult 
-      # testosterone by T. gondii infection
-      T.toxo.adj.mod.f.cub.sub <- lme4::lmer(testosterone.ng.g.ln ~ 
-                                                 toxo.status + fecal.age.cat
-                                               + (1|hy.id), 
-                                  data = subset(fec_horm_neosp_toxo_data_6,
-                                  #data = subset(fec_horm_toxo_data_restrict,
-                                  sex == 'f' & 
-                                  (fecal.age.cat == 'cub' | 
-                                  fecal.age.cat == 'subadult') &
-                                  !is.na(x = toxo.status) & 
-                                  !is.na(x = testosterone.ng.g.ln)))
-      
-      summary(T.toxo.adj.mod.f.cub.sub) # print model summary (ln scale)
-      confint(T.toxo.adj.mod.f.cub.sub) # 95% CIs (ln scale)
-      plot(T.toxo.adj.mod.f.cub.sub) # view fitted vs residuals
-      
-    ## c) Unadjusted mixed-model: Female adult
-      # testosterone by T. gondii infection
-      T.toxo.unadj.mod.f.adult <- lme4::lmer(testosterone.ng.g.ln ~ 
-                                               toxo.status 
-                                       + (1|hy.id), 
-                            data = subset(fec_horm_neosp_toxo_data_6,
-                            #data = subset(fec_horm_toxo_data_restrict,
-                            sex == 'f' & 
-                            (fecal.age.cat == 'adult') &
-                            !is.na(x = toxo.status) & 
-                             !is.na(x = testosterone.ng.g.ln)))
-      
-      summary(T.toxo.unadj.mod.f.adult) # print model summary (ln scale)
-      confint(T.toxo.unadj.mod.f.adult) # 95% CIs (ln scale)
-      plot(T.toxo.unadj.mod.f.adult) # view fitted vs residuals
-      
-    ## d) Adjusted mixed-model: Female adult 
-      # testosterone by T. gondii infection
-      T.toxo.adj.mod.f.adult <- lme4::lmer(testosterone.ng.g.ln ~ 
-                                               toxo.status + poop.state
-                                             + (1|hy.id), 
-                                data = subset(fec_horm_neosp_toxo_data_6,
-                                #data = subset(fec_horm_toxo_data_restrict,
-                                             sex == 'f' & 
-                                    (fecal.age.cat == 'adult') &
-                                    !is.na(x = toxo.status) & 
-                                    !is.na(x = testosterone.ng.g.ln)))
-      
-      summary(T.toxo.adj.mod.f.adult) # print model summary (ln scale)
-      confint(T.toxo.adj.mod.f.adult) # 95% CIs (ln scale)
-      plot(T.toxo.adj.mod.f.adult) # view fitted vs residuals
-      
-      
-      
-      
-  ### 3.2 Male associations between T. gondii status and testosterone levels
-    ## a) Unadjusted mixed-model: Male cub and subadult 
-      # testosterone by T. gondii infection
-      T.toxo.unadj.mod.m.cub.sub <- lme4::lmer(testosterone.ng.g.ln ~ 
-                                                 toxo.status 
-                                               + (1|hy.id), 
-                                    data = subset(fec_horm_neosp_toxo_data_6,
-                                    #data = subset(fec_horm_toxo_data_restrict,
-                                    sex == 'm' & 
-                                    (fecal.age.cat == 'cub' | 
-                                    fecal.age.cat == 'subadult') &
-                                    !is.na(x = toxo.status) & 
-                                    !is.na(x = testosterone.ng.g.ln)))
-      
-      summary(T.toxo.unadj.mod.m.cub.sub) # print model summary (ln scale)
-      confint(T.toxo.unadj.mod.m.cub.sub) # 95% CIs (ln scale)
-      plot(T.toxo.unadj.mod.m.cub.sub) # view fitted vs residuals
-      
-    ## b) Adjusted mixed-model: Male cub and subadult 
-      # testosterone by T. gondii infection
-      T.toxo.adj.mod.m.cub.sub <- lme4::lmer(testosterone.ng.g.ln ~ 
-                                               toxo.status + migratn.seas.fec
-                                             + (1|hy.id), 
-                                  data = subset(fec_horm_neosp_toxo_data_6,
-                                  #data = subset(fec_horm_toxo_data_restrict,
-                                  sex == 'm' & 
-                                  (fecal.age.cat == 'cub' | 
-                                  fecal.age.cat == 'subadult') &
-                                  !is.na(x = toxo.status) & 
-                                  !is.na(x = testosterone.ng.g.ln)))
-      
-      summary(T.toxo.adj.mod.m.cub.sub) # print model summary (ln scale)
-      confint(T.toxo.adj.mod.m.cub.sub) # 95% CIs (ln scale)
-      plot(T.toxo.adj.mod.m.cub.sub) # view fitted vs residuals
-      
-    ## c) Unadjusted mixed-model: Male adult
-      # testosterone by T. gondii infection
-      T.toxo.unadj.mod.m.adult <- lme4::lmer(testosterone.ng.g.ln ~ 
-                                               toxo.status 
-                                             + (1|hy.id), 
-                                  data = subset(fec_horm_neosp_toxo_data_6,
-                                  #data = subset(fec_horm_toxo_data_restrict,
-                                  sex == 'm' & 
-                                  (fecal.age.cat == 'adult') &
-                                  !is.na(x = toxo.status) & 
-                                  !is.na(x = testosterone.ng.g.ln)))
-      
-      summary(T.toxo.unadj.mod.m.adult) # print model summary (ln scale)
-      confint(T.toxo.unadj.mod.m.adult) # 95% CIs (ln scale)
-      plot(T.toxo.unadj.mod.m.adult) # view fitted vs residuals
-      
-    ## d) Adjusted mixed-model: Male adult 
-      # testosterone by T. gondii infection
-      T.toxo.adj.mod.m.adult <- lme4::lmer(testosterone.ng.g.ln ~ 
-                                             toxo.status + migratn.seas.fec
-                                           + (1|hy.id), 
-                                data = subset(fec_horm_neosp_toxo_data_6,
-                                #data = subset(fec_horm_toxo_data_restrict,
-                                sex == 'm' & 
-                                (fecal.age.cat == 'adult') &
-                                !is.na(x = toxo.status) & 
-                                !is.na(x = testosterone.ng.g.ln)))
-      
-      summary(T.toxo.adj.mod.m.adult) # print model summary (ln scale)
-      confint(T.toxo.adj.mod.m.adult) # 95% CIs (ln scale)
-      plot(T.toxo.adj.mod.m.adult) # view fitted vs residuals
-      
-      
-  ### 3.3 Female associations between T. gondii status and corticosterone levels
-    ## a) Unadjusted mixed-model: Female cub and subadult 
-      # corticosterone by T. gondii infection
-      cort.toxo.unadj.mod.f.cub.sub <- lme4::lmer(corticosterone.ng.g.ln ~ 
-                                                 toxo.status 
-                                               + (1|hy.id), 
-                                    data = subset(fec_horm_neosp_toxo_data_6,
-                                    #data = subset(fec_horm_toxo_data_restrict,
-                                    sex == 'f' & 
-                                    (fecal.age.cat == 'cub' | 
-                                    fecal.age.cat == 'subadult') &
-                                    !is.na(x = toxo.status) & 
-                                    !is.na(x = corticosterone.ng.g.ln)))
-      
-      summary(cort.toxo.unadj.mod.f.cub.sub) # print model summary (ln scale)
-      confint(cort.toxo.unadj.mod.f.cub.sub) # 95% CIs (ln scale)
-      plot(cort.toxo.unadj.mod.f.cub.sub) # view fitted vs residuals
-      
-    ## b) Adjusted mixed-model: Female cub and subadult 
-      # corticosterone by T. gondii infection
-      cort.toxo.adj.mod.f.cub.sub <- lme4::lmer(corticosterone.ng.g.ln ~ 
-                                               toxo.status + fecal.age.cat
-                                             + (1|hy.id), 
-                                  data = subset(fec_horm_neosp_toxo_data_6,
-                                  #data = subset(fec_horm_toxo_data_restrict,
-                                  sex == 'f' & 
-                                  (fecal.age.cat == 'cub' | 
-                                   fecal.age.cat == 'subadult') &
-                                  !is.na(x = toxo.status) & 
-                                  !is.na(x = corticosterone.ng.g.ln)))
-      
-      summary(cort.toxo.adj.mod.f.cub.sub) # print model summary (ln scale)
-      confint(cort.toxo.adj.mod.f.cub.sub) # 95% CIs (ln scale)
-      plot(cort.toxo.adj.mod.f.cub.sub) # view fitted vs residuals
-      
-    ## c) Unadjusted mixed-model: Female adult
-      # corticosterone by T. gondii infection
-      cort.toxo.unadj.mod.f.adult <- lme4::lmer(corticosterone.ng.g.ln ~ 
-                                               toxo.status 
-                                             + (1|hy.id), 
-                                  data = subset(fec_horm_neosp_toxo_data_6,
-                                  #data = subset(fec_horm_toxo_data_restrict,
-                                  sex == 'f' & 
-                                  (fecal.age.cat == 'adult') &
-                                  !is.na(x = toxo.status) & 
-                                  !is.na(x = corticosterone.ng.g.ln)))
-      
-      summary(cort.toxo.unadj.mod.f.adult) # print model summary (ln scale)
-      confint(cort.toxo.unadj.mod.f.adult) # 95% CIs (ln scale)
-      plot(cort.toxo.unadj.mod.f.adult) # view fitted vs residuals
-      
-    ## d) Adjusted mixed-model: Female adult 
-      # corticosterone by T. gondii infection
-      cort.toxo.adj.mod.f.adult <- lme4::lmer(corticosterone.ng.g.ln ~ 
-                                             toxo.status + poop.state
-                                           + (1|hy.id), 
-                                data = subset(fec_horm_neosp_toxo_data_6,
-                                #data = subset(fec_horm_toxo_data_restrict,
-                                sex == 'f' & 
-                                (fecal.age.cat == 'adult') &
-                                !is.na(x = toxo.status) & 
-                                !is.na(x = corticosterone.ng.g.ln)))
-      
-      summary(cort.toxo.adj.mod.f.adult) # print model summary (ln scale)
-      confint(cort.toxo.adj.mod.f.adult) # 95% CIs (ln scale)
-      plot(cort.toxo.adj.mod.f.adult) # view fitted vs residuals
-      
-      
-  ### 3.4 Male associations between T. gondii status and corticosterone levels
-    ## a) Unadjusted mixed-model: Male cub and subadult 
-      # corticosterone by T. gondii infection
-      cort.toxo.unadj.mod.m.cub.sub <- lme4::lmer(corticosterone.ng.g.ln ~ 
-                                                 toxo.status 
-                                               + (1|hy.id), 
-                                    data = subset(fec_horm_neosp_toxo_data_6,
-                                    #data = subset(fec_horm_toxo_data_restrict,
-                                    sex == 'm' & 
-                                    (fecal.age.cat == 'cub' | 
-                                    fecal.age.cat == 'subadult') &
-                                    !is.na(x = toxo.status) & 
-                                    !is.na(x = corticosterone.ng.g.ln)))
-      
-      summary(cort.toxo.unadj.mod.m.cub.sub) # print model summary (ln scale)
-      confint(cort.toxo.unadj.mod.m.cub.sub) # 95% CIs (ln scale)
-      plot(cort.toxo.unadj.mod.m.cub.sub) # view fitted vs residuals
-      
-    ## b) Adjusted mixed-model: Male cub and subadult 
-      # corticosterone by T. gondii infection
-      cort.toxo.adj.mod.m.cub.sub <- lme4::lmer(corticosterone.ng.g.ln ~ 
-                                               toxo.status + migratn.seas.fec
-                                               
-                                             + (1|hy.id), 
-                                  data = subset(fec_horm_neosp_toxo_data_6,
-                                  #data = subset(fec_horm_toxo_data_restrict,
-                                  sex == 'm' & 
-                                  (fecal.age.cat == 'cub' | 
-                                  fecal.age.cat == 'subadult') &
-                                  !is.na(x = toxo.status) & 
-                                  !is.na(x = corticosterone.ng.g.ln)))
-      
-      summary(cort.toxo.adj.mod.m.cub.sub) # print model summary (ln scale)
-      confint(cort.toxo.adj.mod.m.cub.sub) # 95% CIs (ln scale)
-      plot(cort.toxo.adj.mod.m.cub.sub) # view fitted vs residuals
-      
-    ## c) Unadjusted mixed-model: Male adult
-      # corticosterone by T. gondii infection
-      cort.toxo.unadj.mod.m.adult <- lme4::lmer(corticosterone.ng.g.ln ~ 
-                                               toxo.status 
-                                             + (1|hy.id), 
-                                 data = subset(fec_horm_neosp_toxo_data_6,
-                                 #data = subset(fec_horm_toxo_data_restrict,
-                                 sex == 'm' & 
-                                 (fecal.age.cat == 'adult') &
-                                 !is.na(x = toxo.status) & 
-                                 !is.na(x = corticosterone.ng.g.ln)))
-      
-      summary(cort.toxo.unadj.mod.m.adult) # print model summary (ln scale)
-      confint(cort.toxo.unadj.mod.m.adult) # 95% CIs (ln scale)
-      plot(cort.toxo.unadj.mod.m.adult) # view fitted vs residuals
-      
-    ## d) Adjusted mixed-model: Male adult 
-      # corticosterone by T. gondii infection
-      cort.toxo.adj.mod.m.adult <- lme4::lmer(corticosterone.ng.g.ln ~ 
-                                             toxo.status + migratn.seas.fec
-                                           + (1|hy.id), 
-                                data = subset(fec_horm_neosp_toxo_data_6,
-                                #data = subset(fec_horm_toxo_data_restrict,
-                                sex == 'm' & 
-                                (fecal.age.cat == 'adult') &
-                                !is.na(x = toxo.status) & 
-                                !is.na(x = corticosterone.ng.g.ln)))
-      
-      summary(cort.toxo.adj.mod.m.adult) # print model summary (ln scale)
-      confint(cort.toxo.adj.mod.m.adult) # 95% CIs (ln scale)
-      plot(cort.toxo.adj.mod.m.adult) # view fitted vs residuals
-
-
-     
