@@ -1,12 +1,12 @@
 ###############################################################################
-#############        Associations of Toxoplasma gondii and        #############
-#############        Neospora caninum with hormone levels         #############
+#############          Associations of Toxoplasma gondii          #############
+#############                  with hormone levels                #############
 #############                                                     #############
 #############                   0. Data Import                    #############
 #############                                                     #############
 #############                  By: Zach Laubach                   #############
 #############                created: 19 Sept 2020                #############
-#############              last updated: 2 Nov 2020               #############
+#############              last updated: 15 Dec 2020              #############
 ###############################################################################
 
 
@@ -89,8 +89,8 @@
       # Versiion 1.2.82
       
     ## b) Rename data tables
-      fecal_horm <- tblFecalHormones
-      fecal_repos <- tblFecalRepository
+      # fecal_horm <- tblFecalHormones
+      # fecal_repos <- tblFecalRepository
       repro_state <- tblReproStates
       darting <- tblDarting
   
@@ -110,7 +110,8 @@
       # RData file.
       save(file = paste0(project_data_path, 
                          '1_raw_data_neo_toxo_fec_horm.RData'), 
-           list = c('neosp_toxo_data', 'fecal_horm', 
-                    'fecal_repos', 'repro_state', 'plasma_horm', 'darting',
+           list = c('neosp_toxo_data', 
+                    #'fecal_horm', 'fecal_repos', 
+                    'repro_state', 'plasma_horm', 'darting',
                     'tblClanMembership'))
     
