@@ -1,13 +1,13 @@
 ###############################################################################
-#############        Associations of Toxoplasma gondii and        #############
-#############        Neospora caninum with hormone levels         #############
+#############          Associations of Toxoplasma gondii          #############
+#############             with steroid hormone levels             #############
 #############                                                     #############
 #############       3 Models: Toxo. and Neosp. associations       #############
 #############                 w/plasma hormones                   #############
 #############                                                     #############
 #############                  By: Zach Laubach                   #############
 #############                created: 15 Oct 2020                 #############
-#############              last updated: 30 Nov 2020              #############
+#############              last updated: 15 Dec 2020              #############
 ###############################################################################
 
 
@@ -157,7 +157,7 @@
       
       
       
-  ### 3.2 Graph of cub approach distance from lions by toxo status       
+  ### 3.2 Graph of testosterone levels by toxo      
       
     ## a) Unadjusted adult male testosterone model
       T.toxo.unadj.mmean.m.adult.tdy <- 
@@ -221,7 +221,7 @@
         # NOTE: we flipped x and y axes above, so the 'xlab' is actually
         # 'ylab' and vice versa. 
         xlab(expression(atop(bold('Mean +/- SE'), 
-                          paste(italic('Nat. Log. testosterone (ug/dL)'))))) +
+                          paste(italic('Nat. Log. testosterone'))))) +
         #scale_y_discrete(labels = c('Seropostive hyenas')) +
         ylab('')
     
@@ -244,90 +244,88 @@
 ############################################################################### 
       
   ### 4.1 Associations between T. gondii status and corticosterone levels
-    ## a) Unadjusted model: Male adults
+    ## a) Unadjusted model: Female 
       # Corticosterone by T. gondii infection
-      cort.toxo.unadj.mod.m.adult <- lm(c.ln ~ toxo.status, 
+      cort.toxo.unadj.mod.f <- lm(c.ln ~ toxo.status, 
+                                    data = subset(plasma_horm_neosp_toxo_data,
+                                                      sex == 'f' & 
+                                                      dart.time.diff <= 13 & 
+                                                      stressca <=2 &
+                                                      !is.na(x = toxo.status) &
+                                                      !is.na(x = c.ln)))
+      
+      summary(cort.toxo.unadj.mod.f) # print model summary (ln scale)
+      confint(cort.toxo.unadj.mod.f) # 95% CIs (ln scale)
+      #plot(cort.toxo.unadj.mod.f) # view fitted vs residuals
+      
+      # Use emmeans to estimate marginal means
+      cort.toxo.unadj.mmean.f <- emmeans(cort.toxo.unadj.mod.f, 
+                                               'toxo.status')
+      
+      summary(cort.toxo.unadj.mmean.f)
+      
+    ## b) Adjusted model: Female 
+      # Corticosterone by T. gondii infection
+      cort.toxo.adj.mod.f <- lm(c.ln ~ toxo.status + dart.am.pm, 
+                                  data = subset(plasma_horm_neosp_toxo_data,
+                                                    sex == 'f' & 
+                                                    dart.time.diff <= 13 & 
+                                                    stressca <=2 &
+                                                    !is.na(x = toxo.status) &
+                                                    !is.na(x = c.ln)))
+      
+      summary(cort.toxo.adj.mod.f) # print model summary (ln scale)
+      confint(cort.toxo.adj.mod.f) # 95% CIs (ln scale)
+      #plot(cort.toxo.adj.mod.f) # view fitted vs residuals
+      
+      # Use emmeans to estimate marginal means
+      cort.toxo.adj.mmean.f <- emmeans(cort.toxo.adj.mod.f, 
+                                             'toxo.status')
+      
+      summary(cort.toxo.adj.mmean.f)
+      
+  ### 4.1 Associations between T. gondii status and corticosterone levels
+    ## a) Unadjusted model: Male 
+      # Corticosterone by T. gondii infection
+      cort.toxo.unadj.mod.m <- lm(c.ln ~ toxo.status, 
                                      data = subset(plasma_horm_neosp_toxo_data,
                                             sex == 'm' & 
-                                            age.cat.dart == 'adult' &
-                                        dart.time.diff <= 13 & stressca <=2 &
+                                            dart.time.diff <= 13 & 
+                                            stressca <=2 &
                                             !is.na(x = toxo.status) &
                                             !is.na(x = c.ln)))
       
-      summary(cort.toxo.unadj.mod.m.adult) # print model summary (ln scale)
-      confint(cort.toxo.unadj.mod.m.adult) # 95% CIs (ln scale)
-      #plot(cort.toxo.unadj.mod.m.adult) # view fitted vs residuals
+      summary(cort.toxo.unadj.mod.m) # print model summary (ln scale)
+      confint(cort.toxo.unadj.mod.m) # 95% CIs (ln scale)
+      #plot(cort.toxo.unadj.mod.m) # view fitted vs residuals
       
       # Use emmeans to estimate marginal means
-      cort.toxo.unadj.mmean.m.adult <- emmeans(cort.toxo.unadj.mod.m.adult, 
+      cort.toxo.unadj.mmean.m <- emmeans(cort.toxo.unadj.mod.m, 
                                             'toxo.status')
       
-      summary(cort.toxo.unadj.mmean.m.adult)
+      summary(cort.toxo.unadj.mmean.m)
       
-    ## b) Adjusted model: Male adults
+    ## b) Adjusted model: Male 
       # Corticosterone by T. gondii infection
-      cort.toxo.adj.mod.m.adult <- lm(c.ln ~ toxo.status + dart.am.pm, 
-                                        data = subset(plasma_horm_neosp_toxo_data,
-                                        sex == 'm' & 
-                                        age.cat.dart == 'adult' &
-                                        dart.time.diff <= 13 & stressca <=2 &
+      cort.toxo.adj.mod.m <- lm(c.ln ~ toxo.status + dart.am.pm, 
+                                    data = subset(plasma_horm_neosp_toxo_data,
+                                        sex == 'm' &
+                                        dart.time.diff <= 13 &
+                                        stressca <=2 &
                                         !is.na(x = toxo.status) &
                                         !is.na(x = c.ln)))
       
-      summary(cort.toxo.adj.mod.m.adult) # print model summary (ln scale)
-      confint(cort.toxo.adj.mod.m.adult) # 95% CIs (ln scale)
-      #plot(cort.toxo.adj.mod.m.adult) # view fitted vs residuals
+      summary(cort.toxo.adj.mod.m) # print model summary (ln scale)
+      confint(cort.toxo.adj.mod.m) # 95% CIs (ln scale)
+      #plot(cort.toxo.adj.mod.m) # view fitted vs residuals
       
       # Use emmeans to estimate marginal means
-      cort.toxo.adj.mmean.m.adult <- emmeans(cort.toxo.adj.mod.m.adult, 
+      cort.toxo.adj.mmean.m <- emmeans(cort.toxo.adj.mod.m, 
                                                'toxo.status')
       
-      summary(cort.toxo.adj.mmean.m.adult)
+      summary(cort.toxo.adj.mmean.m)
       
-    ## c) Unadjusted model: Male Cubs and Subadults
-      # Corticosterone by T. gondii infection
-      cort.toxo.unadj.mod.m.cub.sub <- lm(c.ln ~ toxo.status, 
-                                        data = subset(plasma_horm_neosp_toxo_data,
-                                         sex == 'm' & 
-                                         (age.cat.dart == 'cub' | 
-                                           age.cat.dart == 'subadult') &
-                                         dart.time.diff <= 13 & stressca <=2 &
-                                         !is.na(x = toxo.status) &
-                                         !is.na(x = c.ln)))
-      
-      summary(cort.toxo.unadj.mod.m.cub.sub) # print model summary (ln scale)
-      confint(cort.toxo.unadj.mod.m.cub.sub) # 95% CIs (ln scale)
-      #plot(cort.toxo.unadj.mod.m.cub.sub) # view fitted vs residuals
-      
-      # Use emmeans to estimate marginal means
-      cort.toxo.unadj.mmean.m.cub.sub <- 
-        emmeans(cort.toxo.unadj.mod.m.cub.sub, 'toxo.status')
-      
-      summary(cort.toxo.unadj.mmean.m.cub.sub)
-      
-    ## d) Unadjusted model: Female Cubs and Subadults
-      # Corticosterone by T. gondii infection
-      cort.toxo.unadj.mod.f.cub.sub <- lm(c.ln ~ toxo.status, 
-                                    data = subset(plasma_horm_neosp_toxo_data,
-                                    sex == 'f' & 
-                                    (age.cat.dart == 'cub' | 
-                                        age.cat.dart == 'subadult') &
-                                    dart.time.diff <= 13 & stressca <=2 &
-                                    !is.na(x = toxo.status) &
-                                    !is.na(x = c.ln)))
-      
-      summary(cort.toxo.unadj.mod.f.cub.sub) # print model summary (ln scale)
-      confint(cort.toxo.unadj.mod.f.cub.sub) # 95% CIs (ln scale)
-      #plot(cort.toxo.unadj.mod.f.cub.sub) # view fitted vs residuals
-      
-      # Use emmeans to estimate marginal means
-      cort.toxo.unadj.mmean.f.cub.sub <- 
-        emmeans(cort.toxo.unadj.mod.f.cub.sub, 'toxo.status')
-      
-      summary(cort.toxo.unadj.mmean.f.cub.sub)
-      
-      
-      
+    
       
       
       
