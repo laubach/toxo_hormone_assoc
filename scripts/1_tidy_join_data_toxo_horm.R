@@ -6,7 +6,7 @@
 #############                                                     #############
 #############                  By: Zach Laubach                   #############
 #############                created: 19 Sept 2020                #############
-#############              last updated: 15 Dec 2020              #############
+#############              last updated: 20 April 2021            #############
 ###############################################################################
 
 
@@ -37,7 +37,6 @@
 
   ### 1.2 Install and load CRAN packages
     ## a) Data Manipulation and Descriptive Stats Packages
-      # Check for tidyverse and install if not already installed
      
       # load tidyverse package
         library('tidyverse')
@@ -48,8 +47,18 @@
       # load here package
         library('here')
       
-      # load lubridate package
-        library ('lubridate')
+      # load hyenadata package
+        library('hyenadata')
+      
+      # load mice package (for imputation)
+        library('mice')
+      # prevent mice from masking base cbind and rbind
+        cbind <- base::cbind
+        rbind <- base::rbind
+      
+      # load naniar package (graph missing data)
+        library(naniar)
+      
       
 
   ### 1.3 Get Version and Session Info
@@ -136,7 +145,7 @@
                                                        "positive")))
       
     ## c) Drop redundant variable, 'toxo.status'   
-      neosp_toxo_data <- neosp_toxo_data  %>%
+      neosp_toxo_data <- neosp_toxo_data %>%
         select(-c(toxo.status))
       
     ## d) Format as neo_status as a factor
@@ -190,7 +199,106 @@
       plasma_horm <- plasma_horm %>%
         mutate(dart.date = as.Date(plasma_horm$dart.date,
                                    format = '%m/%d/%y'))
+      
+#********************** Data Inclusion/Exclusion Criteria ********************** 
+      
+    ## f) Remove hy 'oak' from plasma_horm becuase it has two kaycodes listed
+      # for a darting that occurs on a single date
+      plasma_horm <- plasma_horm %>%
+        dplyr::filter(hy.id != 'oak')
+      
+#********************** Data Inclusion/Exclusion Criteria **********************    
 
+      
+      
+###############################################################################
+##############          4. Impute plasma hormone data            ##############
+###############################################################################
+  
+  ### 4.1 Select and tidy variables to use in imputation
+    ## a) Select variables  
+      plasma_horm_imp <- plasma_horm %>%
+        select(c(hy.id, dart.date, t, p, c, e, a, lh, igf, igf06, nips, 
+                 testes, body, shoulder, wt, rank, agemo))
+    
+    ## b) Replace 0 with NA for T and Cort in order to impute 
+      plasma_horm_imp$t <- ifelse(plasma_horm_imp$t == 0, NA, 
+                                  plasma_horm_imp$t)
+      
+      plasma_horm_imp$c <- ifelse(plasma_horm_imp$c == 0, NA, 
+                                  plasma_horm_imp$c)
+      
+    ## c) Extract id for missing T and Cort
+      t_id <- plasma_horm_imp %>%
+        dplyr::filter(is.na(t)) %>%
+        select(hy.id, dart.date)
+      
+      c_id <- plasma_horm_imp %>%
+        dplyr::filter(is.na(c)) %>%
+        select(hy.id, dart.date)
+      
+    ## d) Strip hy.id from plasma_horm_imp
+      plasma_horm_imp <- plasma_horm_imp %>%
+        select(-c(hy.id, dart.date))
+      
+    
+  ### 4.2 Imputation
+    ## a) Determine the amount of missing data
+      perc_miss_plot <- gg_miss_var(plasma_horm_imp, show_pct = TRUE)
+      print(perc_miss_plot)
+      
+      # Graham et al. 2007 recommend 20 imputation for 10-30% missing,
+      # and 40 imputations for 50% missing
+    
+    ## b) Use 'mice' to impute data   
+      imputed_hormone_data <- mice(plasma_horm_imp, m=40, 
+                           maxit = 50, method = 'pmm', seed = 500)
+      
+      # m = nos imputed data sets
+      # maxit = nos iterations to impute missing data
+      # method = 1 of 4 methods for imputation (PMM - numeric vars, 
+                # logreg - binar vars, polyreg - factor vars, 
+                # proportional odds model - ordered factor vars)
+     
+    ## c) Extract the imputed t values
+      t_imp <- imputed_hormone_data$imp$t
+      
+    ## d) Combine imputed values with hy.id
+      t_imp <- cbind(t_id, t_imp)
+      
+    ## e) Calculate row averages for each imputed data
+      t_imp$t.imp <- rowMeans(t_imp[ , c(3,42)], na.rm=TRUE)
+      
+    ## f) Extract the imputed c values
+      c_imp <- imputed_hormone_data$imp$c
+      
+    ## g) Combine imputed values with hy.id
+      c_imp <- cbind(c_id, c_imp)
+      
+    ## h) Calculate row averages for each imputed data
+      c_imp$c.imp <- rowMeans(c_imp[ , c(3,42)], na.rm=TRUE)
+      
+  ### 4.3 Join imputed values to back to plasma_horm and tidy data
+    ## a) join the average t imputed values to plasma hormone  
+      plasma_horm <- plasma_horm %>%
+      left_join(select(t_imp, c(hy.id, dart.date, t.imp)),
+                by = c('hy.id' = 'hy.id',
+                       'dart.date' = 'dart.date'))
+      
+    ## b) join the average t imputed values to plasma hormone  
+      plasma_horm <- plasma_horm %>%
+        left_join(select(c_imp, c(hy.id, dart.date, c.imp)),
+                  by = c('hy.id' = 'hy.id',
+                         'dart.date' = 'dart.date'))
+      
+    ## c) Fill in NA in t.imp with actual t values 
+      plasma_horm$t.imp <- ifelse(is.na(plasma_horm$t.imp), plasma_horm$t,
+                                  plasma_horm$t.imp)
+      
+    ## d) Fill in NA in c.imp with actual c values 
+      plasma_horm$c.imp <- ifelse(is.na(plasma_horm$c.imp), plasma_horm$c,
+                                  plasma_horm$c.imp)
+      
       
       
 ###############################################################################
@@ -266,21 +374,21 @@
         select(-c(dart.date.y)) %>%
         rename('dart.date' = 'dart.date.x')
 
-    ## d) Get the clan status for each hyena on their poop date
-      clan_status <- hyenadata::get_clan_status(
-        plasma_horm_neosp_toxo_data$hy.id,
-        plasma_horm_neosp_toxo_data$dart.date)
-
-    ## e) Rename clan as poop.clan
-      clan_status <- clan_status %>%
-        rename('dart.clan' = 'clan') %>%
-        rename('dart.status' = 'status')
-
-    ## f) Left join clan_status to plasma_horm_neosp_toxo_data
-      plasma_horm_neosp_toxo_data <- plasma_horm_neosp_toxo_data %>%
-        left_join(select(clan_status, c(ids, dates, dart.clan, dart.status)),
-                  by = c('hy.id' = 'ids',
-                         'dart.date' = 'dates'))
+    # ## d) Get the clan status for each hyena on their poop date
+    #   clan_status <- hyenadata::get_clan_status(
+    #     plasma_horm_neosp_toxo_data$hy.id,
+    #     plasma_horm_neosp_toxo_data$dart.date)
+    # 
+    # ## e) Rename clan as poop.clan
+    #   clan_status <- clan_status %>%
+    #     rename('dart.clan' = 'clan') %>%
+    #     rename('dart.status' = 'status')
+    # 
+    # ## f) Left join clan_status to plasma_horm_neosp_toxo_data
+    #   plasma_horm_neosp_toxo_data <- plasma_horm_neosp_toxo_data %>%
+    #     left_join(select(clan_status, c(ids, dates, dart.clan, dart.status)),
+    #               by = c('hy.id' = 'ids',
+    #                      'dart.date' = 'dates'))
       
     ## g) Left join darting info to plasma_horm_neosp_toxo_data
       plasma_horm_neosp_toxo_data <- plasma_horm_neosp_toxo_data %>%
@@ -359,28 +467,28 @@
       plasma_horm_neosp_toxo_data <- plasma_horm_neosp_toxo_data %>%
         rename('hum.pop.dob' = 'hum.pop.den')
 
-    ## i) Create a 2-level ordinal factor indicating human pastoralist presence
-      # /disturbance based Green et. al 2018 when darting sample was collected
-      plasma_horm_neosp_toxo_data <- plasma_horm_neosp_toxo_data %>%
-        mutate(hum.pop.dart = case_when(plasma_horm_neosp_toxo_data$dart.clan
-                                        %in% c('talek', 'talek.e', 'kcm',
-                                               'fig tree') &
-                                  plasma_horm_neosp_toxo_data$dart.yr >= 2000
-                                        ~ c('hi'),
-                                  plasma_horm_neosp_toxo_data$dart.clan
-                                        %in% c('talek', 'talek.e', 'kcm',
-                                               'fig tree') &
-                                  plasma_horm_neosp_toxo_data$dart.yr < 2000
-                                        ~ c('low'),
-                                  plasma_horm_neosp_toxo_data$dart.clan
-                                        %in% c('serena.n', 'serena.s',
-                                               'happy.zebra')
-                                        ~ c('low')))
-
-    ## j) Re-code hum.dist as nominal factor and set level (order)
-      plasma_horm_neosp_toxo_data <- transform(plasma_horm_neosp_toxo_data,
-                                            hum.pop.dart = factor(hum.pop.dart,
-                                                      levels = c('hi','low')))
+    # ## i) Create a 2-level ordinal factor indicating human pastoralist presence
+    #   # /disturbance based Green et. al 2018 when darting sample was collected
+    #   plasma_horm_neosp_toxo_data <- plasma_horm_neosp_toxo_data %>%
+    #     mutate(hum.pop.dart = case_when(plasma_horm_neosp_toxo_data$dart.clan
+    #                                     %in% c('talek', 'talek.e', 'kcm',
+    #                                            'fig tree') &
+    #                               plasma_horm_neosp_toxo_data$dart.yr >= 2000
+    #                                     ~ c('hi'),
+    #                               plasma_horm_neosp_toxo_data$dart.clan
+    #                                     %in% c('talek', 'talek.e', 'kcm',
+    #                                            'fig tree') &
+    #                               plasma_horm_neosp_toxo_data$dart.yr < 2000
+    #                                     ~ c('low'),
+    #                               plasma_horm_neosp_toxo_data$dart.clan
+    #                                     %in% c('serena.n', 'serena.s',
+    #                                            'happy.zebra')
+    #                                     ~ c('low')))
+    # 
+    # ## j) Re-code hum.dist as nominal factor and set level (order)
+    #   plasma_horm_neosp_toxo_data <- transform(plasma_horm_neosp_toxo_data,
+    #                                         hum.pop.dart = factor(hum.pop.dart,
+    #                                                   levels = c('hi','low')))
       
     ## k) Re-code *nominal* factor (with ordered levels)
       # Set levels (odering) of state variable and sets the reference level
@@ -430,25 +538,32 @@
                                                   levels = c('am', 'pm'))) 
     
     
-  ### 4.4 Tidy plasma_horm_neosp_toxo_data by removing extra variables
+  ### 4.4 Tidy plasma_horm_neosp_toxo_data
     ## a) Make list of variables to keep
       var_list <- c('hy.id', 'dart.date', 'tucb', 'a4ucb', 't', 'p', 'c', 'e',
-                    'a' , 'lh', 'stressca', 'testes', 'plate', 'ifa.neospora', 
+                    'a', 'lh', 'stressca', 'testes', 'plate', 'ifa.neospora', 
                     'diagnosis.neo', 'neo.status','toxo.status', 'spratio', 
                     'diagnosis.toxo', 'hum.pop.dob', 'kay.code',
                     'sample.origin', 'notes.appearance', 'dart.year', 
                     'dob.date', 'dob.event.data', 'sex', 'status', 'mom', 
                     'dad', 'dob.yr', 'age.cat.dart', 'hum.dist.dob', 
-                    'rank.dart', 'stan.rank.dart', 'dart.clan', 'dart.status', 
+                    'rank.dart', 'stan.rank.dart', #'dart.clan', 'dart.status', 
                     'found.dead', 'darting.time', 'time.down', 
                     'blood.sampling.time', 'gnrh.challenge', 'dart.age.days',
                     'dart.mon', 'dart.yr', 'migratn.seas.dart', 'dart.state', 
-                    'hum.pop.dart', 'dart.time.diff','dart.am.pm')
+                    #'hum.pop.dart', 
+                    'dart.time.diff','dart.am.pm',
+                    't.imp', 'c.imp')
       
-    ## b) Select variables according to var_list
+    ## b) Select variables according to var_list.
       plasma_horm_neosp_toxo_data <- plasma_horm_neosp_toxo_data %>%
         select(all_of(var_list))
-   
+      
+    ## c) Remove two hyenas, baj and gil which have no toxo.status
+      plasma_horm_neosp_toxo_data <- plasma_horm_neosp_toxo_data %>%
+        filter(!is.na(toxo.status))
+      
+
       
 ###############################################################################
 ##############               5. Export data files                ##############

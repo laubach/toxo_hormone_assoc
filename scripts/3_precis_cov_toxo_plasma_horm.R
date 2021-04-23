@@ -7,7 +7,7 @@
 #############                                                     #############
 #############                  By: Zach Laubach                   #############
 #############                 created: 6 Oct 2020                 #############
-#############              last updated: 15 Dec 2020              #############
+#############             last updated: 22 April 2020             #############
 ###############################################################################
 
 
@@ -202,61 +202,76 @@
                                        'status')
       summary(T.status.mmean.m.adult)
       
-    ## e) Unadjusted model: Male adults
+    ## e) Unadjusted model: Female 
       # testosterone by time of day
-      #*** NOTE: no female model becaus all samples from am
-      T.am.pm.mod.m.adult <- lm(t.ln ~ dart.am.pm, 
+      T.am.pm.mod.f <- lm(t.ln ~ dart.am.pm, 
                                  data = subset(plasma_horm_neosp_toxo_data,
-                                          sex == 'm' & age.cat.dart == 'adult'
+                                          sex == 'f'  #& age.cat.dart == 'adult'
                                                & !is.na(x = t.ln)))
       
-      summary(T.am.pm.mod.m.adult) # print model summary (ln scale)
-      confint(T.am.pm.mod.m.adult) # 95% CIs (ln scale)
-      #plot(T.am.pm.mod.m.adult) # view fitted vs residuals
-      Anova(T.am.pm.mod.m.adult, type = 'II') # type II SS from Car package
+      summary(T.am.pm.mod.f) # print model summary (ln scale)
+      confint(T.am.pm.mod.f) # 95% CIs (ln scale)
+      #plot(T.am.pm.mod.f) # view fitted vs residuals
+      Anova(T.am.pm.mod.f, type = 'II') # type II SS from Car package
       
       # Use emmeans to estimate marginal means
-      T.am.pm.mmean.m.adult <- emmeans(T.am.pm.mod.m.adult, 
+      T.am.pm.mmean.f <- emmeans(T.am.pm.mod.f, 
                                         'dart.am.pm')
-      summary(T.am.pm.mmean.m.adult)
+      summary(T.am.pm.mmean.f)
       
-    ## f) Unadjusted model: Female adults
-      # testosterone by migration season
-      #*** NOTE: no female model becaus all samples from am
-      T.migrtn.mod.f.adult <- lm(t.ln ~ migratn.seas.dart, 
+    ## f) Unadjusted model: Male 
+      # testosterone by time of day
+      T.am.pm.mod.m <- lm(t.ln ~ dart.am.pm, 
                                 data = subset(plasma_horm_neosp_toxo_data,
-                                          sex == 'f' & age.cat.dart == 'adult'
+                                              sex == 'm' #& age.cat.dart == 'adult'
+                                                & !is.na(x = t.ln)))
+      
+      summary(T.am.pm.mod.m) # print model summary (ln scale)
+      confint(T.am.pm.mod.m) # 95% CIs (ln scale)
+      #plot(T.am.pm.mod.m) # view fitted vs residuals
+      Anova(T.am.pm.mod.m, type = 'II') # type II SS from Car package
+      
+      # Use emmeans to estimate marginal means
+      T.am.pm.mmean.m <- emmeans(T.am.pm.mod.m, 
+                                       'dart.am.pm')
+      summary(T.am.pm.mmean.m)
+      
+    ## f) Unadjusted model: Female 
+      # testosterone by migration season
+      T.migrtn.mod.f <- lm(t.ln ~ migratn.seas.dart, 
+                                data = subset(plasma_horm_neosp_toxo_data,
+                                          sex == 'f' #& age.cat.dart == 'adult'
                                               & !is.na(x = t.ln)))
       
-      summary(T.migrtn.mod.f.adult) # print model summary (ln scale)
-      confint(T.migrtn.mod.f.adult) # 95% CIs (ln scale)
-      #plot(T.migrtn.mod.f.adult) # view fitted vs residuals
-      Anova(T.migrtn.mod.f.adult, type = 'II') # type II SS from Car package
+      summary(T.migrtn.mod.f) # print model summary (ln scale)
+      confint(T.migrtn.mod.f) # 95% CIs (ln scale)
+      #plot(T.migrtn.mod.f) # view fitted vs residuals
+      Anova(T.migrtn.mod.f, type = 'II') # type II SS from Car package
       
       # Use emmeans to estimate marginal means
-      T.migrtn.mmean.f.adult <- emmeans(T.migrtn.mod.f.adult, 
+      T.migrtn.mmean.f <- emmeans(T.migrtn.mod.f, 
                                        'migratn.seas.dart')
-      summary(T.migrtn.mmean.f.adult)
+      summary(T.migrtn.mmean.f)
       
-    ## g) Unadjusted model: Male adults
+    ## g) Unadjusted model: Male
       # testosterone by migration season
-      #*** NOTE: no female model becaus all samples from am
-      T.migrtn.mod.m.adult <- lm(t.ln ~ migratn.seas.dart, 
+      T.migrtn.mod.m <- lm(t.ln ~ migratn.seas.dart, 
                                  data = subset(plasma_horm_neosp_toxo_data,
-                                        sex == 'm' & age.cat.dart == 'adult'
+                                        sex == 'm' #& age.cat.dart == 'adult'
                                                & !is.na(x = t.ln)))
       
-      summary(T.migrtn.mod.m.adult) # print model summary (ln scale)
-      confint(T.migrtn.mod.m.adult) # 95% CIs (ln scale)
-      #plot(T.migrtn.mod.m.adult) # view fitted vs residuals
-      Anova(T.migrtn.mod.m.adult, type = 'II') # type II SS from Car package
+      summary(T.migrtn.mod.m) # print model summary (ln scale)
+      confint(T.migrtn.mod.m) # 95% CIs (ln scale)
+      #plot(T.migrtn.mod.m) # view fitted vs residuals
+      Anova(T.migrtn.mod.m, type = 'II') # type II SS from Car package
       
       # Use emmeans to estimate marginal means
-      T.migrtn.mmean.m.adult <- emmeans(T.migrtn.mod.m.adult, 
+      T.migrtn.mmean.m <- emmeans(T.migrtn.mod.m, 
                                         'migratn.seas.dart')
-      summary(T.migrtn.mmean.m.adult)
+      summary(T.migrtn.mmean.m)
       
-    
+      
+          
   ### 3.2 Associations between precision covariates and corticosterone levels
     ## a) Unadjusted model: Females
       # corticosterone by age 
@@ -298,7 +313,7 @@
       # corticosterone by reproductive state 
       cort.state.mod.f <- lm(c.ln ~ dart.state, 
                                 data = subset(plasma_horm_neosp_toxo_data,
-                                        sex == 'f' &
+                                        sex == 'f' & age.cat.dart == 'adult' &
                                         dart.time.diff <= 13 & stressca <=2 &
                                         !is.na(x = c.ln)))
       
@@ -316,7 +331,7 @@
       # corticosterone by residency status
       cort.status.mod.m <- lm(c.ln ~ status, 
                                  data = subset(plasma_horm_neosp_toxo_data,
-                                        sex == 'm' & 
+                                        sex == 'm' & age.cat.dart == 'adult' &
                                         dart.time.diff <= 13 & stressca <=2 &
                                         !is.na(x = c.ln)))
       

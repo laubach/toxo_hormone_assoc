@@ -29,7 +29,7 @@
     ## a) clear global environment
       rm(list = ls())
 
-    ## b) prevent R from automatically reading charater strins as factors
+    ## b) prevent R from automatically reading charater strings as factors
       options(stringsAsFactors = FALSE)
       
     # ## c) Setup packrat for reproducibility

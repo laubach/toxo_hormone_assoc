@@ -32,8 +32,8 @@ plate5,NA,,,negative,0.05,negative,low,5799,76,hob,6/14/92,blood,NA,1992,7/20/91
 plate4,800,high,positive,negative,0.45,doubtful,low,4116,79,zip,4/11/92,blood,"sample reads ""5/11/92"" but excel has ""4/11/92"" as the date",1992,NA,talek,4/21/94,dls,fate unknown,m,i,NA,NA,NA,NA,0,NA,NA,adult,NA,NA,NA
 plate5,100,low,negative,negative,0.16,negative,low,6136,82,ger,7/12/93,blood,frozen on side,1993,11/7/92,talek,6/2/05,dead,humans,f,r,coch,en,1,1,0,8.1,1992,cub,low,5,0.6
 plate5,100,low,negative,positive,0.7,positive,low,6141,83,bern,7/19/93,blood,NA,1993,10/1/92,talek,9/4/00,dls,lions,f,r,lg,hol,0,1,1,9.6,1992,cub,low,20,-0.9
-NA,100,low,negative,positive,NA,NA,low,NA,84,baj,7/14/93,blood,,1993,1/1/93,talek,,,,m,r,bb,fn,1,2,,6.37,1993,cub,low,NA,NA
-NA,800,high,positive,positive,NA,NA,low,NA,87,gil,7/18/93,blood,,1993,8/1/92,talek,,,,f,r,bsh,NA,0,1,,11.5,1992,cub,low,NA,NA
+NA,100,low,negative,,,,low,NA,84,baj,7/14/93,blood,,1993,1/1/93,talek,,,,m,r,bb,fn,1,2,,6.37,1993,cub,low,NA,NA
+NA,800,high,positive,,,,low,NA,87,gil,7/18/93,blood,,1993,8/1/92,talek,,,,f,r,bsh,NA,0,1,,11.5,1992,cub,low,NA,NA
 plate5,400,low,negative,negative,0.13,negative,low,4712,89,gol,5/26/92,blood,no hyena id on vial,1992,7/20/91,talek,3/14/01,dead,humans (speared),f,r,es,fn,1,1,0,10.2,1991,cub,low,16,-0.666666667
 plate4,400,low,negative,negative,0.47,doubtful,low,4860,90,gan,6/7/92,blood,NA,1992,10/30/88,talek,8/2/94,dls,inferred dead,f,r,es,NA,1,2,0,43.2,1988,adult,low,18,-0.888888889
 plate5,400,low,negative,positive,0.82,positive,low,12138,96,jab,12/8/92,blood,cream; normal,1992,2/2/92,talek,4/26/98,dls,inferred dead,f,r,bb,NA,1,NA,1,10.2,1992,cub,low,2,0.888888889
@@ -152,7 +152,7 @@ plate3,800,high,positive,positive,0.8,positive,low,6917,1013,bart,8/8/12,blood,N
 plate2,100,low,negative,positive,0.68,positive,low,4035,1015,peep,6/30/12,blood,NA,2012,NA,serena.n,1/24/13,dls,,f,r,NA,NA,NA,NA,1,NA,NA,adult,low,3,0.8
 plate2,1600,high,positive,positive,0.52,positive,low,4042,1020,tnsl,6/19/12,blood,p frozen on side,2012,NA,serena.n,6/12/14,dls,fate unknown,f,r,elf?,NA,NA,NA,1,NA,NA,adult,low,16,-0.5
 plate3,1600,high,positive,positive,0.76,positive,low,3777,1021,mtn,7/21/12,blood,NA,2012,NA,serena.s,12/22/16,dls,,f,r,NA,NA,NA,NA,1,NA,NA,adult,low,15,-0.75
-plate2,800,high,positive,negative,0.39,doubtful,low,12107,1022,wafl,7/2/12,blood,"cream; normal, tube says ""hep. plasma 1 ml""",2012,8/1/07,serena.n,NA,,,f,r,NA,NA,NA,NA,0,59,2007,adult,low,1,1
+plate2,800,high,positive,negative,0.39,negative,low,12107,1022,wafl,7/2/12,blood,"cream; normal, tube says ""hep. plasma 1 ml""",2012,8/1/07,serena.n,NA,,,f,r,NA,NA,NA,NA,0,59,2007,adult,low,1,1
 plate2,400,low,negative,positive,0.58,positive,low,12112,1036,ema,7/7/12,blood,cream; normal,2012,NA,serena.n,3/13/16,dls,fate unknown,f,r,NA,NA,NA,NA,1,NA,NA,adult,low,17,-0.6
 plate2,800,high,positive,positive,0.51,positive,low,3667,1048,digs,6/21/13,blood,white,2013,NA,serena.n,3/31/15,dead,,f,r,NA,NA,NA,NA,1,NA,NA,adult,low,4,0.7
 plate3,1600,high,positive,negative,0.46,doubtful,low,6933,1071,taj,9/6/12,blood,NA,2012,NA,serena.s,1/8/18,dls,fate unknown,f,r,NA,NA,NA,NA,0,NA,NA,adult,low,8,0.125

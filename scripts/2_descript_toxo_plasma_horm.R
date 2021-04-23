@@ -6,7 +6,7 @@
 #############                                                     #############
 #############                  By: Zach Laubach                   #############
 #############                 created: 5 Oct 2020                 #############
-#############              last updated: 15 Dec 2020              #############
+#############             last updated: 22 April 2021             #############
 ###############################################################################
 
 
@@ -117,7 +117,31 @@
       dev.off()
       
       
-    ## c) Histogram plasma testosterone
+    ## c) Sample size (includes sample below assay detection limit)
+      sex_age_plasma_T_tot_samp_size <- plasma_horm_neosp_toxo_data %>%
+        group_by(sex, age.cat.dart) %>%
+        summarise (n.T = sum(!is.na(t))) %>%
+        ungroup()
+      
+    ## d) Descriptive stats plasma testosterone (T) data within sex and age
+      sex_age_sum_plasma_T_stat <- plasma_horm_neosp_toxo_data %>%
+        filter(t > 0) %>%
+        group_by(sex, age.cat.dart) %>%
+        summarise (n.T = sum(!is.na(t)),
+                   avg.T = round (mean(t, 
+                                       na.rm = T),2),
+                   stdev.T = round (sd(t, 
+                                       na.rm = T), 2),
+                   med.T = round(median(t,
+                                        na.rm = T), 2),
+                   min.T = round(min(t,
+                                     na.rm = T), 2),
+                   max.T = round(max(t,
+                                     na.rm = T), 2)) %>%
+        ungroup()
+      
+      
+    ## e) Histogram plasma testosterone
       hist_plot_plasma_T <- ggplot(data=plasma_horm_neosp_toxo_data , 
                                 aes(x=t)) + 
         geom_histogram(aes(y = ..count..),
@@ -135,7 +159,7 @@
       
 #********************** Data Inclusion/Exclusion Criteria ********************** 
       
-    ## d) Set Zero's to 1/2 the minimum detected value
+    ## f) Set Zero's to 1/2 the minimum detected value
       plasma_horm_neosp_toxo_data <- plasma_horm_neosp_toxo_data  %>%
         mutate(t.adj = ifelse(t == 0, 
            (0.5*min(plasma_horm_neosp_toxo_data[,'t']
@@ -145,11 +169,14 @@
 #********************** Data Inclusion/Exclusion Criteria **********************      
 
       
-    ## e) Natural log transformation of T data 
+    ## g) Natural log transformation of T data and T.imp
       plasma_horm_neosp_toxo_data $t.ln <- 
         log(plasma_horm_neosp_toxo_data$t.adj)
       
-    ## f) Histogram of Nat. Log. of plasma testosterone
+      plasma_horm_neosp_toxo_data $t.imp.ln <- 
+        log(plasma_horm_neosp_toxo_data$t.imp)
+      
+    ## h) Histogram of Nat. Log. of plasma testosterone
       hist_plot_ln_plasma_T <- ggplot(data=plasma_horm_neosp_toxo_data , 
                             aes(x=t.ln)) + 
         geom_histogram(aes(y = ..count..),
@@ -164,18 +191,90 @@
       
       print(hist_plot_ln_plasma_T)
 
-    ## g) Save histogram plot
+    ## i) Save histogram plot
       # use ggsave to save the plot
-      ggsave('histogram_ln_T.pdf', plot = hist_plot_ln_T, 
+      ggsave('histogram_ln_T.pdf', plot = hist_plot_ln_plasma_T, 
              device = NULL, 
              path = here('output/'), scale = 1, width = 5, 
              height = 3, 
              units = c('in'), dpi = 300, limitsize = TRUE)  
+
+      
+#************************** Data Manipulation Criteria ************************* 
+      
+    ## j) Descriptive stats plasma testosterone (T) to determine cutoffs
+      sex_age_plasma_T_cutoffs <- plasma_horm_neosp_toxo_data %>%
+        group_by(sex, age.cat.dart) %>%
+                  summarise (n.T = sum(!is.na(t)),
+                  avg.T = round (mean(t, 
+                                       na.rm = T),2),
+                  stdev.T = round (sd(t, 
+                                       na.rm = T), 2),
+                  med.T = round(median(t,
+                                        na.rm = T), 2),
+                  min.T = round(min(t,
+                                     na.rm = T), 2),
+                  max.T = round(max(t,
+                                     na.rm = T), 2)) %>%
+        ungroup()
+      
+    ## k) Within sex and age strata, categorize t-levels as low vs hi
+      #*** BASED on within age/sex median values***
+      plasma_horm_neosp_toxo_data <- plasma_horm_neosp_toxo_data  %>%     
+        mutate(t.bin = case_when(plasma_horm_neosp_toxo_data$sex == 'f' &
+                                   plasma_horm_neosp_toxo_data$age.cat.dart == 
+                                   'adult' & 
+                                   plasma_horm_neosp_toxo_data$t <= 0.03
+                                 ~ 0,
+                                 plasma_horm_neosp_toxo_data$sex == 'f' &
+                                   plasma_horm_neosp_toxo_data$age.cat.dart == 
+                                   'adult' & 
+                                   plasma_horm_neosp_toxo_data$t > 0.03
+                                 ~ 1,
+                                 plasma_horm_neosp_toxo_data$sex == 'f' &
+                                   plasma_horm_neosp_toxo_data$age.cat.dart != 
+                                   'adult' & 
+                                   plasma_horm_neosp_toxo_data$t <= 0
+                                 ~ 0,
+                                 plasma_horm_neosp_toxo_data$sex == 'f' &
+                                   plasma_horm_neosp_toxo_data$age.cat.dart != 
+                                   'adult' & 
+                                   plasma_horm_neosp_toxo_data$t > 0
+                                 ~ 1,
+                                 plasma_horm_neosp_toxo_data$sex == 'm' &
+                                   plasma_horm_neosp_toxo_data$age.cat.dart == 
+                                   'adult' & 
+                                   plasma_horm_neosp_toxo_data$t <= 0.24
+                                 ~ 0,
+                                 plasma_horm_neosp_toxo_data$sex == 'm' &
+                                   plasma_horm_neosp_toxo_data$age.cat.dart == 
+                                   'adult' & 
+                                   plasma_horm_neosp_toxo_data$t > 0.24
+                                 ~ 1,
+                                 plasma_horm_neosp_toxo_data$sex == 'm' &
+                                   plasma_horm_neosp_toxo_data$age.cat.dart != 
+                                   'adult' & 
+                                   plasma_horm_neosp_toxo_data$t <= 0
+                                 ~ 0,
+                                 plasma_horm_neosp_toxo_data$sex == 'm' &
+                                   plasma_horm_neosp_toxo_data$age.cat.dart != 
+                                   'adult' & 
+                                   plasma_horm_neosp_toxo_data$t > 0
+                                 ~ 1)) 
+      
+    # ## l) Re-code t.bin as nominal factor and set level (order)
+    #   plasma_horm_neosp_toxo_data <- transform(plasma_horm_neosp_toxo_data,
+    #                                            t.bin = factor(t.bin,
+    #                                            levels = c('hi','low')))
+      
+#************************** Data Manipulation Criteria *************************       
       
     
   ### 3.2 Univariate stats plasma Cortisol (cort)
     ## a) Descriptive stats plasma Cortisol (cort) data
       univar_plasma_cort_stat <- plasma_horm_neosp_toxo_data  %>%
+        filter(stressca <=2 & dart.time.diff <= 13 & 
+                 !is.na(x = toxo.status)) %>%
         summarise (n.cort = sum(!is.na(c )),
                    avg.cort = round (mean(c , 
                                        na.rm = T),2),
@@ -193,9 +292,39 @@
       grid.table(univar_plasma_cort_stat)
       dev.off()
       
-    ## c) Histogram plasma Cortisol
-      hist_plot_plasma_c <- ggplot(data=plasma_horm_neosp_toxo_data , 
-                            aes(x=c )) + 
+    ## c) Sample size (includes sample below assay detection limit)
+      sex_age_plasma_cort_tot_samp_size <- plasma_horm_neosp_toxo_data %>%
+        filter(stressca <=2 & dart.time.diff <= 13 & 
+                 !is.na(x = toxo.status)) %>%
+        group_by(sex, age.cat.dart) %>%
+        summarise (n.C = sum(!is.na(c))) %>%
+        ungroup()
+      
+    ## d) Descriptive stats plasma corticosterone (C) data within sex and age
+      sex_age_sum_plasma_C_stat <- plasma_horm_neosp_toxo_data %>%
+        filter(c > 0 & stressca <=2 & dart.time.diff <= 13 & 
+                 !is.na(x = toxo.status)) %>%
+        group_by(sex, age.cat.dart) %>%
+        summarise (n.C = sum(!is.na(c)),
+                   avg.C = round (mean(c, 
+                                       na.rm = T),2),
+                   stdev.C = round (sd(c, 
+                                       na.rm = T), 2),
+                   med.C = round(median(c,
+                                        na.rm = T), 2),
+                   min.C = round(min(c,
+                                     na.rm = T), 2),
+                   max.C = round(max(c,
+                                     na.rm = T), 2)) %>%
+        ungroup()
+      
+    ## e) Histogram plasma Cortisol
+      hist_plot_plasma_c <- ggplot(data=subset(plasma_horm_neosp_toxo_data,
+                                                 dart.time.diff <= 13 & 
+                                                 stressca <=2 &
+                                                 !is.na(x = spratio) &
+                                                 !is.na(x = c.ln)),
+                                   aes(x=c )) + 
         geom_histogram(aes(y = ..count..),
                        breaks=seq(0, 20, by = 1), 
                        col='black',
@@ -210,7 +339,7 @@
       
 #********************** Data Inclusion/Exclusion Criteria ********************** 
       
-    ## d) Set Zero's to 1/2 the minimum detected value
+    ## f) Set Zero's to 1/2 the minimum detected value
       plasma_horm_neosp_toxo_data <- plasma_horm_neosp_toxo_data  %>%
         mutate(c.adj = ifelse(c == 0, 
                               (0.5*min(plasma_horm_neosp_toxo_data[,'c']
@@ -219,12 +348,19 @@
       
 #********************** Data Inclusion/Exclusion Criteria **********************      
       
-    ## e) Natural log transformation of cort data 
+    ## g) Natural log transformation of cort data 
       plasma_horm_neosp_toxo_data $c.ln <- 
         log(plasma_horm_neosp_toxo_data$c.adj )
       
-    ## f) Histogram of Nat. Log. of plasma Cortisol
-      hist_plot_ln_plasma_c <- ggplot(data=plasma_horm_neosp_toxo_data , 
+      plasma_horm_neosp_toxo_data $c.imp.ln <- 
+        log(plasma_horm_neosp_toxo_data$c.imp )
+      
+    ## h) Histogram of Nat. Log. of plasma Cortisol
+      hist_plot_ln_plasma_c <- ggplot(data=subset(plasma_horm_neosp_toxo_data,
+                                                  dart.time.diff <= 13 & 
+                                                    stressca <=2 &
+                                                    !is.na(x = spratio) &
+                                                    !is.na(x = c.ln)), 
                                aes(x=c.ln)) + 
         geom_histogram(aes(y = ..count..),
                        breaks=seq(0, 4, by = 0.125), 
@@ -238,7 +374,7 @@
       
       print(hist_plot_ln_plasma_c)
       
-    ## g) Save histogram plot
+    ## i) Save histogram plot
       # use ggsave to save the plot
       ggsave('histogram_ln_cort.pdf', plot = hist_plot_ln_plasma_c, 
              device = NULL, 
@@ -246,6 +382,46 @@
              height = 3, 
              units = c('in'), dpi = 300, limitsize = TRUE) 
       
+#************************** Data Manipulation Criteria ************************* 
+    ## j) Descriptive stats plasma corticosterone (C) to determine cutoffs
+      sex_age_plasma_C_cutoffs <- plasma_horm_neosp_toxo_data %>%
+        filter(c > 0 & stressca <=2 & dart.time.diff <= 13 & 
+                 !is.na(x = toxo.status)) %>%
+        group_by(sex) %>%
+        summarise (n.C = sum(!is.na(c)),
+                   avg.C = round (mean(c, 
+                                       na.rm = T),2),
+                   stdev.C = round (sd(c, 
+                                       na.rm = T), 2),
+                   med.C = round(median(c,
+                                        na.rm = T), 2),
+                   min.C = round(min(c,
+                                     na.rm = T), 2),
+                   max.C = round(max(c,
+                                     na.rm = T), 2)) %>%
+        ungroup()
+      
+    ## k) Categorize cort-levels as low vs hi
+      #*** BASED on within sex median values***
+      plasma_horm_neosp_toxo_data <- plasma_horm_neosp_toxo_data  %>%
+        mutate(c.bin = case_when(plasma_horm_neosp_toxo_data$sex == 'f' &
+                                   plasma_horm_neosp_toxo_data$c <= 1.92
+                                 ~ 0,
+                                 plasma_horm_neosp_toxo_data$sex == 'f' &
+                                   plasma_horm_neosp_toxo_data$c > 1.92
+                                 ~ 1,
+                                 plasma_horm_neosp_toxo_data$sex == 'm' &
+                                   plasma_horm_neosp_toxo_data$c <= 0.90
+                                 ~ 0,
+                                 plasma_horm_neosp_toxo_data$sex == 'm' &
+                                   plasma_horm_neosp_toxo_data$c > 0.90
+                                 ~ 1))
+    # ## l) Re-code c.bin as nominal factor and set level (order)
+    #   plasma_horm_neosp_toxo_data <- transform(plasma_horm_neosp_toxo_data,
+    #                                            c.bin = factor(c.bin,
+    #                                                   levels = c('hi','low')))
+      
+#************************** Data Manipulation Criteria *************************
       
   ### 3.3 Univariate stats T. gondii 
     ## a) Descriptive stats T. gondii infection prevalence
@@ -260,17 +436,17 @@
       dev.off()
       
       
-  ### 3.4 Univariate stats N. caninum 
-    ## a) Descriptive stats N. caninum  infection prevalence
-      univar_neosp_plasma_stat <- plasma_horm_neosp_toxo_data  %>%
-        group_by(neo.status) %>%
-        summarise(n.status = sum(!is.na(neo.status))) %>%
-        mutate(freq = n.status / sum(n.status, na.rm = T))
-      
-    ## b) save the data frame of summary stats out as a pdf into output file
-      pdf(here('output/univar_neosp_plasma_stat.pdf'), height = 4, width = 8)
-      grid.table(univar_neosp_plasma_stat)
-      dev.off()
+  # ### 3.4 Univariate stats N. caninum 
+  #   ## a) Descriptive stats N. caninum  infection prevalence
+  #     univar_neosp_plasma_stat <- plasma_horm_neosp_toxo_data  %>%
+  #       group_by(neo.status) %>%
+  #       summarise(n.status = sum(!is.na(neo.status))) %>%
+  #       mutate(freq = n.status / sum(n.status, na.rm = T))
+  #     
+  #   ## b) save the data frame of summary stats out as a pdf into output file
+  #     pdf(here('output/univar_neosp_plasma_stat.pdf'), height = 4, width = 8)
+  #     grid.table(univar_neosp_plasma_stat)
+  #     dev.off()
       
       
 
@@ -382,7 +558,7 @@
       
     ## c) Testosterone by sex by age where t > 0
       plasma_T_non_zero_sex_age_sum <- plasma_horm_neosp_toxo_data %>%
-        filter(t > 0) %>%
+        filter(t > 0 & !is.na(x = toxo.status)) %>%
         #filter(!is.na(t) & sex == 'm' & age.cat.dart == 'subadult') %>%
         group_by (sex, age.cat.dart) %>%
         summarise (n.id = sum(!is.na(t)),
@@ -399,7 +575,7 @@
       grid.table(plasma_T_non_zero_sex_age_sum)
       dev.off()
       
-    ## e) Testosterone by sex by age
+    ## e) Nat. log testosterone by sex by age
       plasma_T_sex_age_sum <- plasma_horm_neosp_toxo_data %>%
         filter(!is.na(t.ln)) %>%
        #filter(!is.na(t.ln) & sex == 'm' & age.cat.dart == 'subadult') %>%
@@ -418,7 +594,7 @@
       grid.table(plasma_T_sex_age_sum)
       dev.off()
       
-    ## g) Testosterone by reproductive state (adult females only)
+    ## g) Nat. log Testosterone by reproductive state (adult females only)
       plasma_T_state_sum_adult_f <- plasma_horm_neosp_toxo_data %>%
         filter(!is.na(t.ln) & sex == 'f' & 
                  age.cat.dart == 'adult') %>%
@@ -437,7 +613,7 @@
       grid.table(plasma_T_state_sum_adult_f)
       dev.off()
       
-    ## i) Testosterone by residency (adult males only)
+    ## i) Nat. log Testosterone by residency (adult males only)
       plasma_T_status_sum_adult_m <- plasma_horm_neosp_toxo_data %>%
         filter(!is.na(t.ln) & sex == 'm' & 
                  age.cat.dart == 'adult') %>%
@@ -456,10 +632,9 @@
       grid.table(plasma_T_status_sum_adult_m)
       dev.off()
       
-      
-    ## k) Testosterone by time of day (adult females and males only)
-      plasma_T_time_sum_adult_f_m <- plasma_horm_neosp_toxo_data %>%
-        filter(!is.na(t.ln) & age.cat.dart == 'adult') %>%
+    ## k) Nat. log Testosterone by time of day
+      plasma_T_time_sum <- plasma_horm_neosp_toxo_data %>%
+        filter(!is.na(t.ln)) %>%
         group_by (sex, dart.am.pm) %>%
         summarise (n.id = sum(!is.na(t.ln)),
                    avg.T = round(mean(t.ln, na.rm = T),2),
@@ -470,14 +645,14 @@
         mutate(freq = n.id / sum(n.id))
       
     ## l) save the data frame of summary stats out as a pdf into output file
-      pdf(here('output/plasma_T_time_sum_adult_f_m.pdf'), 
+      pdf(here('output/plasma_T_time_sum.pdf'), 
           height = 4, width = 8)
-      grid.table(plasma_T_time_sum_adult_f_m)
+      grid.table(plasma_T_time_sum)
       dev.off()
       
-    ## m) Testosterone by migration season (adult females and males only)
-      plasma_T_migrtn_sum_adult_f_m <- plasma_horm_neosp_toxo_data %>%
-        filter(!is.na(t.ln) & age.cat.dart == 'adult') %>%
+    ## m) Nat. log Testosterone by migration season (adult females and males only)
+      plasma_T_migrtn_sum <- plasma_horm_neosp_toxo_data %>%
+        filter(!is.na(t.ln)) %>%
         group_by (sex, migratn.seas.dart) %>%
         summarise (n.id = sum(!is.na(t.ln)),
                    avg.T = round(mean(t.ln, na.rm = T),2),
@@ -488,9 +663,9 @@
         mutate(freq = n.id / sum(n.id))
       
     ## n) save the data frame of summary stats out as a pdf into output file
-      pdf(here('output/plasma_T_migrtn_sum_adult_f_m.pdf'), 
+      pdf(here('output/plasma_T_migrtn_sum.pdf'), 
           height = 4, width = 8)
-      grid.table(plasma_T_migrtn_sum_adult_f_m)
+      grid.table(plasma_T_migrtn_sum)
       dev.off()  
       
       
@@ -515,7 +690,8 @@
       
     ## c) Cortisol by sex by age where c > 0
       plasma_cort_non_zero_sex_age_sum <- plasma_horm_neosp_toxo_data %>%
-        filter(c > 0 & stressca <=2 & dart.time.diff <= 13) %>%
+        filter(c > 0 & stressca <=2 & dart.time.diff <= 13 & 
+                 !is.na(x = toxo.status)) %>%
         #filter(!is.na(c) & sex == 'm' & age.cat.dart == 'subadult') %>%
         group_by (sex, age.cat.dart) %>%
         summarise (n.id = sum(!is.na(c)),
@@ -534,7 +710,8 @@
       
     ## c) Cortisol by sex by age
       plasma_cort_sex_age_sum <- plasma_horm_neosp_toxo_data %>%
-        filter(!is.na(c.ln) & sex == 'f' & age.cat.dart == 'adult') %>%
+        filter(stressca <=2 & dart.time.diff <= 13 & 
+                 !is.na(x = toxo.status)) %>%
         group_by (sex, age.cat.dart) %>%
         summarise (n.id = sum(!is.na(c.ln)),
                    avg.cort = round(mean(c.ln, na.rm = T),2),
@@ -589,9 +766,9 @@
       dev.off()
       
       
-    ## i) Cortisol by time of day (adult females and males only)
-      plasma_cort_time_sum_adult_f_m <- plasma_horm_neosp_toxo_data %>%
-        filter(!is.na(c.ln) & age.cat.dart == 'adult'
+    ## i) Cortisol by time of day
+      plasma_cort_time_sum <- plasma_horm_neosp_toxo_data %>%
+        filter(!is.na(c.ln)
                & dart.time.diff <= 13 & stressca <=2) %>%
         group_by (sex, dart.am.pm) %>%
         summarise (n.id = sum(!is.na(c.ln)),
@@ -603,14 +780,14 @@
         mutate(freq = n.id / sum(n.id))
       
     ## j) save the data frame of summary stats out as a pdf into output file
-      pdf(here('output/plasma_cort_time_sum_adult_f_m.pdf'), 
+      pdf(here('output/plasma_cort_time_sum.pdf'), 
           height = 4, width = 8)
-      grid.table(plasma_cort_time_sum_adult_f_m)
+      grid.table(plasma_cort_time_sum)
       dev.off()
       
-    ## k) Testosterone by migration season (adult females and males only)
-      plasma_cort_migrtn_sum_adult_f_m <- plasma_horm_neosp_toxo_data %>%
-        filter(!is.na(c.ln) & age.cat.dart == 'adult'
+    ## k) Testosterone by migration season 
+      plasma_cort_migrtn_sum <- plasma_horm_neosp_toxo_data %>%
+        filter(!is.na(c.ln) 
                & dart.time.diff <= 13 & stressca <=2) %>%
         group_by (sex, migratn.seas.dart) %>%
         summarise (n.id = sum(!is.na(c.ln)),
@@ -622,9 +799,9 @@
         mutate(freq = n.id / sum(n.id))
       
     ## l) save the data frame of summary stats out as a pdf into output file
-      pdf(here('output/plasma_cort_migrtn_sum_adult_f_m.pdf'), 
+      pdf(here('output/plasma_cort_migrtn_sum.pdf'), 
           height = 4, width = 8)
-      grid.table(plasma_cort_migrtn_sum_adult_f_m)
+      grid.table(plasma_cort_migrtn_sum)
       dev.off()  
    
       
