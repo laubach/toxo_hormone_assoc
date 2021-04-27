@@ -247,6 +247,14 @@
       perc_miss_plot <- gg_miss_var(plasma_horm_imp, show_pct = TRUE)
       print(perc_miss_plot)
       
+    ## b) Save histogram plot
+      # use ggsave to save the plot
+      ggsave('perc_miss_plot.pdf', plot = perc_miss_plot, 
+             device = NULL, 
+             path = here('output/'), scale = 1, width = 5, 
+             height = 3, 
+             units = c('in'), dpi = 300, limitsize = TRUE)  
+      
       # Graham et al. 2007 recommend 20 imputation for 10-30% missing,
       # and 40 imputations for 50% missing
     
