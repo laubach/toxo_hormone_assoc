@@ -7,7 +7,7 @@
 #############                                                     #############
 #############                  By: Zach Laubach                   #############
 #############                 created: 6 Oct 2020                 #############
-#############             last updated: 22 April 2020             #############
+#############             last updated: 22 April 2021             #############
 ###############################################################################
 
 
@@ -345,9 +345,8 @@
                                         'status')
       summary(cort.status.mmean.m)
       
-    ## e) Unadjusted model: Feale 
+    ## e) Unadjusted model: Female 
       # corticosterone by time of day
-      #*** NOTE: no female model becaus all samples from am
       cort.am.pm.mod.f <- lm(c.ln ~ dart.am.pm, 
                              data = subset(plasma_horm_neosp_toxo_data,
                                            sex == 'f' &
